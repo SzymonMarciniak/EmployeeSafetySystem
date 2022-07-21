@@ -1,0 +1,58 @@
+MainWindow:
+
+<MainWindow@BoxLayout>:
+    orientation: "vertical"
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint: 1, .2
+
+        ToggleButton:
+            group: 'create_room'
+            text: "Create new room"
+            on_press: root.create_room_activate()
+
+        ToggleButton:
+            group: 'create_room'
+            text: "Create new door"
+            on_press: root.create_door_activate()
+           
+
+        ToggleButton:
+            group: 'create_room'
+            text: "C"
+
+        ToggleButton:
+            group: 'create_room'
+            text: "D"
+
+        ToggleButton:
+            group: 'create_room'
+            text: "E"
+    
+        
+    FloatLayout:
+
+    Label: 
+        text: "Other"
+        pos_hint: {'center_x':.45, 'center_y':.45 }
+
+        #on_touch_down: root.
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
