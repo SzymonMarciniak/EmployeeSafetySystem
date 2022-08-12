@@ -1,0 +1,118 @@
+#: import mtx kivy.metrics
+#: import icon kivy.garden.iconfonts.icon
+
+<MainScreen>:
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: rgba('#ececec')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    ScreenManager:
+        Screen:
+            name: 'startup_screen'
+            canvas.before:
+                Color:
+                    rgba: rgba('#08c48c30')
+                Ellipse:
+                    pos: self.size[0] - 200, - 200
+                    size: 400, 400
+                Ellipse:
+                    pos: -225, self.size[1] *.5 - 125
+                    size: 250, 250
+                Color:
+                    rgba: rgba('#0fafff')
+                Triangle:
+                    points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
+                Color:
+                    rgba: rgba('#0f87ff')
+                Triangle:
+                    points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .7 * self.size[1]]
+            BoxLayout:
+                orientation: 'vertical'
+                Widget:
+                    size_hint_y: .25
+                Label:
+                    text: "Zaloguj się do usługi"
+                    color: rgba('#0fafff')
+                    font_size: mtx.sp(24)
+                    size_hint_y: .1
+                BoxLayout:
+                    background_color: 0,1,0,1
+                    size_hint_y: .2
+                    orientation: 'horizontal'
+                    spacing: -1 * (.5 * self.size[0])
+                    Label:
+                        markup: True
+                        text: "%s" % icon('zmdi-key')
+                        color: rgba('#0fafff')
+                        font_size: mtx.sp(96)
+                    Label:
+                        markup: True
+                        text: "%s" % icon('zmdi-lock')
+                        color: rgba('#0fafff')
+                        font_size: mtx.sp(96)
+                BoxLayout:
+                    size_hint_y: .6
+                    padding: [.1 * self.size[0], 0]
+                    orientation: 'vertical'
+                    SimpleInput:
+                        id: loginBox
+                        hint_text: 'Login'
+                    Widget:
+                        size_hint_y: .1
+                    SimpleInput:
+                        id: passwordBox
+                        password: True
+                        hint_text: 'Hasło'
+                    Widget:
+                        size_hint_y: .3
+                    LoginButton:
+                        id: loginBtn
+                        text: "Zaloguj się"
+                        size_hint_y: .2
+                    RegisterButton:
+                        id: registerBtn
+                        text: "Nowy? Zarejestruj się"
+                        size_hint_y: .1
+                    Widget:
+                        size_hint_y: .1
+
+
+<LoginButton>:
+    background_color: [0,0,0,0]
+    color: rgba('#ececec')
+    on_press: root.on_pressed()
+    on_release: root.on_pressed()
+    canvas.before:
+        Color:
+            id: rectColor
+            rgba: rgba('#0f87ff')
+        RoundedRectangle:
+
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 20, 20]
+
+
+
+<RegisterButton@Button>:
+    background_normal: ''
+    background_color: [0,0,0,0]
+    color: [0,0,0,.6]
+
+<SimpleInput>:
+    size_hint_y: .1
+    font_size: mtx.sp(16)
+    multiline: False
+    background_normal: ''
+    background_active: ''
+    background_color: [1,1,1,0]
+    canvas.before:
+        Color:
+            rgba: rgba('#0f87ff')
+        Rectangle:
+            pos: self.pos
+            size: [self.size[0], 1]
+
