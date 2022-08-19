@@ -1,0 +1,128 @@
+<RegisterScreen@Screen>:
+    name: 'register_screen'
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: rgba('#ececec')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: rgba('#08c48c30')
+        Ellipse:
+            pos: self.size[0] - 200, - 200
+            size: 400, 400
+        Ellipse:
+            pos: -225, self.size[1] *.5 - 125
+            size: 250, 250
+        Color:
+            rgba: rgba('#0fafff')
+        Triangle:
+            points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
+        Color:
+            rgba: rgba('#0f87ff')
+        Triangle:
+            points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .73 * self.size[1]]
+    BoxLayout:
+        orientation: 'vertical'
+        Widget:
+            size_hint_y: .25
+        Label:
+            text: "EmployeeSafetySystem | Sign in"
+            color: rgba('#0fafff')
+            font_size: mtx.sp(24)
+            size_hint_y: .1
+        BoxLayout:
+            background_color: 0,1,0,1
+            size_hint_y: .2
+            orientation: 'horizontal'
+            spacing: -1 * (.5 * self.size[0])
+            Label:
+                markup: True
+                text: "%s" % icon('zmdi-key')
+                color: rgba('#0fafff')
+                font_size: mtx.sp(96)
+            Label:
+                markup: True
+                text: "%s" % icon('zmdi-lock')
+                color: rgba('#0fafff')
+                font_size: mtx.sp(96)
+
+        RegisterScreenLayout:
+            size_hint_y: .6
+            spacing: 20
+            padding: [.1 * self.size[0], 0]
+            orientation: 'vertical'
+            ScrollView:
+                do_scroll_x: False
+                do_scroll_y: True
+                BoxLayout:
+                    height: 450
+                    spacing: -30
+                    size_hint_y: .3
+                    size_hint: 1, None
+                    orientation: 'vertical'
+                    SimpleInput:
+                        id: loginBox
+                        hint_text: 'E-Mail address'
+                    SimpleInput:
+                        id: newPasswordBox
+                        password: True
+                        hint_text: 'New password'
+                    SimpleInput:
+                        id: repeatPasswordBox
+                        password: True
+                        hint_text: 'Repeat new password'
+                    SimpleInput:
+                        id: nameBox
+                        hint_text: 'First and last name'
+                    BoxLayout:
+                        ErrorBox:
+                            pos_hint: {'top':1.0}
+                            size_hint_x: .5
+                            id: errorBox
+
+                            text: "[size=40]%s[/size]\nCould not log in. Ensure the credentials match" % icon('zmdi-alert-circle')
+            BoxLayout:
+                size_hint_y: .6
+                orientation: 'vertical'
+                spacing: 10
+                RegisterButton:
+                    loginBox: loginBox
+                    newPasswordBox: newPasswordBox
+                    repeatPasswordBox: repeatPasswordBox
+                    nameBox: nameBox
+                    errorBox: errorBox
+                    id: loginBtn
+                    text: "Sign in"
+                    size_hint_y: .4
+                SwitchRegisterButton:
+                    id: registerBtn
+                    text: "Already a user? Log in"
+                    size_hint_y: .4
+                    on_release:
+                        app.root.transition = FadeTransition()
+                        app.root.current = 'login_screen'
+                ResetPasswordButton:
+                    id: resetPswdBtn
+                    text: "Forgot password?"
+                    size_hint_y: .2
+            Widget:
+                size_hint_y: .1
+
+
+<RegisterButton>:
+    background_color: [0,0,0,0]
+    color: rgba('#ececec')
+    on_press: root.on_pressed()
+    on_release: root.on_released()
+    font_size: mtx.sp(24)
+    font_name: 'Lato'
+    bold: True
+    canvas.before:
+        Color:
+            rgba: rgba(self.rectColor)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 20, 20]
