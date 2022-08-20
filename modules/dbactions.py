@@ -1,10 +1,5 @@
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.utils import rgba
-
 import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, CMySQLConnection
-from mysql.connector.cursor import MySQLCursor
 from mysql.connector.cursor_cext import CMySQLCursor
 
 

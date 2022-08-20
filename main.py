@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.stacklayout import StackLayout
 
 from modules import dbactions
-from modules import main_logics
+from modules import auth_view_logics
 
 
 class ScreenManagement(ScreenManager):
