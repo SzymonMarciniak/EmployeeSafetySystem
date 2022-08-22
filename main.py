@@ -5,29 +5,42 @@ from kivy.garden.iconfonts import iconfonts
 
 # SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.stacklayout import StackLayout
 
 from modules import dbactions
 from modules import auth_view_logics
 
+hoverEventObjects = None
+
 
 class ScreenManagement(ScreenManager):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class LoginScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    # def on_enter(self, *args):
+    #     global hoverEventObjects
+    #     hoverEventObjects = [self.ids.loginBox, self.ids.passwordBox, self.ids.loginBtn,
+    #                          self.ids.registerBtn] self
+    #     print(hoverEventObjects)
 
 
 class MainScreen(StackLayout):
     def __init__(self, **kwargs):
-        super(MainScreen, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         for i in range(50):
-            box = Button(size_hint=[100, 100], text="Work in progress")
+            box = Button(size_hint=[.5, .2], text="Work in progress")
             self.add_widget(box)
 
 
 class EmployeeSafetySystemApp(App):
     def __init__(self, **kwargs):
         super(EmployeeSafetySystemApp, self).__init__(**kwargs)
-        self.hoverEventObjects = None
         Window.bind(mouse_pos=self.on_mouse_pos)
         LabelBase.register(name='Lato',
                            fn_regular='fonts/Lato-Regular.ttf',
@@ -45,10 +58,11 @@ class EmployeeSafetySystemApp(App):
         Tracks mouse position on the screen and changes cursor accordingly to desired value while hovering specific
         objects
         """
-        self.hoverEventObjects = [self.root.ids.loginBox, self.root.ids.passwordBox, self.root.ids.loginBtn,
-                                  self.root.ids.registerBtn, self.root.ids.resetPswdBtn]
+        global hoverEventObjects
+        hoverEventObjects = [self.root.ids.loginBox, self.root.ids.passwordBox, self.root.ids.loginBtn,
+                             self.root.ids.registerBtn]
         changed = False
-        for hoverObj in self.hoverEventObjects:
+        for hoverObj in hoverEventObjects:
             if hoverObj.collide_point(*pos):
                 changed = True
                 Window.set_system_cursor('hand')

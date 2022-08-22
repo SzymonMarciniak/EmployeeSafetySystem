@@ -1,7 +1,9 @@
 import re
 
 from kivy.animation import Animation
+from kivy.app import App
 from kivy.garden.iconfonts import icon
+from kivy.uix.screenmanager import FadeTransition
 
 from main import ScreenManagement
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
@@ -127,10 +129,10 @@ def checkCredintialsInDatabase(login, password, errorBox):
     print(cursor)
     print(results)
     if results is not None:
-        ScreenManagement().transition
-        ScreenManagement().current = 'main_screen'
         disableErrorMsg(errorBox)
         print("SUCCESS. LOGGED IN. SHOULD SHOW MAIN SCREEN")
+        App.get_running_app().root.transition = FadeTransition()
+        App.get_running_app().root.current = 'main_screen'
     else:
         ErrorBox().showError(errorBox, "Could not log in. Ensure the credentials match")
         closeDatabaseConnection(db, cursor)

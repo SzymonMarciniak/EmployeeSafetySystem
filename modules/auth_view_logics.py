@@ -1,7 +1,9 @@
 from kivy.animation import Animation
+from kivy.app import App
 from kivy.properties import StringProperty, ObjectProperty, ColorProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.screenmanager import FadeTransition
 from kivy.uix.textinput import TextInput
 
 from modules.checkers import checkDataCorrectness
@@ -61,6 +63,15 @@ class RegisterButton(Button):
 
     def on_released(self):
         self.rectColor = "#0fafff"
+
+
+class ResetPasswordButton(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def on_press(self):
+        App.get_running_app().root.transition = FadeTransition()
+        App.get_running_app().root.current = 'forgot_password_screen'
 
 
 class SwitchRegisterButton(Button):

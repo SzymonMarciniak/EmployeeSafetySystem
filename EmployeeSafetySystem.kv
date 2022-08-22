@@ -5,7 +5,7 @@
 #: include register_screen.kv
 <ScreenManagement>:
     id: screen_manager
-    Screen:
+    LoginScreen:
         name: 'login_screen'
         orientation: 'vertical'
         canvas.before:
@@ -102,7 +102,12 @@
         name: 'main_screen'
         MainScreen:
 
-<ResetPasswordButton@Button>:
+    Screen:
+        name: 'forgot_password_screen'
+        Button:
+            text: "Reset password"
+
+<ResetPasswordButton>:
     background_color: [0,0,0,0]
     color: [0,0,0,.5]
 
