@@ -3,6 +3,7 @@
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 
 #: include register_screen.kv
+
 <ScreenManagement>:
     id: screen_manager
     LoginScreen:
@@ -30,7 +31,7 @@
             Color:
                 rgba: rgba('#0fafff')
             Triangle:
-                points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
+                points: [0, self.size[1], self.size[0], self.size[1], 0, .75 * self.size[1]]
             Color:
                 rgba: rgba('#0f87ff')
             Triangle:
@@ -38,7 +39,14 @@
         BoxLayout:
             orientation: 'vertical'
             Widget:
-                size_hint_y: .25
+                size_hint_y: .15
+            BoxLayout:
+                size_hint_y: .1
+                Image:
+                    source: "img/pl.png"
+                    allow_stretch: True
+                    size_hint_y: None
+                    height: 35
             Label:
                 text: "EmployeeSafetySystem | Log in"
                 color: rgba('#0fafff')
@@ -69,11 +77,22 @@
                     hint_text: 'E-Mail address'
                 Widget:
                     size_hint_y: .1
-                SimpleInput:
-                    id: passwordBox
+                RelativeLayout:
                     size_hint_y: .1
-                    password: True
-                    hint_text: 'Password'
+                    SimpleInput:
+                        id: passwordBox
+                        password: True
+                        hint_text: 'Password'
+                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    PasswordSwitch:
+                        size_hint_x: .1
+                        pos_hint: {'center_x': 0.95, 'center_y': 0.60}
+                        on_press:
+                            passwordBox.password = False
+                            self.color = rgba('#08c48c')
+                        on_release:
+                            passwordBox.password = True
+                            self.color = rgba('#0fafff')
                 ErrorBox:
                     id: errorBox
                     size_hint_y: .3
@@ -109,8 +128,7 @@
 
     Screen:
         name: 'forgot_password_screen'
-        Button:
-            text: "Reset password"
+
 
 <ResetPasswordButton>:
     background_color: [0,0,0,0]
@@ -185,4 +203,12 @@
         Rectangle:
             pos: self.pos[0], self.pos[1] + self.height - 40
             size: [self.size[0], 1]
+
+<PasswordSwitch@Button>:
+    background_normal: ''
+    background_color: [0,0,0,0]
+    color: rgba("#0fafff")
+    font_size: mtx.sp(24)
+    markup: True
+    text: "%s" % icon('zmdi-eye')
 

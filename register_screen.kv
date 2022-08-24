@@ -69,14 +69,36 @@
                     SimpleInput:
                         id: newLoginBox
                         hint_text: 'E-Mail address'
-                    SimpleInput:
-                        id: newPasswordBox
-                        password: True
-                        hint_text: 'New password'
-                    SimpleInput:
-                        id: repeatPasswordBox
-                        password: True
-                        hint_text: 'Repeat new password'
+                    RelativeLayout:
+                        SimpleInput:
+                            id: newPasswordBox
+                            password: True
+                            hint_text: 'New password'
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        PasswordSwitch:
+                            size_hint_x: .1
+                            pos_hint: {'center_x': 0.95, 'center_y': 0.85}
+                            on_press:
+                                newPasswordBox.password = False
+                                self.color = rgba('#08c48c')
+                            on_release:
+                                newPasswordBox.password = True
+                                self.color = rgba('#0fafff')
+                    RelativeLayout:
+                        SimpleInput:
+                            id: repeatPasswordBox
+                            password: True
+                            hint_text: 'Password'
+                            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        PasswordSwitch:
+                            size_hint_x: .1
+                            pos_hint: {'center_x': 0.95, 'center_y': 0.85}
+                            on_press:
+                                repeatPasswordBox.password = False
+                                self.color = rgba('#08c48c')
+                            on_release:
+                                repeatPasswordBox.password = True
+                                self.color = rgba('#0fafff')
                     SimpleInput:
                         id: nameBox
                         hint_text: 'First and last name'
