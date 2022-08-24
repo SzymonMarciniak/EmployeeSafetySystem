@@ -1,12 +1,54 @@
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.properties import StringProperty, ObjectProperty, ColorProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import FadeTransition
+from kivy.uix.screenmanager import FadeTransition, Screen
 from kivy.uix.textinput import TextInput
 
 from modules.checkers import checkDataCorrectness
+from modules import globals
+
+
+class LoginScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    loginBox = ObjectProperty()
+    passwordBox = ObjectProperty()
+    registerBtn = ObjectProperty()
+    loginBtn = ObjectProperty()
+    resetPswdBtn = ObjectProperty()
+
+    def on_pre_enter(self):
+        Clock.schedule_once(self.callback)
+        # It is necessary to call function one frame later.
+        # Calling it right away is causing an error because
+        # the IDs are not yet initalized
+
+    def callback(self, dt):
+        globals.hoverEventObjects = [self.loginBox, self.passwordBox, self.loginBtn,
+                                     self.registerBtn, self.resetPswdBtn]
+
+
+class RegisterScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    newLoginBox = ObjectProperty()
+    newPasswordBox = ObjectProperty()
+    repeatPasswordBox = ObjectProperty()
+    nameBox = ObjectProperty()
+    registerBtn = ObjectProperty()
+    loginBtn = ObjectProperty()
+    resetPswdBtn = ObjectProperty()
+
+    def on_pre_enter(self):
+        Clock.schedule_once(self.callback)
+
+    def callback(self, dt):
+        globals.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
 
 
 class LoginScreenLayout(BoxLayout):

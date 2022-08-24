@@ -5,29 +5,17 @@ from kivy.garden.iconfonts import iconfonts
 
 # SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
 from kivy.uix.button import Button
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.stacklayout import StackLayout
 
 from modules import dbactions
 from modules import auth_view_logics
-
-hoverEventObjects = None
+from modules import globals
 
 
 class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-
-class LoginScreen(Screen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    # def on_enter(self, *args):
-    #     global hoverEventObjects
-    #     hoverEventObjects = [self.ids.loginBox, self.ids.passwordBox, self.ids.loginBtn,
-    #                          self.ids.registerBtn] self
-    #     print(hoverEventObjects)
 
 
 class MainScreen(StackLayout):
@@ -58,11 +46,8 @@ class EmployeeSafetySystemApp(App):
         Tracks mouse position on the screen and changes cursor accordingly to desired value while hovering specific
         objects
         """
-        global hoverEventObjects
-        hoverEventObjects = [self.root.ids.loginBox, self.root.ids.passwordBox, self.root.ids.loginBtn,
-                             self.root.ids.registerBtn]
         changed = False
-        for hoverObj in hoverEventObjects:
+        for hoverObj in globals.hoverEventObjects:
             if hoverObj.collide_point(*pos):
                 changed = True
                 Window.set_system_cursor('hand')

@@ -41,7 +41,7 @@ def checkDataCorrectness(login, password, errorBox, repeatPassword=None, fullNam
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
 
     if not EMAIL_REGEX.fullmatch(login):
-        ErrorBox().showError(errorBox=errorBox, reason="E-mail address is incorrect")
+        ErrorBox().showError(errorBox=errorBox, reason="E-mail structure is incorrect")
         return False
     elif len(password) < 8 or len(password) > 64:
         ErrorBox().showError(errorBox, "Password should be 8-64 characters long")
