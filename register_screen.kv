@@ -75,6 +75,7 @@
                             password: True
                             hint_text: 'New password'
                             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            on_text: self.on_entered()
                         PasswordSwitch:
                             size_hint_x: .1
                             pos_hint: {'center_x': 0.95, 'center_y': 0.85}
@@ -84,12 +85,17 @@
                             on_release:
                                 newPasswordBox.password = True
                                 self.color = rgba('#0fafff')
+                        Label:
+                            id: capsLockLabel_newPasswordBox
+                            color: rgba('#08c48c')
+                            pos_hint: {'center_x': 0.80, 'center_y': 0.85}
                     RelativeLayout:
                         SimpleInput:
                             id: repeatPasswordBox
                             password: True
-                            hint_text: 'Password'
+                            hint_text: 'Repeat password'
                             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                            on_text: self.on_entered()
                         PasswordSwitch:
                             size_hint_x: .1
                             pos_hint: {'center_x': 0.95, 'center_y': 0.85}
@@ -99,6 +105,10 @@
                             on_release:
                                 repeatPasswordBox.password = True
                                 self.color = rgba('#0fafff')
+                        Label:
+                            id: capsLockLabel_repeatPasswordBox
+                            color: rgba('#08c48c')
+                            pos_hint: {'center_x': 0.80, 'center_y': 0.85}
                     SimpleInput:
                         id: nameBox
                         hint_text: 'First and last name'

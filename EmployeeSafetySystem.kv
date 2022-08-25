@@ -84,6 +84,7 @@
                         password: True
                         hint_text: 'Password'
                         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                        on_text: self.on_entered()
                     PasswordSwitch:
                         size_hint_x: .1
                         pos_hint: {'center_x': 0.95, 'center_y': 0.60}
@@ -93,6 +94,11 @@
                         on_release:
                             passwordBox.password = True
                             self.color = rgba('#0fafff')
+                    Label:
+                        id: capsLockLabel
+                        color: rgba('#08c48c')
+                        pos_hint: {'center_x': 0.80, 'center_y': 0.60}
+
                 ErrorBox:
                     id: errorBox
                     size_hint_y: .3
@@ -193,6 +199,7 @@
 
 <SimpleInput>:
     font_size: mtx.sp(16)
+    write_tab: False
     multiline: False
     background_normal: ''
     background_active: ''
