@@ -3,6 +3,7 @@
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 
 #: include register_screen.kv
+#: include forgot_password.kv
 
 <ScreenManagement>:
     id: screen_manager
@@ -31,7 +32,7 @@
             Color:
                 rgba: rgba('#0fafff')
             Triangle:
-                points: [0, self.size[1], self.size[0], self.size[1], 0, .75 * self.size[1]]
+                points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
             Color:
                 rgba: rgba('#0f87ff')
             Triangle:
@@ -40,13 +41,16 @@
             orientation: 'vertical'
             Widget:
                 size_hint_y: .15
-            BoxLayout:
+            RelativeLayout:
                 size_hint_y: .1
-                Image:
-                    source: "img/pl.png"
-                    allow_stretch: True
-                    size_hint_y: None
-                    height: 35
+                ChangeLanguage:
+                    background_normal: "img/gb.png"
+                    background_down: "img/gb.png"
+                    size: 50, 38
+                    size_hint: None, None
+                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                    on_press: print('TRANSLATION')
+
             Label:
                 text: "EmployeeSafetySystem | Log in"
                 color: rgba('#0fafff')
@@ -85,6 +89,7 @@
                         hint_text: 'Password'
                         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                         on_text: self.on_entered()
+                        on_text_validate: print("walidejt")
                     PasswordSwitch:
                         size_hint_x: .1
                         pos_hint: {'center_x': 0.95, 'center_y': 0.60}
@@ -132,8 +137,7 @@
         name: 'main_screen'
         MainScreen:
 
-    Screen:
-        name: 'forgot_password_screen'
+    ForgotPasswordScreen:
 
 
 <ResetPasswordButton>:
@@ -218,4 +222,3 @@
     font_size: mtx.sp(24)
     markup: True
     text: "%s" % icon('zmdi-eye')
-

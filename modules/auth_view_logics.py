@@ -148,3 +148,19 @@ class SwitchRegisterButton(Button):
 
     def on_release(self):
         self.color = "#0fafff"
+
+
+class ChangeLanguage(Button):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.english = True
+
+    def on_press(self):
+        if self.english:
+            self.background_down = 'img/pl.png'
+            self.background_normal = 'img/pl.png'
+            self.english = False
+        else:
+            self.background_down = 'img/gb.png'
+            self.background_normal = 'img/gb.png'
+            self.english = True

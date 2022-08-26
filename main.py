@@ -11,6 +11,7 @@ from kivy.uix.stacklayout import StackLayout
 from modules import dbactions
 from modules import auth_view_logics
 from modules import globals
+from modules import recovery_email
 
 
 class ScreenManagement(ScreenManager):

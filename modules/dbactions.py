@@ -80,3 +80,24 @@ def closeDatabaseConnection(db: CMySQLConnection, cursor: CMySQLCursor):
         cursor.close()
     except mysql.connector.Error as error:
         raise Exception("Couldn't close connection. Maybe it is closed already or was never opened? Reason: %s" % error)
+
+
+def checkIsEmailInDatabase(recoveryEmail):
+    """
+    Checks whether the provided E-mail address is located within the database.
+
+    Return value
+    ---------------------
+    True: bool
+        If address was found
+    False: bool
+        Otherwise
+    """
+    db, cursor = connectToDatabase()
+    cursor.execute("SELECT * FROM accounts WHERE login=%s", (recoveryEmail,))
+    results = cursor.fetchone()
+    closeDatabaseConnection(db, cursor)
+    if results is not None:
+        return True
+    else:
+        return False
