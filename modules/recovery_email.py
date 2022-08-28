@@ -4,11 +4,15 @@ import time
 
 from kivy.animation import Animation
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.garden.iconfonts import icon
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
+from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import FadeTransition, Screen
+from kivy.uix.textinput import TextInput
 from kivy.utils import rgba
 
 from modules import globals
@@ -36,10 +40,29 @@ class InfoLabel(Label):
         super().__init__(**kwargs)
 
 
+class BottomLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.orientation = 'horizontal'
+
+    def initialize_code_inputs(self, dt):
+        showAnim = Animation(opacity=1, duration=1.0)
+        codeInput = []
+        for i in range(4):
+            codeInput.append(TextInput(opacity=0, multiline=False))
+            if i == 0:
+                codeInput[i].focus = True
+            # print(codeInput[i])
+            self.add_widget(codeInput[i])
+            # print(codeInput[i])
+            showAnim.start(codeInput[i])
+
+
 class SendEmailButton(Button):
     rectColor = StringProperty('')
     recoveryEmailBox = ObjectProperty()
     infoLabel = ObjectProperty()
+    bottomLayout = ObjectProperty()
     a = NumericProperty(5)
     # b = NumericProperty(5)
     # firstCycle = True
@@ -80,6 +103,8 @@ class SendEmailButton(Button):
 
             def actually_remove_widget(instance, obj):
                 self.remove_widget(self)
+                Clock.schedule_once(self.bottomLayout.initialize_code_inputs)
+
 
             rmAnim.bind(on_complete=actually_remove_widget)
             rmAnim.start(self)
