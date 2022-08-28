@@ -1,7 +1,3 @@
-import asyncio
-import threading
-import time
-
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -41,21 +37,37 @@ class InfoLabel(Label):
 
 
 class BottomLayout(BoxLayout):
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.codeInputs = None
         self.orientation = 'horizontal'
+        self.spacing = .1 * self.width
 
-    def initialize_code_inputs(self, dt):
+    def initialize_code_inputs(self):
         showAnim = Animation(opacity=1, duration=1.0)
-        codeInput = []
-        for i in range(4):
-            codeInput.append(TextInput(opacity=0, multiline=False))
+        codeInputs = []
+        self.clear_widgets()
+        for i in range(6):
+            codeInputs.append(TextInput(opacity=1, multiline=False, write_tab=False))
             if i == 0:
-                codeInput[i].focus = True
-            # print(codeInput[i])
-            self.add_widget(codeInput[i])
-            # print(codeInput[i])
-            showAnim.start(codeInput[i])
+                codeInputs[i].focus = True
+            self.add_widget(codeInputs[i])
+        codeInputs[0].bind(text=lambda instance, value: self.on_text_typed(instance, value, 0, codeInputs))
+        codeInputs[1].bind(text=lambda instance, value: self.on_text_typed(instance, value, 1, codeInputs))
+        codeInputs[2].bind(text=lambda instance, value: self.on_text_typed(instance, value, 2, codeInputs))
+        codeInputs[3].bind(text=lambda instance, value: self.on_text_typed(instance, value, 3, codeInputs))
+        codeInputs[4].bind(text=lambda instance, value: self.on_text_typed(instance, value, 4, codeInputs))
+        codeInputs[5].bind(text=lambda instance, value: self.on_text_typed(instance, value, 5, codeInputs))
+
+    def on_text_typed(self, instance, value, num, codeInputs):
+        if len(codeInputs[num].text) > 1:
+            codeInputs[num].text = value[-1]
+        if int(value)
+        if num != len(codeInputs) - 1:
+            codeInputs[num+1].focus = True
+        else:
+            codeInputs[num].focus = False
 
 
 class SendEmailButton(Button):
@@ -64,6 +76,7 @@ class SendEmailButton(Button):
     infoLabel = ObjectProperty()
     bottomLayout = ObjectProperty()
     a = NumericProperty(5)
+
     # b = NumericProperty(5)
     # firstCycle = True
 
@@ -73,7 +86,6 @@ class SendEmailButton(Button):
         self.rectColor = "#0fafff"
 
     def set_info_label(self):
-        print("znów here hehe" + str(self.a))
         anim = Animation(a=0, duration=self.a)
         self.infoLabel.opacity = 1
         self.infoLabel.color = rgba("08c48c")
@@ -103,8 +115,7 @@ class SendEmailButton(Button):
 
             def actually_remove_widget(instance, obj):
                 self.remove_widget(self)
-                Clock.schedule_once(self.bottomLayout.initialize_code_inputs)
-
+                self.bottomLayout.initialize_code_inputs()
 
             rmAnim.bind(on_complete=actually_remove_widget)
             rmAnim.start(self)
