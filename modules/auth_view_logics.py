@@ -1,3 +1,6 @@
+import platform
+import sys
+
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -66,10 +69,11 @@ class RegisterScreenLayout(BoxLayout):
 class SimpleInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
+        if platform.system() == 'Windows':
+            self.bind(text=self.on_entered)
     activated = False
 
-    def on_entered(self):
+    def on_entered(self, instance, value):
         caps_status = win32api.GetKeyState(win32con.VK_CAPITAL)
         if caps_status == 0 and self.activated:
             current_app = App.get_running_app()

@@ -1,7 +1,13 @@
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from random import randint
+
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.garden.iconfonts import icon
+from kivy.metrics import sp
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
@@ -27,11 +33,54 @@ class ForgotPasswordScreen(Screen):
         globals.hoverEventObjects = [self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
 
 
-def sendRecoveryEmail():
+def sendRecoveryEmail(userMail):
     print("SENT")
+    systemMail = "employeesafetysystem@ess.com"
+
+    db, cursor = connectToDatabase()
+    cursor.execute("SELECT id, name FROM accounts WHERE login=%s", (userMail,))
+    results = cursor.fetchone()
+    userID = results[0]
+    fullName = results[1]
+    closeDatabaseConnection(db, cursor)
+    generatedCode = ''.join(str(randint(0, 9)) for n in range(6))
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = "Password recovery | EmployeeSafetySystem"
+    msg['From'] = systemMail
+    msg['To'] = userMail
+
+    text = "Employee Safety System\n\nHello, %s!\nWe received password reset request for your account\nIf you want to" \
+           "proceed, please input following code on the screen: %s \nNot your request? " \
+           "Ignore this message" % (fullName.split()[0], generatedCode)
+    html = """
+    <html>
+        <head></head>
+        <body>
+            <h1 style="text-align: center">Employee Safety System</h1>
+            <h1 style="text-align: center">Hello, %s!</h1>
+            <p style="text-align: center">We received password reset request for your account<br>
+                                          If you want to proceed, please input following code in the app:</p>
+            <h3 style="text-align: center">%s</h3>
+            <p style="text-align: center">Not your request? Ignore this message"</p>
+        </body>
+    </html>                           
+    """ % (fullName.split()[0], generatedCode)
+
+    part1 = MIMEText(text, 'plain')
+    part2 = MIMEText(html, 'html')
+    msg.attach(part1)
+    msg.attach(part2)
+    smtp = smtplib.SMTP('localhost')
+    smtp.sendmail(systemMail, userMail, msg.as_string())
 
 
 class InfoLabel(Label):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class CodeInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -49,10 +98,17 @@ class BottomLayout(BoxLayout):
         codeInputs = []
         self.clear_widgets()
         for i in range(6):
-            codeInputs.append(TextInput(opacity=1, multiline=False, write_tab=False))
+            inputC = CodeInput(opacity=1, multiline=False, write_tab=False)
+            inputC.input_filter = 'int'
+            # inputC.cursor_color = [1, 1, 1, 0]
+            inputC.cursor_blink = False
+            codeInputs.append(inputC)
             if i == 0:
-                codeInputs[i].focus = True
-            self.add_widget(codeInputs[i])
+                inputC.focus = True
+            inputC.font_name = 'Lato'
+            inputC.font_size = sp(32)
+            self.add_widget(inputC)
+            inputC.bind(focus=self.on_focused)
         codeInputs[0].bind(text=lambda instance, value: self.on_text_typed(instance, value, 0, codeInputs))
         codeInputs[1].bind(text=lambda instance, value: self.on_text_typed(instance, value, 1, codeInputs))
         codeInputs[2].bind(text=lambda instance, value: self.on_text_typed(instance, value, 2, codeInputs))
@@ -60,14 +116,17 @@ class BottomLayout(BoxLayout):
         codeInputs[4].bind(text=lambda instance, value: self.on_text_typed(instance, value, 4, codeInputs))
         codeInputs[5].bind(text=lambda instance, value: self.on_text_typed(instance, value, 5, codeInputs))
 
+    def on_focused(self, instance, value):
+        # instance.text = ''
+        pass
+
     def on_text_typed(self, instance, value, num, codeInputs):
-        if len(codeInputs[num].text) > 1:
-            codeInputs[num].text = value[-1]
-        if int(value)
+        if len(instance.text) >= 1:
+            instance.text = value[-1]
         if num != len(codeInputs) - 1:
-            codeInputs[num+1].focus = True
+            codeInputs[num + 1].focus = True
         else:
-            codeInputs[num].focus = False
+            instance.focus = False
 
 
 class SendEmailButton(Button):
@@ -92,7 +151,7 @@ class SendEmailButton(Button):
 
         def on_ref_pressed(smth, obj):
             print("RESEND MESSAGE")
-            sendRecoveryEmail()
+            # sendRecoveryEmail(self.recoveryEmailBox.text)
             self.set_info_label()
 
         def finish_callback(animation, clock):
@@ -120,7 +179,7 @@ class SendEmailButton(Button):
             rmAnim.bind(on_complete=actually_remove_widget)
             rmAnim.start(self)
             globals.hoverEventObjects.pop(1)
-            sendRecoveryEmail()
+            sendRecoveryEmail(self.recoveryEmailBox.text)
 
         else:
             self.infoLabel.opacity = 1

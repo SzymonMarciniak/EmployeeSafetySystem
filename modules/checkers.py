@@ -9,7 +9,7 @@ from main import ScreenManagement
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
 
 
-def checkDataCorrectness(login, password, errorBox, repeatPassword=None, fullName=None):
+def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: str =None, fullName: str =None):
     """
     Checks whether data provided by user matches all patterns. If 'repeatPassword' is provided the function will
     check additional patterns for registering an account and then check whether login is already in use.
@@ -53,6 +53,8 @@ def checkDataCorrectness(login, password, errorBox, repeatPassword=None, fullNam
         elif len(fullName) < 1:
             ErrorBox().showError(errorBox=errorBox, reason="You did not provide your full name")
             return False
+        elif len(fullName.split(' ')) <= 1:
+            ErrorBox().showError(errorBox=errorBox, reason="Separate first and last name with a gap")
         else:
             if doesAccountExist(login, errorBox) is False:
                 db, cursor = connectToDatabase()
