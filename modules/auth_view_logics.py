@@ -1,10 +1,7 @@
 import platform
-import sys
 
-from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
 from kivy.properties import StringProperty, ObjectProperty, ColorProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button

@@ -5,11 +5,10 @@ from kivy.app import App
 from kivy.garden.iconfonts import icon
 from kivy.uix.screenmanager import FadeTransition
 
-from main import ScreenManagement
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
 
 
-def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: str =None, fullName: str =None):
+def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: str = None, fullName: str = None):
     """
     Checks whether data provided by user matches all patterns. If 'repeatPassword' is provided the function will
     check additional patterns for registering an account and then check whether login is already in use.

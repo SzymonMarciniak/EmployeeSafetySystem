@@ -4,12 +4,9 @@ from email.mime.text import MIMEText
 from random import randint
 
 from kivy.animation import Animation
-from kivy.app import App
-from kivy.clock import Clock
 from kivy.garden.iconfonts import icon
 from kivy.metrics import sp
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
-from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
@@ -52,7 +49,7 @@ def sendRecoveryEmail(userMail):
 
     text = "Employee Safety System\n\nHello, %s!\nWe received password reset request for your account\nIf you want to" \
            "proceed, please input following code on the screen: %s \nNot your request? " \
-           "Ignore this message" % (fullName.split()[0], generatedCode)
+           "Ignore this message" % (fullName.split()[0], ' '.join(generatedCode))
     html = """
     <html>
         <head></head>
@@ -62,10 +59,10 @@ def sendRecoveryEmail(userMail):
             <p style="text-align: center">We received password reset request for your account<br>
                                           If you want to proceed, please input following code in the app:</p>
             <h3 style="text-align: center">%s</h3>
-            <p style="text-align: center">Not your request? Ignore this message"</p>
+            <p style="text-align: center">Not your request? Ignore this message</p>
         </body>
     </html>                           
-    """ % (fullName.split()[0], generatedCode)
+    """ % (fullName.split()[0], ' '.join(generatedCode))
 
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')

@@ -1,13 +1,14 @@
+
 from kivy.app import App
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from kivy.garden.iconfonts import iconfonts
 
-# SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.stacklayout import StackLayout
 
+# SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
 from modules import dbactions
 from modules import auth_view_logics
 from modules import globals
