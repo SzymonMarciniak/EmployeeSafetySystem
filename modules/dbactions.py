@@ -42,7 +42,7 @@ def connectToDatabase(firstConnect=False):
         else:
             raise ConnectionError("Cannot establish connection. Reason: %s" % error)
     else:
-        cursor = db.cursor()
+        cursor = db.cursor(buffered=True)
         if firstConnect:
             try:
                 cursor.execute(
@@ -53,7 +53,7 @@ def connectToDatabase(firstConnect=False):
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS pswdResets (id INT NOT NULL auto_increment PRIMARY KEY, userID INT "
                     "NOT NULL, "
-                    "code VARCHAR(8), initDate INT, expDate INT);")
+                    "code VARCHAR(8), initDate INT, expDate INT, USED INT);")
             except mysql.connector.Error as error:
                 raise TimeoutError("Cannot process query. Reason: %s" % error)
         return db, cursor

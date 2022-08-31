@@ -1,5 +1,7 @@
 import platform
 
+import win32api
+import win32con
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import StringProperty, ObjectProperty, ColorProperty
@@ -7,10 +9,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import FadeTransition, Screen
 from kivy.uix.textinput import TextInput
-import win32api, win32con
 
-from modules.checkers import checkDataCorrectness
 from modules import globals
+from modules.checkers import checkDataCorrectness
 
 
 class LoginScreen(Screen):
@@ -78,14 +79,12 @@ class SimpleInput(TextInput):
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = ''
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = ''
             self.activated = False
-            print(0)
         elif caps_status == 1 and not self.activated:
             current_app = App.get_running_app()
             current_app.root.ids.capsLockLabel.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
             self.activated = True
-            print(1)
 
 
 class LoginButton(Button):

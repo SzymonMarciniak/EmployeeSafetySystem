@@ -4,6 +4,8 @@ from email.mime.text import MIMEText
 from random import randint
 
 from kivy.animation import Animation
+from kivy.app import App
+from kivy.clock import Clock
 from kivy.garden.iconfonts import icon
 from kivy.metrics import sp
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
@@ -16,6 +18,8 @@ from kivy.utils import rgba
 
 from modules import globals
 from modules.dbactions import connectToDatabase, closeDatabaseConnection, checkIsEmailInDatabase
+
+clientID = None
 
 
 class ForgotPasswordScreen(Screen):
@@ -39,8 +43,20 @@ def sendRecoveryEmail(userMail):
     results = cursor.fetchone()
     userID = results[0]
     fullName = results[1]
-    closeDatabaseConnection(db, cursor)
     generatedCode = ''.join(str(randint(0, 9)) for n in range(6))
+
+    cursor.execute("SELECT id FROM pswdresets WHERE expDate > UNIX_TIMESTAMP() AND userID=%s AND used=0", (userID,))
+    results = cursor.fetchone()
+    if results is None:
+        cursor.execute("INSERT INTO pswdresets VALUES(null, %s, %s, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() + %s, 0)",
+                       (userID, generatedCode, 300))
+        db.commit()
+    else:
+        cursor.execute("UPDATE pswdresets SET initDate=UNIX_TIMESTAMP(), expDate=UNIX_TIMESTAMP() + %s, code=%s WHERE "
+                       "userID=%s AND used=0",
+                       (300, generatedCode, userID))
+        db.commit()
+    closeDatabaseConnection(db, cursor)
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = "Password recovery | EmployeeSafetySystem"
@@ -70,6 +86,8 @@ def sendRecoveryEmail(userMail):
     msg.attach(part2)
     smtp = smtplib.SMTP('localhost')
     smtp.sendmail(systemMail, userMail, msg.as_string())
+    global clientID
+    clientID = userID
 
 
 class InfoLabel(Label):
@@ -80,6 +98,44 @@ class InfoLabel(Label):
 class CodeInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+
+
+class SubmitCodeButton(Button):
+    def __init__(self, **kwargs):
+        super(SubmitCodeButton, self).__init__(**kwargs)
+        self.markup = True
+        self.font_size = 32
+        self.background_color = rgba('#ececec')
+        self.text = "%s" % icon('zmdi-chevron-right')
+        self.size_hint_x = 1.5
+
+    def on_press(self):
+        print("CODE VALIDATION")
+        db, cursor = connectToDatabase()
+        code = ''
+        global clientID
+        for i, child in enumerate(self.parent.children):
+            if i == 0:
+                continue
+            code += child.text
+        cursor.execute("SELECT id FROM pswdresets WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
+                       "AND used=0", (clientID, code[::-1]))
+        results = cursor.fetchone()
+        if results is None:
+            self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Provided code is invalid. " \
+                                                           "Recheck your input" % icon('zmdi-alert-circle')
+            self.parent.parent.parent.infoLabel.color = rgba("c92a1e")
+        else:
+            cursor.execute("UPDATE pswdresets SET used=1 WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
+                           "AND used=0", (clientID, code[::-1]))
+            db.commit()
+            self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Code valid, redirecting..."\
+                                                       % icon('zmdi-check-circle')
+            self.parent.parent.parent.infoLabel.color = rgba("08c48c")
+            App.get_running_app().root.transition = FadeTransition()
+            App.get_running_app().root.current = 'new_password_screen'
+        closeDatabaseConnection(db, cursor)
 
 
 class BottomLayout(BoxLayout):
@@ -89,23 +145,27 @@ class BottomLayout(BoxLayout):
         self.codeInputs = None
         self.orientation = 'horizontal'
         self.spacing = .1 * self.width
+        self.alreadyChanged = False
 
     def initialize_code_inputs(self):
+        self.padding = -1 * .05 * self.width, 0
         showAnim = Animation(opacity=1, duration=1.0)
         codeInputs = []
         self.clear_widgets()
         for i in range(6):
             inputC = CodeInput(opacity=1, multiline=False, write_tab=False)
             inputC.input_filter = 'int'
-            # inputC.cursor_color = [1, 1, 1, 0]
+            inputC.cursor_color = [1, 1, 1, 0]
             inputC.cursor_blink = False
+            inputC.halign = 'center'
             codeInputs.append(inputC)
             if i == 0:
                 inputC.focus = True
             inputC.font_name = 'Lato'
             inputC.font_size = sp(32)
             self.add_widget(inputC)
-            inputC.bind(focus=self.on_focused)
+        submitBtn = SubmitCodeButton()
+        self.add_widget(submitBtn)
         codeInputs[0].bind(text=lambda instance, value: self.on_text_typed(instance, value, 0, codeInputs))
         codeInputs[1].bind(text=lambda instance, value: self.on_text_typed(instance, value, 1, codeInputs))
         codeInputs[2].bind(text=lambda instance, value: self.on_text_typed(instance, value, 2, codeInputs))
@@ -113,12 +173,10 @@ class BottomLayout(BoxLayout):
         codeInputs[4].bind(text=lambda instance, value: self.on_text_typed(instance, value, 4, codeInputs))
         codeInputs[5].bind(text=lambda instance, value: self.on_text_typed(instance, value, 5, codeInputs))
 
-    def on_focused(self, instance, value):
-        # instance.text = ''
-        pass
-
     def on_text_typed(self, instance, value, num, codeInputs):
-        if len(instance.text) >= 1:
+        if len(instance.text) < 1:
+            instance.text = value
+        else:
             instance.text = value[-1]
         if num != len(codeInputs) - 1:
             codeInputs[num + 1].focus = True
@@ -174,8 +232,9 @@ class SendEmailButton(Button):
                 self.bottomLayout.initialize_code_inputs()
 
             rmAnim.bind(on_complete=actually_remove_widget)
-            rmAnim.start(self)
+
             globals.hoverEventObjects.pop(1)
+            Clock.schedule_once(lambda dt: rmAnim.start(self))
             sendRecoveryEmail(self.recoveryEmailBox.text)
 
         else:
