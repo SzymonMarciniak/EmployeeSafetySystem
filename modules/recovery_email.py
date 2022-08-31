@@ -35,6 +35,15 @@ class ForgotPasswordScreen(Screen):
 
 
 def sendRecoveryEmail(userMail):
+    """
+    Sends recovery mail to E-mail address provided by user. Checks for already existing requests and updates them
+    if needed, otherwise inserts it.
+
+    Params
+    ------------------
+    userMail: string
+        E-mail provided by user to receive password recovery message
+    """
     print("SENT")
     systemMail = "employeesafetysystem@ess.com"
 
