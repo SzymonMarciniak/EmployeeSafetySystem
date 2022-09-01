@@ -60,7 +60,6 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
                 cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, NOW(), NOW())", ([login, password,
                                                                                                     fullName]))
                 db.commit()
-                print("SUCCESS. CREATED ACCOUNT. USER SHOULD LOG IN")
                 return True
             else:
                 ErrorBox().showError(errorBox=errorBox, reason="Account already registered for this E-mail")
@@ -89,11 +88,8 @@ def doesAccountExist(login, errorBox):
         Account found; can't create another one with the same login
     """
     db, cursor = connectToDatabase()
-    print(cursor)
     cursor.execute("SELECT * FROM accounts WHERE login=%s", (login,))
     results = cursor.fetchone()
-    print(cursor)
-    print(results)
     if results is None:
         disableErrorMsg(errorBox)
         closeDatabaseConnection(db, cursor)
@@ -124,14 +120,10 @@ def checkCredintialsInDatabase(login, password, errorBox):
         Invalid credintials; error shown
     """
     db, cursor = connectToDatabase()
-    print(cursor)
     cursor.execute("SELECT * FROM accounts WHERE login=%s AND password=%s;", (login, password))
     results = cursor.fetchone()
-    print(cursor)
-    print(results)
     if results is not None:
         disableErrorMsg(errorBox)
-        print("SUCCESS. LOGGED IN. SHOULD SHOW MAIN SCREEN")
         App.get_running_app().root.transition = FadeTransition()
         App.get_running_app().root.current = 'main_screen'
     else:

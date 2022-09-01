@@ -2,133 +2,14 @@
 #: import icon kivy.garden.iconfonts.icon
 #: import FadeTransition kivy.uix.screenmanager.FadeTransition
 
+#: include login_screen.kv
 #: include register_screen.kv
 #: include forgot_password.kv
 
 <ScreenManagement>:
     id: screen_manager
     LoginScreen:
-        name: 'login_screen'
-        loginBox: loginBox
-        passwordBox: passwordBox
-        registerBtn: registerBtn
-        loginBtn: loginBtn
-        resetPswdBtn: resetPswdBtn
-        orientation: 'vertical'
-        canvas.before:
-            Color:
-                rgba: rgba('#ececec')
-            Rectangle:
-                size: self.size
-                pos: self.pos
-            Color:
-                rgba: rgba('#08c48c30')
-            Ellipse:
-                pos: self.size[0] - 200, - 200
-                size: 400, 400
-            Ellipse:
-                pos: -225, self.size[1] *.5 - 125
-                size: 250, 250
-            Color:
-                rgba: rgba('#0fafff')
-            Triangle:
-                points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
-            Color:
-                rgba: rgba('#0f87ff')
-            Triangle:
-                points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .73 * self.size[1]]
-        BoxLayout:
-            orientation: 'vertical'
-            Widget:
-                size_hint_y: .15
-            RelativeLayout:
-                size_hint_y: .1
-                ChangeLanguage:
-                    background_normal: "img/gb.png"
-                    background_down: "img/gb.png"
-                    size: 50, 38
-                    size_hint: None, None
-                    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                    on_press: print('TRANSLATION')
 
-            Label:
-                text: "EmployeeSafetySystem | Log in"
-                color: rgba('#0fafff')
-                font_size: mtx.sp(24)
-                size_hint_y: .1
-            BoxLayout:
-                background_color: 0,1,0,1
-                size_hint_y: .2
-                orientation: 'horizontal'
-                spacing: -1 * (.5 * self.size[0])
-                Label:
-                    markup: True
-                    text: "%s" % icon('zmdi-key')
-                    color: rgba('#0fafff')
-                    font_size: mtx.sp(96)
-                Label:
-                    markup: True
-                    text: "%s" % icon('zmdi-lock')
-                    color: rgba('#0fafff')
-                    font_size: mtx.sp(96)
-            LoginScreenLayout:
-                size_hint_y: .6
-                padding: [.1 * self.size[0], 0]
-                orientation: 'vertical'
-                SimpleInput:
-                    id: loginBox
-                    size_hint_y: .1
-                    hint_text: 'E-Mail address'
-                Widget:
-                    size_hint_y: .1
-                RelativeLayout:
-                    size_hint_y: .1
-                    SimpleInput:
-                        id: passwordBox
-                        password: True
-                        hint_text: 'Password'
-                        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-                    PasswordSwitch:
-                        size_hint_x: .1
-                        pos_hint: {'center_x': 0.95, 'center_y': 0.60}
-                        on_press:
-                            passwordBox.password = False
-                            self.color = rgba('#08c48c')
-                        on_release:
-                            passwordBox.password = True
-                            self.color = rgba('#0fafff')
-                    Label:
-                        id: capsLockLabel
-                        color: rgba('#08c48c')
-                        pos_hint: {'center_x': 0.80, 'center_y': 0.60}
-
-                ErrorBox:
-                    id: errorBox
-                    size_hint_y: .3
-                BoxLayout:
-                    size_hint_y: .3
-                    orientation: 'vertical'
-                    spacing: 10
-                    LoginButton:
-                        loginBox: loginBox
-                        passwordBox: passwordBox
-                        errorBox: errorBox
-                        id: loginBtn
-                        text: "Log in"
-                        size_hint_y: .4
-                    SwitchRegisterButton:
-                        id: registerBtn
-                        text: "Newcomer? Sign in here"
-                        size_hint_y: .4
-                        on_release:
-                            app.root.transition = FadeTransition()
-                            app.root.current = 'register_screen'
-                    ResetPasswordButton:
-                        id: resetPswdBtn
-                        text: "Forgot password?"
-                        size_hint_y: .2
-                Widget:
-                    size_hint_y: .05
     RegisterScreen:
 
     Screen:
@@ -146,21 +27,6 @@
 <ResetPasswordButton>:
     background_color: [0,0,0,0]
     color: [0,0,0,.5]
-
-<ErrorBox@Label>:
-    color: rgba("#c92a1e")
-    margin: 20
-    lineWidth: 1.8
-    markup: True
-    halign: 'center'
-    opacity: 0
-    disabled: True
-    canvas.before:
-        Color:
-            rgba: rgba("#c92a1e")
-        Line:
-            width: self.lineWidth + 1
-            rectangle: self.x + self.lineWidth, self.y + self.margin, self.width - self.lineWidth, self.height - 2* self.margin
 
 
 <LoginButton>:
@@ -217,11 +83,3 @@
         Rectangle:
             pos: self.pos[0], self.pos[1] + self.height - 40
             size: [self.size[0], 1]
-
-<PasswordSwitch@Button>:
-    background_normal: ''
-    background_color: [0,0,0,0]
-    color: rgba("#0fafff")
-    font_size: mtx.sp(24)
-    markup: True
-    text: "%s" % icon('zmdi-eye')

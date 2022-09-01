@@ -44,7 +44,6 @@ def sendRecoveryEmail(userMail):
     userMail: string
         E-mail provided by user to receive password recovery message
     """
-    print("SENT")
     systemMail = "employeesafetysystem@ess.com"
 
     db, cursor = connectToDatabase()
@@ -120,7 +119,6 @@ class SubmitCodeButton(Button):
         self.size_hint_x = 1.5
 
     def on_press(self):
-        print("CODE VALIDATION")
         db, cursor = connectToDatabase()
         code = ''
         global clientID
@@ -214,7 +212,6 @@ class SendEmailButton(Button):
         self.infoLabel.color = rgba("08c48c")
 
         def on_ref_pressed(smth, obj):
-            print("RESEND MESSAGE")
             # sendRecoveryEmail(self.recoveryEmailBox.text)
             self.set_info_label()
 

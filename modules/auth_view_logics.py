@@ -75,16 +75,17 @@ class SimpleInput(TextInput):
         caps_status = win32api.GetKeyState(win32con.VK_CAPITAL)
         if caps_status == 0 and self.activated:
             current_app = App.get_running_app()
-            current_app.root.ids.capsLockLabel.text = ''
+            current_app.root.get_screen('login_screen').ids.capsLockLabel.text = ''
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = ''
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = ''
             self.activated = False
         elif caps_status == 1 and not self.activated:
             current_app = App.get_running_app()
-            current_app.root.ids.capsLockLabel.text = 'Caps ON'
+            current_app.root.get_screen('login_screen').ids.capsLockLabel.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
             self.activated = True
+        current_app = App.get_running_app()
 
 
 class LoginButton(Button):
