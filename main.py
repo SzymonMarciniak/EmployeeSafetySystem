@@ -1,60 +1,55 @@
-from kivy.app import App
-from kivy.core.window import Window
-from kivy.uix.boxlayout import BoxLayout
-from kivy.garden.iconfonts import register, iconfonts
 
-from os.path import dirname, join
+from kivy.app import App
+from kivy.core.text import LabelBase
+from kivy.core.window import Window
+from kivy.garden.iconfonts import iconfonts
 
 from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.utils import rgba
+from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.stacklayout import StackLayout
 
-iconfonts.register("default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
+# SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
+from modules import dbactions
+from modules import auth_view_logics
+from modules import globals
+from modules import recovery_email
 
 
-class MainScreen(BoxLayout):
-    pass
-
-
-class SimpleInput(TextInput):
+class ScreenManagement(ScreenManager):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
-class LoginButton(Button):
+class MainScreen(StackLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    def on_pressed(self):
-        # rectColor = self.root.ids.rectColor
-        # rectColor.rgba = rgba('#0a5bab')
-        pass
-
-    def on_released(self):
-        # rectColor = self.root.ids.rectColor
-        # rectColor.rgba = rgba('#0f87ff')
-        pass
+        for i in range(50):
+            box = Button(size_hint=[.5, .2], text="Work in progress")
+            self.add_widget(box)
 
 
 class EmployeeSafetySystemApp(App):
     def __init__(self, **kwargs):
-        super(EmployeeSafetySystemApp, self).__init__()
-        self.hoverEventObjects = None
+        super(EmployeeSafetySystemApp, self).__init__(**kwargs)
         Window.bind(mouse_pos=self.on_mouse_pos)
+        LabelBase.register(name='Lato',
+                           fn_regular='fonts/Lato-Regular.ttf',
+                           fn_bold='fonts/Lato-Bold.ttf')
+        iconfonts.register("default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
+        db, cursor = dbactions.connectToDatabase(True)
+        db.close()
 
     def build(self):
         Window.size = (400, 750)
-        return MainScreen()
+        return ScreenManagement()
 
     def on_mouse_pos(self, window, pos):
         """
         Tracks mouse position on the screen and changes cursor accordingly to desired value while hovering specific
         objects
         """
-        self.hoverEventObjects = [self.root.ids.loginBox, self.root.ids.passwordBox, self.root.ids.loginBtn,
-                                  self.root.ids.registerBtn]
         changed = False
-        for hoverObj in self.hoverEventObjects:
+        for hoverObj in globals.hoverEventObjects:
             if hoverObj.collide_point(*pos):
                 changed = True
                 Window.set_system_cursor('hand')
@@ -65,4 +60,5 @@ class EmployeeSafetySystemApp(App):
         changed = False
 
 
-EmployeeSafetySystemApp().run()
+if __name__ == "__main__":
+    EmployeeSafetySystemApp().run()

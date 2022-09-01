@@ -1,110 +1,78 @@
 #: import mtx kivy.metrics
 #: import icon kivy.garden.iconfonts.icon
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
 
-<MainScreen>:
-    orientation: 'vertical'
-    canvas.before:
-        Color:
-            rgba: rgba('#ececec')
-        Rectangle:
-            size: self.size
-            pos: self.pos
-    ScreenManager:
-        Screen:
-            name: 'startup_screen'
-            canvas.before:
-                Color:
-                    rgba: rgba('#08c48c30')
-                Ellipse:
-                    pos: self.size[0] - 200, - 200
-                    size: 400, 400
-                Ellipse:
-                    pos: -225, self.size[1] *.5 - 125
-                    size: 250, 250
-                Color:
-                    rgba: rgba('#0fafff')
-                Triangle:
-                    points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
-                Color:
-                    rgba: rgba('#0f87ff')
-                Triangle:
-                    points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .7 * self.size[1]]
-            BoxLayout:
-                orientation: 'vertical'
-                Widget:
-                    size_hint_y: .25
-                Label:
-                    text: "Zaloguj się do usługi"
-                    color: rgba('#0fafff')
-                    font_size: mtx.sp(24)
-                    size_hint_y: .1
-                BoxLayout:
-                    background_color: 0,1,0,1
-                    size_hint_y: .2
-                    orientation: 'horizontal'
-                    spacing: -1 * (.5 * self.size[0])
-                    Label:
-                        markup: True
-                        text: "%s" % icon('zmdi-key')
-                        color: rgba('#0fafff')
-                        font_size: mtx.sp(96)
-                    Label:
-                        markup: True
-                        text: "%s" % icon('zmdi-lock')
-                        color: rgba('#0fafff')
-                        font_size: mtx.sp(96)
-                BoxLayout:
-                    size_hint_y: .6
-                    padding: [.1 * self.size[0], 0]
-                    orientation: 'vertical'
-                    SimpleInput:
-                        id: loginBox
-                        hint_text: 'Login'
-                    Widget:
-                        size_hint_y: .1
-                    SimpleInput:
-                        id: passwordBox
-                        password: True
-                        hint_text: 'Hasło'
-                    Widget:
-                        size_hint_y: .3
-                    LoginButton:
-                        id: loginBtn
-                        text: "Zaloguj się"
-                        size_hint_y: .2
-                    RegisterButton:
-                        id: registerBtn
-                        text: "Nowy? Zarejestruj się"
-                        size_hint_y: .1
-                    Widget:
-                        size_hint_y: .1
+#: include login_screen.kv
+#: include register_screen.kv
+#: include forgot_password.kv
+
+<ScreenManagement>:
+    id: screen_manager
+    LoginScreen:
+
+    RegisterScreen:
+
+    Screen:
+        name: 'main_screen'
+        MainScreen:
+
+    ForgotPasswordScreen:
+
+    Screen:
+        name: 'new_password_screen'
+        Button:
+            text: "Set new password\nTO BE MADE"
+
+
+<ResetPasswordButton>:
+    background_color: [0,0,0,0]
+    color: [0,0,0,.5]
 
 
 <LoginButton>:
     background_color: [0,0,0,0]
     color: rgba('#ececec')
     on_press: root.on_pressed()
-    on_release: root.on_pressed()
+    on_release: root.on_released()
+    font_size: mtx.sp(24)
+    font_name: 'Lato'
+    bold: True
     canvas.before:
         Color:
-            id: rectColor
-            rgba: rgba('#0f87ff')
+            rgba: rgba(self.rectColor)
         RoundedRectangle:
-
             pos: self.pos
             size: self.size
             radius: [20, 20, 20, 20]
 
 
-
-<RegisterButton@Button>:
+<SwitchRegisterButton>:
     background_normal: ''
     background_color: [0,0,0,0]
-    color: [0,0,0,.6]
+    color: rgba("#0fafff")
+    font_size: mtx.sp(18)
+    margin: 20
+    lineWidth: 3
+    font_name: 'Lato'
+    cuttedSize: 40
+    outline: 10
+    canvas.before:
+        Color:
+            rgba: rgba('0fafff')
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 20, 20]
+        Color:
+            rgba: rgba('#ececec')
+        RoundedRectangle:
+            pos: self.pos[0] + (.5 * self.outline), self.pos[1] + (.5 * self.outline)
+            size: self.size[0] - self.outline, self.size[1] - self.outline
+            radius: [20, 20, 20, 20]
 
 <SimpleInput>:
-    size_hint_y: .1
     font_size: mtx.sp(16)
+    write_tab: False
     multiline: False
     background_normal: ''
     background_active: ''
@@ -113,6 +81,5 @@
         Color:
             rgba: rgba('#0f87ff')
         Rectangle:
-            pos: self.pos
+            pos: self.pos[0], self.pos[1] + self.height - 40
             size: [self.size[0], 1]
-
