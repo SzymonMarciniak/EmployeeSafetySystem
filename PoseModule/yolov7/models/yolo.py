@@ -9,11 +9,11 @@ from pathlib import Path
 sys.path.append(Path(__file__).parent.parent.absolute().__str__())  # to run '$ python *.py' files in subdirectories
 logger = logging.getLogger(__name__)
 
-from Modules.yolov7.models.common import *
-from Modules.yolov7.models.experimental import *
-from Modules.yolov7.utils.autoanchor import check_anchor_order
-from Modules.yolov7.utils.general import make_divisible, check_file, set_logging
-from Modules.yolov7.utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \
+from PoseModule.yolov7.models.common import *
+from PoseModule.yolov7.models.experimental import *
+from PoseModule.yolov7.utils.autoanchor import check_anchor_order
+from PoseModule.yolov7.utils.general import make_divisible, check_file, set_logging
+from PoseModule.yolov7.utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, \
     select_device, copy_attr
 
 try:
