@@ -108,6 +108,7 @@ def checkIsSpam(userMail):
     cursor.execute("SELECT expDate FROM pswdresets WHERE expDate > UNIX_TIMESTAMP() AND userID=%s AND used=0",
                    (userID,))
     results = cursor.fetchone()
+    closeDatabaseConnection(db, cursor)
     if results is None:
         return False
     else:
