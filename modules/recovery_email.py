@@ -1,4 +1,5 @@
 import smtplib
+import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from random import randint
@@ -17,9 +18,8 @@ from kivy.uix.textinput import TextInput
 from kivy.utils import rgba
 
 from modules import globals
-from modules.dbactions import connectToDatabase, closeDatabaseConnection, checkIsEmailInDatabase
-
-clientID = None
+from modules.checkers import checkForPassword
+from modules.dbactions import connectToDatabase, closeDatabaseConnection, checkIsEmailInDatabase, setNewPassword
 
 
 class ForgotPasswordScreen(Screen):
@@ -43,6 +43,10 @@ def sendRecoveryEmail(userMail):
     ------------------
     userMail: string
         E-mail provided by user to receive password recovery message
+
+    infoLabel: ObjectProperty
+        Object of infoLabel; used to handle error message
+
     """
     systemMail = "employeesafetysystem@ess.com"
 
@@ -52,8 +56,8 @@ def sendRecoveryEmail(userMail):
     userID = results[0]
     fullName = results[1]
     generatedCode = ''.join(str(randint(0, 9)) for n in range(6))
-
-    cursor.execute("SELECT id FROM pswdresets WHERE expDate > UNIX_TIMESTAMP() AND userID=%s AND used=0", (userID,))
+    cursor.execute("SELECT id FROM pswdresets WHERE expDate > UNIX_TIMESTAMP() AND userID=%s AND used=0",
+                   (userID,))
     results = cursor.fetchone()
     if results is None:
         cursor.execute("INSERT INTO pswdresets VALUES(null, %s, %s, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() + %s, 0)",
@@ -65,7 +69,6 @@ def sendRecoveryEmail(userMail):
                        (300, generatedCode, userID))
         db.commit()
     closeDatabaseConnection(db, cursor)
-
     msg = MIMEMultipart('alternative')
     msg['Subject'] = "Password recovery | EmployeeSafetySystem"
     msg['From'] = systemMail
@@ -94,8 +97,23 @@ def sendRecoveryEmail(userMail):
     msg.attach(part2)
     smtp = smtplib.SMTP('localhost')
     smtp.sendmail(systemMail, userMail, msg.as_string())
-    global clientID
-    clientID = userID
+    globals.userID = userID
+
+
+def checkIsSpam(userMail):
+    db, cursor = connectToDatabase()
+    cursor.execute("SELECT id FROM accounts WHERE login=%s", (userMail,))
+    results = cursor.fetchone()
+    userID = results[0]
+    cursor.execute("SELECT expDate FROM pswdresets WHERE expDate > UNIX_TIMESTAMP() AND userID=%s AND used=0",
+                   (userID,))
+    results = cursor.fetchone()
+    if results is None:
+        return False
+    else:
+        if time.time() < results[0] - 180:
+            return True
+        return False
 
 
 class InfoLabel(Label):
@@ -107,6 +125,12 @@ class CodeInput(TextInput):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pos_hint = {'center_x': 0.5, 'center_y': 0.5}
+        self.input_filter = 'int'
+        self.cursor_color = [1, 1, 1, 0]
+        self.cursor_blink = False
+        self.halign = 'center'
+        self.font_name = 'Lato'
+        self.font_size = sp(32)
 
 
 class SubmitCodeButton(Button):
@@ -114,35 +138,59 @@ class SubmitCodeButton(Button):
         super(SubmitCodeButton, self).__init__(**kwargs)
         self.markup = True
         self.font_size = 32
-        self.background_color = rgba('#ececec')
+        self.background_color = rgba('#0fafff')
+        self.background_normal = ''
+        self.background_down = ''
         self.text = "%s" % icon('zmdi-chevron-right')
+        self.color = rgba('#ececec')
         self.size_hint_x = 1.5
 
     def on_press(self):
         db, cursor = connectToDatabase()
         code = ''
-        global clientID
         for i, child in enumerate(self.parent.children):
             if i == 0:
                 continue
             code += child.text
         cursor.execute("SELECT id FROM pswdresets WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
-                       "AND used=0", (clientID, code[::-1]))
+                       "AND used=0", (globals.userID, code[::-1]))
         results = cursor.fetchone()
         if results is None:
             self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Provided code is invalid. " \
-                                                           "Recheck your input" % icon('zmdi-alert-circle')
+                                                       "Recheck your input" % icon('zmdi-alert-circle')
             self.parent.parent.parent.infoLabel.color = rgba("c92a1e")
         else:
             cursor.execute("UPDATE pswdresets SET used=1 WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
-                           "AND used=0", (clientID, code[::-1]))
+                           "AND used=0", (globals.userID, code[::-1]))
             db.commit()
-            self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Code valid, redirecting..."\
+            self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Code valid, redirecting..." \
                                                        % icon('zmdi-check-circle')
             self.parent.parent.parent.infoLabel.color = rgba("08c48c")
             App.get_running_app().root.transition = FadeTransition()
             App.get_running_app().root.current = 'new_password_screen'
         closeDatabaseConnection(db, cursor)
+
+
+class SetPasswordButton(Button):
+    rectColor = StringProperty('')
+    new_password_box = ObjectProperty()
+    repeat_password_box = ObjectProperty()
+    errorBox = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.ids.rectColor = self.color
+        self.rectColor = "#0fafff"
+
+    def on_pressed(self):
+        self.rectColor = "#0f87ff"
+        if checkForPassword(self.new_password_box.text, self.repeat_password_box.text, self.errorBox):
+            App.get_running_app().root.transition = FadeTransition()
+            App.get_running_app().root.current = 'login_screen'
+            setNewPassword(self.new_password_box.text)
+
+    def on_released(self):
+        self.rectColor = "#0fafff"
 
 
 class BottomLayout(BoxLayout):
@@ -161,15 +209,9 @@ class BottomLayout(BoxLayout):
         self.clear_widgets()
         for i in range(6):
             inputC = CodeInput(opacity=1, multiline=False, write_tab=False)
-            inputC.input_filter = 'int'
-            inputC.cursor_color = [1, 1, 1, 0]
-            inputC.cursor_blink = False
-            inputC.halign = 'center'
             codeInputs.append(inputC)
             if i == 0:
                 inputC.focus = True
-            inputC.font_name = 'Lato'
-            inputC.font_size = sp(32)
             self.add_widget(inputC)
         submitBtn = SubmitCodeButton()
         self.add_widget(submitBtn)
@@ -216,9 +258,6 @@ class SendEmailButton(Button):
             self.set_info_label()
 
         def finish_callback(animation, clock):
-            self.infoLabel.text = "[size=24]%s[/size] Recovery E-mail successfully sent! [ref=xd][u]Send again[" \
-                                  "/ref][/u]" \
-                                  % (icon('zmdi-check-circle'))
             self.infoLabel.bind(on_ref_press=on_ref_pressed)
 
         anim.bind(on_complete=finish_callback)
@@ -227,6 +266,14 @@ class SendEmailButton(Button):
     def on_pressed(self):
         self.rectColor = "#0f87ff"
         if checkIsEmailInDatabase(self.recoveryEmailBox.text):
+            if not checkIsSpam(self.recoveryEmailBox.text):
+                Clock.schedule_once(lambda dt: rmAnim.start(self))
+            else:
+                self.infoLabel.opacity = 1
+                self.infoLabel.color = rgba("c92a1e")
+                self.infoLabel.text = "[size=24]%s[/size] You've sent another request within the last 120 seconds." \
+                                      "Try again later" % icon('zmdi-alert-circle')
+                return
             self.set_info_label()
             self.disabled = True
             self.disabled_color = self.color
@@ -240,7 +287,6 @@ class SendEmailButton(Button):
             rmAnim.bind(on_complete=actually_remove_widget)
 
             globals.hoverEventObjects.pop(1)
-            Clock.schedule_once(lambda dt: rmAnim.start(self))
             sendRecoveryEmail(self.recoveryEmailBox.text)
 
         else:
@@ -250,8 +296,10 @@ class SendEmailButton(Button):
                                   % icon('zmdi-alert-circle')
 
     def on_a(self, instance, value):
-        self.infoLabel.text = "[size=24]%s[/size] Recovery E-mail successfully sent! Send again (%ds)" \
-                              % (icon('zmdi-check-circle'), round(value))
+        self.infoLabel.text = "[size=24]%s[/size] Recovery E-mail successfully sent! [ref=x]Send again[/ref])"\
+                              % (icon('zmdi-check-circle'))
+        self.infoLabel.color = rgba("08c48c")
+        pass
 
     def on_released(self):
         self.rectColor = "#0fafff"
@@ -260,9 +308,10 @@ class SendEmailButton(Button):
 class BackToLoginButton(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-    def on_press(self):
         self.color = [0, 0, 0, .7]
 
+    def on_press(self):
+        self.color = rgba("#0fafff")
+
     def on_release(self):
-        self.color = "#0fafff"
+        self.color = [0, 0, 0, .7]

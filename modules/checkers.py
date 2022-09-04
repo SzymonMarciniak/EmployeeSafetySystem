@@ -38,12 +38,12 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         Every pattern has been met and account info could have been retrieved or inserted from/to database
     """
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
-
+    splitted = fullName.split(' ')
     if not EMAIL_REGEX.fullmatch(login):
         ErrorBox().showError(errorBox=errorBox, reason="E-mail structure is incorrect")
         return False
     elif len(password) < 8 or len(password) > 64:
-        ErrorBox().showError(errorBox, "Password should be 8-64 characters long")
+        ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
         return False
     elif repeatPassword is not None:
         if password != repeatPassword:
@@ -52,8 +52,14 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         elif len(fullName) < 1:
             ErrorBox().showError(errorBox=errorBox, reason="You did not provide your full name")
             return False
-        elif len(fullName.split(' ')) <= 1:
+        elif len(splitted) <= 1:
             ErrorBox().showError(errorBox=errorBox, reason="Separate first and last name with a gap")
+            return False
+        for s in splitted:
+            if len(s) <= 3:
+                ErrorBox().showError(errorBox=errorBox, reason="Your full name format seems invalid")
+                return False
+
         else:
             if doesAccountExist(login, errorBox) is False:
                 db, cursor = connectToDatabase()
@@ -132,6 +138,18 @@ def checkCredintialsInDatabase(login, password, errorBox):
         return False
     closeDatabaseConnection(db, cursor)
     return True
+
+
+def checkForPassword(password, repeatPassword, errorBox):
+    if len(password) < 8 or len(password) > 64:
+        ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
+        return False
+    elif password != repeatPassword:
+        ErrorBox().showError(errorBox=errorBox, reason="Passwords do not match")
+        return False
+    else:
+        disableErrorMsg(errorBox)
+        return True
 
 
 def disableErrorMsg(errorBox):

@@ -2,6 +2,8 @@ import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, CMySQLConnection
 from mysql.connector.cursor_cext import CMySQLCursor
 
+from modules import globals
+
 
 def connectToDatabase(firstConnect=False):
     """
@@ -101,3 +103,10 @@ def checkIsEmailInDatabase(recoveryEmail):
         return True
     else:
         return False
+
+
+def setNewPassword(password):
+    db, cursor = connectToDatabase()
+    cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, globals.userID))
+    db.commit()
+    closeDatabaseConnection(db, cursor)

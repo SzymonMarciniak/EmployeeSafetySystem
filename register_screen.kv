@@ -29,7 +29,15 @@
     BoxLayout:
         orientation: 'vertical'
         Widget:
-            size_hint_y: .25
+            size_hint_y: .15
+        RelativeLayout:
+            size_hint_y: .1
+            ChangeLanguage:
+                background_normal: "img/gb.png"
+                background_down: "img/gb.png"
+                size: 50, 38
+                size_hint: None, None
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         Label:
             text: "EmployeeSafetySystem | Sign in"
             color: rgba('#0fafff')

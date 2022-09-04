@@ -78,14 +78,18 @@ class SimpleInput(TextInput):
             current_app.root.get_screen('login_screen').ids.capsLockLabel.text = ''
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = ''
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = ''
+            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = ''
+            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text = ''
             self.activated = False
         elif caps_status == 1 and not self.activated:
             current_app = App.get_running_app()
             current_app.root.get_screen('login_screen').ids.capsLockLabel.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
+            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = 'Caps ON'
+            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text =\
+                'Caps ON '
             self.activated = True
-        current_app = App.get_running_app()
 
 
 class LoginButton(Button):
