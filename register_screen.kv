@@ -6,12 +6,12 @@
     resetPswdBtn: resetPswdBtn
     canvas.before:
         Color:
-            rgba: rgba('#ececec')
+            rgba: BG_COLOR
         Rectangle:
             size: self.size
             pos: self.pos
         Color:
-            rgba: rgba('#08c48c30')
+            rgba: DECORATION_COLOR
         Ellipse:
             pos: self.size[0] - 200, - 200
             size: 400, 400
@@ -19,11 +19,11 @@
             pos: -225, self.size[1] *.5 - 125
             size: 250, 250
         Color:
-            rgba: rgba('#0fafff')
+            rgba: MAIN_COLOR
         Triangle:
             points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
         Color:
-            rgba: rgba('#0f87ff')
+            rgba: SECONDARY_COLOR
         Triangle:
             points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .73 * self.size[1]]
     BoxLayout:
@@ -40,7 +40,7 @@
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         Label:
             text: "EmployeeSafetySystem | Sign in"
-            color: rgba('#0fafff')
+            color: MAIN_COLOR
             font_size: mtx.sp(24)
             size_hint_y: .1
         BoxLayout:
@@ -51,12 +51,12 @@
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-key')
-                color: rgba('#0fafff')
+                color: MAIN_COLOR
                 font_size: mtx.sp(96)
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-lock')
-                color: rgba('#0fafff')
+                color: MAIN_COLOR
                 font_size: mtx.sp(96)
 
         RegisterScreenLayout:
@@ -90,7 +90,7 @@
                                 self.color = rgba('#08c48c')
                             on_release:
                                 newPasswordBox.password = True
-                                self.color = rgba('#0fafff')
+                                self.color = MAIN_COLOR
                         Label:
                             id: capsLockLabel_newPasswordBox
                             color: rgba('#08c48c')
@@ -109,7 +109,7 @@
                                 self.color = rgba('#08c48c')
                             on_release:
                                 repeatPasswordBox.password = True
-                                self.color = rgba('#0fafff')
+                                self.color = MAIN_COLOR
                         Label:
                             id: capsLockLabel_repeatPasswordBox
                             color: rgba('#08c48c')
@@ -154,7 +154,7 @@
 
 <RegisterButton>:
     background_color: [0,0,0,0]
-    color: rgba('#ececec')
+    color: BG_COLOR
     on_press: root.on_pressed()
     on_release: root.on_released()
     font_size: mtx.sp(24)
