@@ -34,6 +34,19 @@ class ForgotPasswordScreen(Screen):
         globals.hoverEventObjects = [self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
 
 
+class NewPasswordScreen(Screen):
+    forgot_new_password_box = ObjectProperty()
+    forgot_repeat_new_password_box = ObjectProperty()
+    setPasswordBtn = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def on_pre_enter(self):
+        globals.hoverEventObjects = [self.forgot_new_password_box, self.forgot_repeat_new_password_box,
+                                     self.setPasswordBtn]
+
+
 def sendRecoveryEmail(userMail):
     """
     Sends recovery mail to E-mail address provided by user. Checks for already existing requests and updates them
@@ -43,10 +56,6 @@ def sendRecoveryEmail(userMail):
     ------------------
     userMail: string
         E-mail provided by user to receive password recovery message
-
-    infoLabel: ObjectProperty
-        Object of infoLabel; used to handle error message
-
     """
     systemMail = "employeesafetysystem@ess.com"
 
@@ -132,6 +141,7 @@ class CodeInput(TextInput):
         self.halign = 'center'
         self.font_name = 'Lato'
         self.font_size = sp(32)
+        self.background_color = [1, 1, 1, 1]
 
 
 class SubmitCodeButton(Button):
@@ -297,7 +307,7 @@ class SendEmailButton(Button):
                                   % icon('zmdi-alert-circle')
 
     def on_a(self, instance, value):
-        self.infoLabel.text = "[size=24]%s[/size] Recovery E-mail successfully sent! [ref=x]Send again[/ref])"\
+        self.infoLabel.text = "[size=24]%s[/size] Recovery E-mail successfully sent! [ref=x]Send again[/ref])" \
                               % (icon('zmdi-check-circle'))
         self.infoLabel.color = rgba("08c48c")
         pass

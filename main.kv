@@ -6,11 +6,14 @@
 #: set MAIN_COLOR rgba('#0fafff')
 #: set SECONDARY_COLOR rgba('#0f87ff')
 #: set DECORATION_COLOR rgba('#08c48c30')
+#: set DECORATION_COLOR_NOALPHA rgba('#08c48c')
+#: set ERROR_COLOR rgba("#c92a1e")
 
 #: include login_screen.kv
 #: include register_screen.kv
 #: include forgot_password.kv
 #: include new_password.kv
+#: include choose_workplace.kv
 
 <ScreenManagement>:
     id: screen_manager
@@ -18,9 +21,7 @@
 
     RegisterScreen:
 
-    Screen:
-        name: 'main_screen'
-        MainScreen:
+    ChooseWorkplaceScreen:
 
     ForgotPasswordScreen:
 

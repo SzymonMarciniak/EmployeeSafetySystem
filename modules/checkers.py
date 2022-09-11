@@ -5,6 +5,7 @@ from kivy.app import App
 from kivy.garden.iconfonts import icon
 from kivy.uix.screenmanager import FadeTransition
 
+from modules import globals
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
 
 
@@ -38,7 +39,6 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         Every pattern has been met and account info could have been retrieved or inserted from/to database
     """
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
-    splitted = fullName.split(' ')
     if not EMAIL_REGEX.fullmatch(login):
         ErrorBox().showError(errorBox=errorBox, reason="E-mail structure is incorrect")
         return False
@@ -46,6 +46,7 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
         return False
     elif repeatPassword is not None:
+        splitted = fullName.split(' ')
         if password != repeatPassword:
             ErrorBox().showError(errorBox=errorBox, reason="Passwords do not match")
             return False
@@ -63,8 +64,8 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         else:
             if doesAccountExist(login, errorBox) is False:
                 db, cursor = connectToDatabase()
-                cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, NOW(), NOW())", ([login, password,
-                                                                                                    fullName]))
+                cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())",
+                               ([login, password, fullName]))
                 db.commit()
                 return True
             else:
@@ -126,12 +127,13 @@ def checkCredintialsInDatabase(login, password, errorBox):
         Invalid credintials; error shown
     """
     db, cursor = connectToDatabase()
-    cursor.execute("SELECT * FROM accounts WHERE login=%s AND password=%s;", (login, password))
+    cursor.execute("SELECT id FROM accounts WHERE login=%s AND password=%s;", (login, password))
     results = cursor.fetchone()
     if results is not None:
         disableErrorMsg(errorBox)
+        globals.userID = results[0]
         App.get_running_app().root.transition = FadeTransition()
-        App.get_running_app().root.current = 'main_screen'
+        App.get_running_app().root.current = 'choose_workplace_screen'
     else:
         ErrorBox().showError(errorBox, "Could not log in. Ensure the credentials match")
         closeDatabaseConnection(db, cursor)

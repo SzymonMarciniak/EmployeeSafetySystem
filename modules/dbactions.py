@@ -48,14 +48,16 @@ def connectToDatabase(firstConnect=False):
         if firstConnect:
             try:
                 cursor.execute(
-                    "CREATE TABLE IF NOT EXISTS accounts (id INT NOT NULL auto_increment PRIMARY KEY, login VARCHAR("
-                    "128), "
-                    "password "
-                    "VARCHAR(64), name VARCHAR(128), type INT, creationDate INT, lastLogin INT);")
+                    "CREATE TABLE IF NOT EXISTS accounts (id INT NOT NULL auto_increment PRIMARY KEY, "
+                    "login VARCHAR(128), password VARCHAR(64), name VARCHAR(128), "
+                    "type INT, creationDate INT, lastLogin INT);")
                 cursor.execute(
                     "CREATE TABLE IF NOT EXISTS pswdResets (id INT NOT NULL auto_increment PRIMARY KEY, userID INT "
-                    "NOT NULL, "
-                    "code VARCHAR(8), initDate INT, expDate INT, USED INT);")
+                    "NOT NULL, code VARCHAR(8), initDate INT, expDate INT, USED INT);")
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS workplaces (id INT NOT NULL auto_increment PRIMARY KEY, userID INT "
+                    "NOT NULL, name VARCHAR(64), position INT, state_activation BOOLEAN, state_notifications BOOLEAN);"
+                )
             except mysql.connector.Error as error:
                 raise TimeoutError("Cannot process query. Reason: %s" % error)
         return db, cursor

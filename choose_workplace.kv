@@ -1,0 +1,74 @@
+<ChooseWorkplaceScreen>:
+    name: "choose_workplace_screen"
+    workplace_chooser_layout: workplace_chooser_layout
+    canvas.before:
+        Color:
+            rgba: BG_COLOR
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: DECORATION_COLOR
+        Ellipse:
+            pos: self.size[0] - 200, - 200
+            size: 400, 400
+        Ellipse:
+            pos: -225, self.size[1] *.5 - 125
+            size: 250, 250
+        Color:
+            rgba: MAIN_COLOR
+        Triangle:
+            points: [0, self.size[1], self.size[0], self.size[1], 0, .9 * self.size[1]]
+        Color:
+            rgba: SECONDARY_COLOR
+        Triangle:
+            points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .9 * self.size[1]]
+    BoxLayout:
+        id: choose_main_layout
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: .2
+            Label:
+                text: "Choose workplace"
+                valign: 'bottom'
+                color: MAIN_COLOR
+                font_name: 'Lato'
+                font_size: sp(24)
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_y: .7
+            WorkplaceChooserLayout:
+                id: workplace_chooser_layout
+        Widget:
+            size_hint_y: .1
+
+<ExistingWorkplace>:
+    line_padding: 10
+    canvas.before:
+        Color:
+            rgba: DECORATION_COLOR_NOALPHA
+        Line:
+            width: 1
+            rectangle: self.pos[0], self.pos[1] + self.line_padding, self.width, self.height - 2 * self.line_padding
+            dash_length: 5
+            dash_offset: 10
+
+<NewWorkplace>:
+    line_padding: 10
+    canvas.before:
+        Color:
+            rgba: DECORATION_COLOR_NOALPHA
+        Line:
+            width: 1
+            rectangle: self.pos[0], self.pos[1] + self.line_padding, self.width, self.height - 2 * self.line_padding
+            dash_length: 5
+            dash_offset: 10
+
+<RoundedButton>:
+    canvas.before:
+        Color:
+            rgba: SECONDARY_COLOR
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 20, 20]
