@@ -119,20 +119,15 @@ class WorkplaceChooserLayout(BoxLayout):
 
     def build_layout(self):
         db, cursor = connectToDatabase()
-        print(globals.userID)
         cursor.execute("SELECT name, position, state_activation, state_notifications FROM workplaces WHERE userid=%s "
                        "ORDER BY position ASC;", (globals.userID,))
         results = cursor.fetchall()
         row_count = cursor.rowcount
         closeDatabaseConnection(db, cursor)
-        print(row_count)
         if results is not None:
-            print("not none")
             for row in results:
-                print("for results")
                 self.buildExistingWorkplace(row[0], row[1], row[2], row[3])
         for i in range(row_count, 3):
-            print("in range")
             self.buildNewWorkplace()
 
     def buildExistingWorkplace(self, title, pos, s_activation, s_notifications):
