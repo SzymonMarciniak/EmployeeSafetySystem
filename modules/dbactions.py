@@ -3,6 +3,7 @@ from mysql.connector import errorcode, MySQLConnection, CMySQLConnection
 from mysql.connector.cursor_cext import CMySQLCursor
 
 from modules import globals
+from modules.globals import userID
 
 
 def connectToDatabase(firstConnect=False):
@@ -112,3 +113,9 @@ def setNewPassword(password):
     cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, globals.userID))
     db.commit()
     closeDatabaseConnection(db, cursor)
+
+
+def insertNewWorkplace(name, notifications_status):
+    db, cursor = connectToDatabase()
+    cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 0, %s);", (globals.userID, name, notifications_status))
+    db.commit()

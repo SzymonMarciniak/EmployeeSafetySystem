@@ -1,11 +1,13 @@
+from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics import Color, Line
 from kivy.metrics import sp
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
-from kivy.uix.screenmanager import Screen
+from kivy.uix.screenmanager import Screen, FadeTransition
 from modules import globals
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules.globals import MAIN_COLOR, DECORATION_COLOR_NOALPHA, SECONDARY_COLOR
@@ -21,16 +23,27 @@ class ChooseWorkplaceScreen(Screen):
     def on_pre_enter(self):
         Window.set_system_cursor('arrow')
         globals.hoverEventObjects = []
-        # TO BE MADE. It has to be made to get children of this screen and then append them to this array
+        size = Window.size
+        Window.size = (100,100)
+        Window.size = size
+        self.workplace_chooser_layout.clear_widgets()
         self.workplace_chooser_layout.build_layout()
 
 
-class NewWorkplace(Label):
+class NewWorkplace(Button):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint_y = .3
         self.color = MAIN_COLOR
         self.text = "+ SETUP NEW WORKPLACE"
+        self.background_down = ''
+        self.background_normal = ''
+        self.background_color = [0, 0, 0, 0]
+
+    def on_press(self):
+        app = App.get_running_app()
+        app.root.transition = FadeTransition()
+        app.root.current = 'new_workplace_screen'
 
 
 class ExistingWorkplace(BoxLayout):
@@ -48,7 +61,6 @@ class EwTitle(Label):
         self.valign = 'top'
         self.color = SECONDARY_COLOR
         self.font_name = 'Lato'
-        self.font_size = sp(24)
         self.bind(size=self.update)
 
     def update(self, *args):
@@ -58,52 +70,18 @@ class EwTitle(Label):
 class EwNumber(Label):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint_x = .1
         self.valign = 'top'
         self.halign = 'right'
         self.color = SECONDARY_COLOR
         self.font_name = 'Lato'
-        self.font_size = sp(24)
-        self.bind(size=self.update)
-
-    def update(self, *args):
-        self.text_size = self.size
 
 
 class EwStatus(Label):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.markup = True
-        self.font_size = sp(20)
         self.font_name = 'Lato'
         self.color = [0, 0, 0, 1]
-        self.bind(size=self.update)
-
-    def update(self, *args):
-        self.text_size = self.size
-
-
-class EwNotifications(Label):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.markup = True
-        self.font_size = sp(20)
-        self.font_name = 'Lato'
-        self.color = [0, 0, 0, 1]
-        self.bind(size=self.update)
-
-    def update(self, *args):
-        self.text_size = self.size
-
-
-class EwAlerts(Label):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.markup = True
-        self.font_size = sp(20)
-        self.font_name = 'Lato'
-        self.color = [0, 0, 0, 1]
-        self.text = "[color=#08c48c]%s[/color] No new alerts" % icon('zmdi-check')
         self.bind(size=self.update)
 
     def update(self, *args):
@@ -113,8 +91,6 @@ class EwAlerts(Label):
 class WorkplaceChooserLayout(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.orientation = 'vertical'
-        self.padding = 30, 5
         self.size_hint_y = .73
 
     def build_layout(self):
@@ -134,10 +110,10 @@ class WorkplaceChooserLayout(BoxLayout):
         ew = ExistingWorkplace()
         boxlayout = BoxLayout()
         boxlayout.add_widget(EwTitle(text=title))
-        boxlayout.add_widget(EwNumber(text='#'+str(pos)))
+        boxlayout.add_widget(EwNumber(text='#' + str(pos)))
         ew.add_widget(boxlayout)
-        division = BoxLayout()
-        boxlayout = BoxLayout(orientation='vertical', size_hint_x=.8)
+        division = DivisionLayout(spacing=10)
+        boxlayout = StatusGridLayout()
         label_text = "[color=%s]%s[/color] " \
                      "Status: %s" % ("#08c48c" if s_activation > 0 else "#c92a1e",
                                      icon('zmdi-circle'), "Active" if s_activation > 0 else "Disabled")
@@ -147,22 +123,30 @@ class WorkplaceChooserLayout(BoxLayout):
                                             icon('zmdi-notifications-off') if s_notifications > 0 else
                                             icon('zmdi-notifications-active'), "Active"
                                             if s_activation > 0 else "Disabled")
-        boxlayout.add_widget(EwNotifications(text=label_text))
+        boxlayout.add_widget(EwStatus(text=label_text))
         # label_text = "[color=%s]%s[/color] " \
         #              "%s" % ("#08c48c" if s_notifications > 0 else "#c92a1e",
         #                      icon('zmdi-') if s_notifications > 0 else
         #                      icon('zmdi-notifications-active'), "No actions to be taken"
         #                      if self.s_activation > 0 else "X alerts active")
-        boxlayout.add_widget(EwAlerts())
+        boxlayout.add_widget(EwStatus(text="[color=#08c48c]%s[/color] No new alerts" % icon('zmdi-check')))
         division.add_widget(boxlayout)
-        boxlayout = BoxLayout(size_hint_x=.2)
-        boxlayout.add_widget(RoundedButton(markup=True, text="%s" % icon('zmdi-chevron-right')))
-        division.add_widget(boxlayout)
+        division.add_widget(RoundedButton(markup=True, text="%s" % icon('zmdi-chevron-right')))
         ew.add_widget(division)
         self.add_widget(ew)
 
     def buildNewWorkplace(self):
         self.add_widget(NewWorkplace())
+
+
+class StatusGridLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+class DivisionLayout(BoxLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
 
 class RoundedButton(Button):
@@ -172,3 +156,26 @@ class RoundedButton(Button):
         self.background_down = ''
         self.background_color = [0, 0, 0, 0]
         self.font_size = sp(32)
+
+
+class LogoutButton(Button):
+    workplace_chooser_layout = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.ids.rectColor = self.color
+        self.rectColor = "#0fafff"
+
+    def on_pressed(self):
+        self.rectColor = "#0f87ff"
+
+    def on_released(self):
+        self.rectColor = "#0fafff"
+        LogoutClient()
+
+
+def LogoutClient():
+    globals.userID = None
+    app = App.get_running_app()
+    app.root.transition = FadeTransition()
+    app.root.current = "login_screen"

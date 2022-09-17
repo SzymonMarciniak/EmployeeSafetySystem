@@ -33,13 +33,15 @@ class LoginScreen(Screen):
     def callback(self, dt):
         globals.hoverEventObjects = [self.loginBox, self.passwordBox, self.loginBtn,
                                      self.registerBtn, self.resetPswdBtn]
+        self.loginBox.text = ''
+        self.passwordBox.text = ''
 
 
 class RegisterScreen(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    newLoginBox = ObjectProperty()
+    loginBox = ObjectProperty()
     newPasswordBox = ObjectProperty()
     repeatPasswordBox = ObjectProperty()
     nameBox = ObjectProperty()
@@ -48,10 +50,11 @@ class RegisterScreen(Screen):
     resetPswdBtn = ObjectProperty()
 
     def on_pre_enter(self):
-        Clock.schedule_once(self.callback)
-
-    def callback(self, dt):
         globals.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
+        self.loginBox.text = ''
+        self.newPasswordBox.text = ''
+        self.repeatPasswordBox.text = ''
+        self.nameBox.text = ''
 
 
 class LoginScreenLayout(BoxLayout):
@@ -143,13 +146,12 @@ class ResetPasswordButton(Button):
 
 
 class SwitchRegisterButton(Button):
-    transitionColor = ColorProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def on_press(self):
-        self.color = [0, 0, 0, .7]
+        self.color = "#0f87ff"
 
     def on_release(self):
         self.color = "#0fafff"

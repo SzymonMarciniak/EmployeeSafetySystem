@@ -7,13 +7,14 @@
 #: set SECONDARY_COLOR rgba('#0f87ff')
 #: set DECORATION_COLOR rgba('#08c48c30')
 #: set DECORATION_COLOR_NOALPHA rgba('#08c48c')
-#: set ERROR_COLOR rgba("#c92a1e")
+#: set ERROR_COLOR rgba('#c92a1e')
 
 #: include login_screen.kv
 #: include register_screen.kv
 #: include forgot_password.kv
 #: include new_password.kv
 #: include choose_workplace.kv
+#: include new_workplace.kv
 
 <ScreenManagement>:
     id: screen_manager
@@ -27,8 +28,11 @@
 
     NewPasswordScreen:
 
+    NewWorkplaceScreen:
 
 <ResetPasswordButton>:
+    font_size: self.height / 1.5
+    font_name: 'Lato'
     background_color: [0,0,0,0]
     color: [0,0,0,.5]
 
@@ -38,7 +42,7 @@
     color: BG_COLOR
     on_press: root.on_pressed()
     on_release: root.on_released()
-    font_size: mtx.sp(24)
+    font_size: max(15, self.height / 1.7)
     font_name: 'Lato'
     bold: True
     canvas.before:
@@ -49,12 +53,11 @@
             size: self.size
             radius: [20, 20, 20, 20]
 
-
 <SwitchRegisterButton>:
     background_normal: ''
     background_color: [0,0,0,0]
     color: MAIN_COLOR
-    font_size: mtx.sp(18)
+    font_size: max(15, self.height / 2)
     margin: 20
     lineWidth: 3
     font_name: 'Lato'
@@ -75,15 +78,18 @@
             radius: [20, 20, 20, 20]
 
 <SimpleInput>:
-    font_size: mtx.sp(16)
+    font_size: max(15, self.height / 2)
+    font_name: 'Lato'
     write_tab: False
+    foreground_color: DECORATION_COLOR_NOALPHA
     multiline: False
     background_normal: ''
     background_active: ''
+    hint_text_color: SECONDARY_COLOR
     background_color: [1,1,1,0]
-    canvas.before:
+    canvas.after:
         Color:
-            rgba: SECONDARY_COLOR
+            rgba: MAIN_COLOR
         Rectangle:
-            pos: self.pos[0], self.pos[1] + self.height - 40
+            pos: self.pos[0], self.pos[1]
             size: [self.size[0], 1]

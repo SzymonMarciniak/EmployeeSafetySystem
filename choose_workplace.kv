@@ -1,5 +1,5 @@
 <ChooseWorkplaceScreen>:
-    name: "choose_workplace_screen"
+    name: 'choose_workplace_screen'
     workplace_chooser_layout: workplace_chooser_layout
     canvas.before:
         Color:
@@ -29,18 +29,28 @@
         BoxLayout:
             size_hint_y: .2
             Label:
+                id: test_label
                 text: "Choose workplace"
+                text_size: self.size
                 valign: 'bottom'
+                halign: 'center'
                 color: MAIN_COLOR
                 font_name: 'Lato'
-                font_size: sp(24)
+                font_size: sp(max(24, min(72, root.size[0] * root.size[1] / 10000)))
         BoxLayout:
             orientation: 'vertical'
             size_hint_y: .7
             WorkplaceChooserLayout:
                 id: workplace_chooser_layout
+        FloatLayout:
+            size_hint_y: .08
+            LogoutButton:
+                workplace_chooser_layout: workplace_chooser_layout
+                pos_hint: {'center_x' : .5, 'center_y': .5}
+                width: min(300, self.width)
+                text: "Logout"
         Widget:
-            size_hint_y: .1
+            size_hint_y: .02
 
 <ExistingWorkplace>:
     line_padding: 10
@@ -55,6 +65,11 @@
 
 <NewWorkplace>:
     line_padding: 10
+    font_size:
+        (
+        self.height / 10 if app.size in 'S' else
+        self.width / 15
+        )
     canvas.before:
         Color:
             rgba: DECORATION_COLOR_NOALPHA
@@ -65,6 +80,17 @@
             dash_offset: 10
 
 <RoundedButton>:
+    size_hint_x:
+        (
+        .2 if app.size in 'S' else
+        1
+        )
+    size_hint_y:
+        (
+        1 if app.size in 'S' else
+        .5
+        )
+    font_size: self.height * .6
     canvas.before:
         Color:
             rgba: SECONDARY_COLOR
@@ -72,3 +98,84 @@
             pos: self.pos
             size: self.size
             radius: [20, 20, 20, 20]
+
+<LogoutButton>:
+    background_color: [0,0,0,0]
+    color: BG_COLOR
+    on_press: root.on_pressed()
+    on_release: root.on_released()
+    font_size: mtx.sp(24)
+    font_name: 'Lato'
+    bold: True
+    canvas.before:
+        Color:
+            rgba: rgba(self.rectColor)
+        RoundedRectangle:
+            pos: self.pos
+            size: self.size
+            radius: [20, 20, 20, 20]
+
+<StatusGridLayout>:
+#    orientation:
+#        (
+#        'tb-lr' if app.size in 'S' else
+#        'lr-tb'
+#        )
+#    height: self.minimum_height
+    orientation: 'vertical'
+<EwTitle>:
+    font_size:
+        (
+        self.height / 2.5 if app.size in 'S' else
+        self.height / 7.5
+        )
+
+<EwNumber>:
+    size_hint_x: .15
+    text_size: self.size
+    font_size:
+        (
+        self.height / 2.5 if app.size in 'S' else
+        self.height / 7.5
+        )
+<EwStatus>:
+    text_size: self.size
+    font_size:
+        (
+        max(15, min(100, self.height)) if app.size in 'S' else
+        self.height / 2
+        )
+
+<WorkplaceChooserLayout>:
+    padding: [.1 * self.size[0], 5]
+    spacing:
+        (
+        2 if app.size in 'S' else
+        15
+        )
+    orientation:
+        (
+        'vertical' if app.size in 'S' else
+        'horizontal'
+        )
+
+<ExistingWorkplace>:
+    size_hint_y:
+        (
+        .3 if app.size in 'S' else
+        1
+        )
+
+<NewWorkplace>:
+    size_hint_y:
+        (
+        .3 if app.size in 'S' else
+        1
+        )
+
+<DivisionLayout>:
+    orientation:
+        (
+        'horizontal' if app.size in 'S' else
+        'vertical'
+        )

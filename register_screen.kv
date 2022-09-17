@@ -4,6 +4,10 @@
     registerBtn: registerBtn
     loginBtn: loginBtn
     resetPswdBtn: resetPswdBtn
+    loginBox: newLoginBox
+    newPasswordBox: newPasswordBox
+    repeatPasswordBox: repeatPasswordBox
+    nameBox: nameBox
     canvas.before:
         Color:
             rgba: BG_COLOR
@@ -39,9 +43,9 @@
                 size_hint: None, None
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         Label:
-            text: "EmployeeSafetySystem | Sign in"
+            text: "Sign in"
             color: MAIN_COLOR
-            font_size: mtx.sp(24)
+            font_size: self.height / 2
             size_hint_y: .1
         BoxLayout:
             background_color: 0,1,0,1
@@ -52,27 +56,27 @@
                 markup: True
                 text: "%s" % icon('zmdi-key')
                 color: MAIN_COLOR
-                font_size: mtx.sp(96)
+                font_size: self.height / 1.5
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-lock')
                 color: MAIN_COLOR
-                font_size: mtx.sp(96)
+                font_size: self.height / 1.5
 
         RegisterScreenLayout:
             size_hint_y: .6
-            spacing: 20
             padding: [.1 * self.size[0], 0]
+            spacing: 20
             orientation: 'vertical'
             ScrollView:
                 do_scroll_x: False
                 do_scroll_y: True
-                BoxLayout:
-                    height: 450
-                    spacing: -30
-                    size_hint_y: .3
-                    size_hint: 1, None
-                    orientation: 'vertical'
+                GridLayout:
+                    spacing: 30
+                    size_hint_y: None
+                    height: 430
+                    width: self.minimum_width
+                    cols: 1
                     SimpleInput:
                         id: newLoginBox
                         hint_text: 'E-Mail address'
@@ -84,7 +88,7 @@
                             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                         PasswordSwitch:
                             size_hint_x: .1
-                            pos_hint: {'center_x': 0.95, 'center_y': 0.85}
+                            pos_hint: {'center_x': 0.95, 'center_y': 0.60}
                             on_press:
                                 newPasswordBox.password = False
                                 self.color = rgba('#08c48c')
@@ -94,7 +98,7 @@
                         Label:
                             id: capsLockLabel_newPasswordBox
                             color: rgba('#08c48c')
-                            pos_hint: {'center_x': 0.80, 'center_y': 0.85}
+                            pos_hint: {'center_x': 0.80, 'center_y': 0.60}
                     RelativeLayout:
                         SimpleInput:
                             id: repeatPasswordBox
@@ -103,7 +107,7 @@
                             pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                         PasswordSwitch:
                             size_hint_x: .1
-                            pos_hint: {'center_x': 0.95, 'center_y': 0.85}
+                            pos_hint: {'center_x': 0.95, 'center_y': 0.60}
                             on_press:
                                 repeatPasswordBox.password = False
                                 self.color = rgba('#08c48c')
@@ -113,17 +117,17 @@
                         Label:
                             id: capsLockLabel_repeatPasswordBox
                             color: rgba('#08c48c')
-                            pos_hint: {'center_x': 0.80, 'center_y': 0.85}
+                            pos_hint: {'center_x': 0.80, 'center_y': 0.60}
                     SimpleInput:
                         id: nameBox
                         hint_text: 'First and last name'
-                    BoxLayout:
-                        ErrorBox:
-                            pos_hint: {'top':1.0}
-                            size_hint_x: .5
-                            id: errorBox
+                    ErrorBox:
+                        pos_hint: {'top':1.0}
+                        size_hint_y: 3
+                        size_hint_x: .5
+                        id: errorBox
 
-                            text: "[size=40]%s[/size]\nCould not log in. Ensure the credentials match" % icon('zmdi-alert-circle')
+                        text: "[size=%d]%s[/size]\nCould not log in. Ensure the credentials match" % (self.height / 2 * 1.5, icon('zmdi-alert-circle'))
             BoxLayout:
                 size_hint_y: .6
                 orientation: 'vertical'

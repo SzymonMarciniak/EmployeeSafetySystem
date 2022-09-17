@@ -42,9 +42,10 @@
                 pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
         Label:
-            text: "EmployeeSafetySystem | Log in"
+            text: "Log in"
+            font_name: 'Lato'
             color: MAIN_COLOR
-            font_size: mtx.sp(24)
+            font_size: self.height / 2
             size_hint_y: .1
         BoxLayout:
             background_color: 0,1,0,1
@@ -55,12 +56,12 @@
                 markup: True
                 text: "%s" % icon('zmdi-key')
                 color: MAIN_COLOR
-                font_size: mtx.sp(96)
+                font_size: self.height / 1.5
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-lock')
                 color: MAIN_COLOR
-                font_size: mtx.sp(96)
+                font_size: self.height / 1.5
         LoginScreenLayout:
             size_hint_y: .6
             padding: [.1 * self.size[0], 0]
@@ -132,8 +133,10 @@
     color: rgba("#c92a1e")
     margin: 20
     lineWidth: 1.8
+    font_size: min(self.width / 22, 40)
     markup: True
     halign: 'center'
+    valign: 'top'
     opacity: 0
     disabled: True
     canvas.before:
