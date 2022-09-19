@@ -24,14 +24,6 @@ class ScreenManagement(ScreenManager):
         super().__init__(**kwargs)
 
 
-class MainScreen(StackLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        for i in range(50):
-            box = Button(size_hint=[.5, .2], text="Work in progress")
-            self.add_widget(box)
-
-
 class EmployeeSafetySystemApp(App):
     size = OptionProperty('S', options=['S', 'L', 'XL'])
 

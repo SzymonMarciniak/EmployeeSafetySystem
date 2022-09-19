@@ -2,6 +2,7 @@ from kivy.utils import rgba
 
 hoverEventObjects = None
 userID = None
+choosenWorkplace = None
 BG_COLOR = rgba('#ececec')
 MAIN_COLOR = rgba('#0fafff')
 SECONDARY_COLOR = rgba('#0f87ff')

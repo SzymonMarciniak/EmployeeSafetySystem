@@ -8,6 +8,8 @@
 #: set DECORATION_COLOR rgba('#08c48c30')
 #: set DECORATION_COLOR_NOALPHA rgba('#08c48c')
 #: set ERROR_COLOR rgba('#c92a1e')
+#-------------- DARK MODE --------------#
+#: set DM_MAIN_COLOR rgba('#282a35')
 
 #: include login_screen.kv
 #: include register_screen.kv
@@ -15,6 +17,7 @@
 #: include new_password.kv
 #: include choose_workplace.kv
 #: include new_workplace.kv
+#: include main_workplace_screen.kv
 
 <ScreenManagement>:
     id: screen_manager
@@ -29,6 +32,8 @@
     NewPasswordScreen:
 
     NewWorkplaceScreen:
+
+    MainWorkplaceScreen:
 
 <ResetPasswordButton>:
     font_size: self.height / 1.5

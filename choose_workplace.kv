@@ -82,13 +82,13 @@
 <RoundedButton>:
     size_hint_x:
         (
-        .2 if app.size in 'S' else
-        1
+        1 if app.size in 'S' else
+        .7
         )
     size_hint_y:
         (
-        1 if app.size in 'S' else
-        .5
+        .6 if app.size in 'S' else
+        1
         )
     font_size: self.height * .6
     canvas.before:
@@ -98,6 +98,48 @@
             pos: self.pos
             size: self.size
             radius: [20, 20, 20, 20]
+
+<EditButton>:
+    size_hint_x:
+        (
+        1 if app.size in 'S' else
+        .3
+        )
+    size_hint_y:
+        (
+        .4 if app.size in 'S' else
+        1
+        )
+    font_size:
+        (
+        self.height * .8 if app.size in 'S' else
+        self.height * .6
+        )
+    color: SECONDARY_COLOR
+    markup: True
+    text: '%s' % icon('zmdi-edit')
+
+<ActionButtonsLayout>:
+    padding:
+        (
+        [0, -10] if app.size in 'S' else
+        [0, 0]
+        )
+    size_hint_x:
+        (
+        .2 if app.size in 'S' else
+        1
+        )
+    size_hint_y:
+        (
+        1 if app.size in 'S' else
+        .5
+        )
+    orientation:
+        (
+        'vertical' if app.size in 'S' else
+        'horizontal'
+        )
 
 <LogoutButton>:
     background_color: [0,0,0,0]
