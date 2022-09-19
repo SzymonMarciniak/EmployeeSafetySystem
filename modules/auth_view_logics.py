@@ -1,7 +1,8 @@
 import platform
 
-import win32api
-import win32con
+if platform.system() == 'Windows':
+    import win32api
+    import win32con
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.properties import StringProperty, ObjectProperty, ColorProperty
