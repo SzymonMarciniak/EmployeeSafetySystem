@@ -1,11 +1,11 @@
-MainWindow:
+SetupScreen:
 
-<MainWindow@BoxLayout>:
+<SetupScreen@BoxLayout>:
     orientation: "vertical"
 
     BoxLayout:
         orientation: "horizontal"
-        size_hint: 1, .2
+        size_hint: 1, .1
 
         ToggleButton:
             group: 'create_room'
@@ -33,11 +33,6 @@ MainWindow:
         
     FloatLayout:
 
-    Label: 
-        text: "Other"
-        pos_hint: {'center_x':.45, 'center_y':.45 }
-
-        #on_touch_down: root.
         
 
 
