@@ -17,6 +17,7 @@ from modules import globals
 from modules import recovery_email
 from modules import workplace_chooser
 from modules import new_workplace
+from modules import main_workplace
 
 
 class ScreenManagement(ScreenManager):

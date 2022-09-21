@@ -1,14 +1,14 @@
 <MainWorkplaceScreen@Screen>:
-    canvas.before:
-        Color:
-            rgba: BG_COLOR
-        Rectangle:
-            size: self.size
-            pos: self.pos
     name: 'main_workplace_screen'
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
+            canvas.before:
+                Color:
+                    rgba: BG_COLOR
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
             size_hint_y: .05
             padding: 30, 0
             HeaderLabel:
@@ -27,6 +27,7 @@
                 valign: 'center'
                 text: 'v1.3.8-P'
         BoxLayout:
+            main_screen_sm: main_screen_sm
             size_hint_y: .95
             BoxLayout:
                 orientation: 'vertical'
@@ -67,13 +68,14 @@
                         cols: 1
                         MenuButton:
                             text: '%s   Cameras' % icon('zmdi-camera')
-                        MenuButtonActive:
+                        MenuButton:
                             text: '%s   Alerts' % icon('zmdi-notifications-active')
                         MenuButton:
                             text: '%s   Dashboard' % icon('zmdi-view-dashboard')
                         MenuButton:
                             text: '%s   Rules' % icon('zmdi-view-list')
-                        MenuButton:
+                        MenuButtonActive:
+                            main_screen_sm: main_screen_sm
                             text: '%s   Setup' % icon('zmdi-settings')
                 DivisionLine:
                 BoxLayout:
@@ -100,18 +102,23 @@
                 id: main_screen_sm
                 size_hint_x: .795
                 Screen:
-                    canvas.after:
-                        Color:
-                            rgba: DM_MAIN_COLOR
-                        Rectangle:
-                            size: self.size
-                            pos: self.pos
+                Screen:
+                    name: "SetupScreen"
+                    Button:
+                        text: 'setup'
 
 <DivisionLine@Widget>:
+    canvas.before:
+        Color:
+            rgba: BG_COLOR
+        Rectangle:
+            size: self.size
+            pos: self.pos
     size_hint_y: .005
     size_hint_x: 1
 
 <MenuButton@Button>:
+    is_active: False
     font_size:
         (
         self.width / 6.5 if app.size in 'S' else
@@ -121,10 +128,14 @@
     markup: True
     background_normal: ''
     background_down: ''
-    background_color: [0, 0, 0, 0]
+    background_color:
+        (
+        DECORATION_COLOR_NOALPHA if self.is_active else
+        [0, 0, 0, 0]
+        )
     color: BG_COLOR
 
-<MenuButtonActive@Button>:
+<MenuButtonActive>:
     font_size:
         (
         self.width / 6.5 if app.size in 'S' else
