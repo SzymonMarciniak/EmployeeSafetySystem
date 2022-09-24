@@ -1,40 +1,64 @@
+#: import mtx kivy.metrics
+#: import icon kivy.garden.iconfonts.icon
+
 SetupScreen:
 
 <SetupScreen@BoxLayout>:
     orientation: "vertical"
+    floatlayout: floatlayout
 
     BoxLayout:
         orientation: "horizontal"
         size_hint: 1, .1
 
         ToggleButton:
+            id: CreateRoomButton
             group: 'create_room'
-            text: "Create new room"
+            text: "Create room"
             on_press: root.create_room_activate()
 
         ToggleButton:
+            id: CreateDoorButton
             group: 'create_room'
-            text: "Create new door"
+            text: "Create door"
             on_press: root.create_door_activate()
-           
 
         ToggleButton:
+            id: CreateCameraButton
             group: 'create_room'
-            text: "C"
+            text: "Add camera"
+            on_press: root.add_camera_activate()
 
         ToggleButton:
-            group: 'create_room'
-            text: "D"
+            group: 'show_data'
+            text: "Show IDs"
+            
 
         ToggleButton:
-            group: 'create_room'
-            text: "E"
+            group: 'show_data'
+            text: "Show names"
+            
+
+        Button:
+            text: "Delete widgets"
+
     
         
     FloatLayout:
+        id: floatlayout 
+    
 
         
-
+<camera>:
+    x1: 200
+    y1: 200
+    name: "none"
+    background_normal: ''
+    background_color: [0,0,0,0]
+    markup: True
+    size: 10, 10
+    text: "%s" % icon('zmdi-eye')
+    pos_hint: {"x":self.x1 ,"y":self.y1}
 
 
 
