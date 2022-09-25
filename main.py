@@ -4,7 +4,7 @@ from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from kivy.garden.iconfonts import iconfonts
 from kivy.lang import Builder
-from kivy.properties import OptionProperty
+from kivy.properties import OptionProperty, NumericProperty
 
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
@@ -18,6 +18,7 @@ from modules import recovery_email
 from modules import workplace_chooser
 from modules import new_workplace
 from modules import main_workplace
+from modules import cameras
 
 
 class ScreenManagement(ScreenManager):
@@ -27,6 +28,7 @@ class ScreenManagement(ScreenManager):
 
 class EmployeeSafetySystemApp(App):
     size = OptionProperty('S', options=['S', 'L', 'XL'])
+    width = NumericProperty()
 
     def __init__(self, **kwargs):
         super(EmployeeSafetySystemApp, self).__init__(**kwargs)

@@ -1,6 +1,6 @@
 from kivy.utils import rgba
 
-hoverEventObjects = None
+hoverEventObjects = []
 userID = None
 choosenWorkplace = None
 BG_COLOR = rgba('#ececec')

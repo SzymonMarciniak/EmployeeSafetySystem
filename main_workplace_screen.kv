@@ -67,16 +67,25 @@
                         orientation: 'tb-lr'
                         cols: 1
                         MenuButton:
+                            main_screen_sm: main_screen_sm
                             text: '%s   Cameras' % icon('zmdi-camera')
+                            sID: 1
                         MenuButton:
+                            main_screen_sm: main_screen_sm
                             text: '%s   Alerts' % icon('zmdi-notifications-active')
+                            sID: 2
                         MenuButton:
+                            main_screen_sm: main_screen_sm
                             text: '%s   Dashboard' % icon('zmdi-view-dashboard')
+                            sID: 3
                         MenuButton:
+                            main_screen_sm: main_screen_sm
                             text: '%s   Rules' % icon('zmdi-view-list')
-                        MenuButtonActive:
+                            sID: 4
+                        MenuButton:
                             main_screen_sm: main_screen_sm
                             text: '%s   Setup' % icon('zmdi-settings')
+                            sID: 5
                 DivisionLine:
                 BoxLayout:
                     canvas.before:
@@ -91,21 +100,40 @@
                         cols: 1
                         MenuButton:
                             size_hint: 1, .375
+                            main_screen_sm: main_screen_sm
                             text: '%s   Settings' % icon('zmdi-settings')
+                            sID: 6
                         MenuButton:
                             size_hint: 1, .375
+                            main_screen_sm: main_screen_sm
                             text: '%s   Logout' % icon('zmdi-square-right')
+                            sID: 7
             DivisionLine:
-                size_hint_x: .005
+                size_hint_x: None
                 size_hint_y: 1
+                width: 5
             ScreenManager:
                 id: main_screen_sm
+                canvas.before:
+                    Color:
+                        rgba: DM_MAIN_COLOR
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
                 size_hint_x: .795
                 Screen:
+                Screen:
+                    name: 'dev'
+                    Button:
+                        text: 'Every other option'
+
+                CamerasScreen:
+                RulesScreen:
                 Screen:
                     name: "SetupScreen"
                     Button:
                         text: 'setup'
+
 
 <DivisionLine@Widget>:
     canvas.before:
@@ -114,8 +142,8 @@
         Rectangle:
             size: self.size
             pos: self.pos
-    size_hint_y: .005
-    size_hint_x: 1
+    size_hint_y: None
+    height: 5
 
 <MenuButton@Button>:
     is_active: False
@@ -134,6 +162,13 @@
         [0, 0, 0, 0]
         )
     color: BG_COLOR
+    canva_s1: 0
+    canvas.before:
+        Color:
+            rgba: DECORATION_COLOR_NOALPHA
+        Rectangle:
+            pos: self.pos
+            size: self.width * self.canva_s1, self.height
 
 <MenuButtonActive>:
     font_size:
