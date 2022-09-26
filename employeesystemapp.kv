@@ -1,9 +1,12 @@
 #: import mtx kivy.metrics
 #: import icon kivy.garden.iconfonts.icon
+#:import Factory kivy.factory.Factory
 
 SetupScreen:
 
+
 <SetupScreen@BoxLayout>:
+    id: setupScreenId
     orientation: "vertical"
     floatlayout: floatlayout
 
@@ -30,8 +33,10 @@ SetupScreen:
             on_press: root.add_camera_activate()
 
         ToggleButton:
+            id: ShowIDButton
             group: 'show_data'
             text: "Show IDs"
+            on_press: root.show_ids()
             
 
         ToggleButton:
@@ -41,17 +46,18 @@ SetupScreen:
 
         Button:
             text: "Delete widgets"
+            on_release: Factory.DeleteWidgetPopup().open()
 
     
         
     FloatLayout:
         id: floatlayout 
     
-
         
 <camera>:
     x1: 200
     y1: 200
+    deleteId: self.deleteId
     name: "none"
     background_normal: ''
     background_color: [0,0,0,0]
@@ -59,8 +65,35 @@ SetupScreen:
     size: 10, 10
     text: "%s" % icon('zmdi-eye')
     pos_hint: {"x":self.x1 ,"y":self.y1}
+    
 
-
+<DeleteWidgetPopup@Popup>:
+    id: DeletePopup
+    auto_dismiss: True
+    title: "Delete widget by ID" 
+    size_hint: .3, .5
+    title_align: "center"
+    size_hint: .35, None 
+    size: 100, 200 
+    BoxLayout:
+        orientation: "vertical"
+        
+        Label:
+            text: "Write object's ID" 
+            size_hint: 1, None 
+            size: 0, 35 
+        TextInput:
+            id: deleteWidgetId
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":1}
+        
+        Button:
+            text: "Delete"
+            on_release: root.delete_widget()
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":0}
 
 
 
