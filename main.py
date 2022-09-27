@@ -14,13 +14,13 @@ from kivy import Config
 
 from utils import CenterOfLine
 
+
 class camera(Button):
     x1 = NumericProperty()
     y1 = NumericProperty()
     deleteId = NumericProperty()
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
 
 
 class DeleteWidgetPopup(Popup):
@@ -33,6 +33,18 @@ class DeleteWidgetPopup(Popup):
         
         my_id = self.ids.deleteWidgetId.text
         self.setup.delete_widget(my_id)
+        self.dismiss()
+
+class GetNamePopup(Popup):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.setup = SetupScreen()
+
+    def set_name(self):
+        
+        new_name = self.ids.getNameText.text
+        self.setup.set_object_name(new_name)
         self.dismiss()
 
 
@@ -49,12 +61,16 @@ class Door(Line):
         
 rooms_points = []
 rooms_list = []
+rooms_names = []
 
 doors_points = []
-camera_points = []
-
 door_list = []
+
+camera_points = []
 cameras_list = []
+cameras_names = []
+
+new_created = "None"
 
 class SetupScreen(BoxLayout):
     floatlayout = ObjectProperty()
@@ -88,6 +104,7 @@ class SetupScreen(BoxLayout):
         self.new_door_id = 200 
 
         self.idsLabels = []
+        self.namesLabels = []
 
     def create_room_activate(self):
         if self.ids["CreateRoomButton"].state == "down":
@@ -161,13 +178,14 @@ class SetupScreen(BoxLayout):
         new_camera.name = "asd"
         
 
-    def show_ids(self, clear=False, show=False):
+    def show_ids(self, clear=False, show=True):
         if clear:
             for label in self.idsLabels:
                 self.floatlayout.remove_widget(label)
             self.idsLabels = []
 
-        if (self.ids["ShowIDButton"].state == "down") or show:
+        if (self.ids["ShowIDButton"].state == "down") and show:
+            self.show_names(clear=True, show=False)
             for nr, room in enumerate(rooms_list):
                 ckx1, cky1, ckx2, cky2 = rooms_points[nr]
                 x1, x2 = ckx1 * self.width, ckx2 * self.width
@@ -176,6 +194,7 @@ class SetupScreen(BoxLayout):
                 y1, y2 = cky1 * self.height, cky2 * self.height
                 y1, y2 = y1/self.floatlayout.height * self.height, y2/self.floatlayout.height * self.height
                 center_y = ((abs(y1) + abs(y2)) /2 /self.height) - .5
+
                 label = Label(text=str(room.deleteId), pos_hint={"x":center_x ,"y":center_y})
                 self.floatlayout.add_widget(label)
                 self.idsLabels.append(label)
@@ -200,6 +219,7 @@ class SetupScreen(BoxLayout):
                 
                 y1 = cky1 * self.height
                 center_y = (y1 /self.height) - .5 - 0.03
+
                 label = Label(text=str(camera.deleteId), pos_hint={"x":center_x ,"y":center_y})
                 self.floatlayout.add_widget(label)
                 self.idsLabels.append(label)
@@ -208,6 +228,48 @@ class SetupScreen(BoxLayout):
                 self.floatlayout.remove_widget(label)
             
             self.idsLabels = []
+    
+    def show_names(self, clear=False, show=True):
+        if clear:
+            for label in self.namesLabels:
+                self.floatlayout.remove_widget(label)
+            self.namesLabels = []
+
+
+        if self.ids["ShowNameButton"].state == "down" and show:
+            self.show_ids(clear=True, show=False)
+            for nr, room in enumerate(rooms_list):
+
+                ckx1, cky1, ckx2, cky2 = rooms_points[nr]
+                x1, x2 = ckx1 * self.width, ckx2 * self.width
+                center_x = ((x1 + x2) / 2 / self.width) - .5
+
+                y1, y2 = cky1 * self.height, cky2 * self.height
+                y1, y2 = y1/self.floatlayout.height * self.height, y2/self.floatlayout.height * self.height
+                center_y = ((abs(y1) + abs(y2)) /2 /self.height) - .5
+
+                label = Label(text=str(rooms_names[nr]), pos_hint={"x":center_x ,"y":center_y})
+                self.floatlayout.add_widget(label)
+                self.namesLabels.append(label)
+
+            for nr, camera in enumerate(cameras_list):
+                ckx1, cky1 = camera_points[nr]
+                x1 = ckx1 * self.width
+                center_x = (x1 / self.width) - .5
+                
+                y1 = cky1 * self.height
+                center_y = (y1 /self.height) - .5 - 0.03
+
+                label = Label(text=str(cameras_names[nr]), pos_hint={"x":center_x ,"y":center_y})
+                self.floatlayout.add_widget(label)
+                self.namesLabels.append(label)
+
+        else:
+            for label in self.namesLabels:
+                self.floatlayout.remove_widget(label)
+            self.namesLabels = []
+            
+        
         
 
 
@@ -220,21 +282,37 @@ class SetupScreen(BoxLayout):
                 room.points = -1000, -1000
                 rooms_list.remove(room)
                 rooms_points.pop(nr)
-                self.show_ids(clear=True, show=True)
+                self.show_ids(clear=True)
         
         for nr, camera in enumerate(cameras_list):
             if camera.deleteId == int(my_id):
                 camera.pos_hint = {"x": -10, "y":-10}
                 cameras_list.remove(camera)
                 camera_points.pop(nr)
-                self.show_ids(clear=True, show=True)
+                # self.ids["ShowIDButton"].state = "normal"
+                # self.ids["ShowIDButton"].state = "down"
+                #self.show_ids(clear=True, show=True)
 
         for nr, door in enumerate(door_list):
             if door.deleteId == int(my_id):
                 door.points = -1000, -1000
                 door_list.remove(door)
                 doors_points.pop(nr)
-                self.show_ids(clear=True, show=True)
+                self.show_ids(clear=True)
+    
+    def get_object_name(self, object):
+        global new_created
+        new_created = object
+
+        GetNamePopup().open()
+        
+
+    def set_object_name(self, new_name):
+        if new_created == "camera":
+            cameras_names.append(new_name)
+        elif new_created == "room":
+            rooms_names.append(new_name)
+        self.show_names(clear=True)
 
 
         
@@ -314,6 +392,8 @@ class SetupScreen(BoxLayout):
                 self.main_room.points = 0,0
                 self.rooms_refresh()
                 self.show_ids(clear=True)
+                self.get_object_name("room")
+                
         
         if self.choose == "create_door":
             self.double = not self.double  
@@ -328,6 +408,8 @@ class SetupScreen(BoxLayout):
             if self.double:
                 camera_points.append([self.kx1,self.ky1])
                 self.show_ids(clear=True)
+                self.get_object_name("camera")
+                
                 
                 
 class EmployeeSystemApp(App):

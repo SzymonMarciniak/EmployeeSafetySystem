@@ -40,8 +40,10 @@ SetupScreen:
             
 
         ToggleButton:
+            id: ShowNameButton
             group: 'show_data'
             text: "Show names"
+            on_press: root.show_names()
             
 
         Button:
@@ -91,6 +93,33 @@ SetupScreen:
         Button:
             text: "Delete"
             on_release: root.delete_widget()
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":0}
+
+<GetNamePopup@Popup>:
+    id: getNamePopup 
+    auto_dismiss: True
+    title: "Names" 
+    size_hint: .3, .5
+    title_align: "center"
+    size_hint: .35, None 
+    size: 100, 200
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            text: "Write name of new object" 
+            size_hint: 1, None 
+            size: 0, 35 
+        TextInput:
+            id: getNameText
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":1}
+        
+        Button:
+            text: "Apply"
+            on_release: root.set_name()
             size_hint: .5, None 
             size: 0, 35 
             pos_hint: {"x":.25 ,"y":0}
