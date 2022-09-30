@@ -2,8 +2,7 @@ import mysql.connector
 from mysql.connector import errorcode, MySQLConnection, CMySQLConnection
 from mysql.connector.cursor_cext import CMySQLCursor
 
-from modules import globals
-from modules.globals import userID
+from modules import global_vars
 
 
 def connectToDatabase(firstConnect=False):
@@ -59,6 +58,11 @@ def connectToDatabase(firstConnect=False):
                     "CREATE TABLE IF NOT EXISTS workplaces (id INT NOT NULL auto_increment PRIMARY KEY, userID INT "
                     "NOT NULL, name VARCHAR(64), position INT, state_activation BOOLEAN, state_notifications BOOLEAN);"
                 )
+                cursor.execute(
+                    "CREATE TABLE IF NOT EXISTS logs (id INT NOT NULL auto_increment PRIMARY KEY,"
+                    "workplaceID INT NOT NULL, cameraID INT NOT NULL, alertReason VARCHAR(64), alertAction VARCHAR(64),"
+                    "date DATETIME, seen BOOLEAN DEFAULT 0);"
+                )
             except mysql.connector.Error as error:
                 raise TimeoutError("Cannot process query. Reason: %s" % error)
         return db, cursor
@@ -110,12 +114,13 @@ def checkIsEmailInDatabase(recoveryEmail):
 
 def setNewPassword(password):
     db, cursor = connectToDatabase()
-    cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, globals.userID))
+    cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, global_vars.userID))
     db.commit()
     closeDatabaseConnection(db, cursor)
 
 
 def insertNewWorkplace(name, notifications_status):
     db, cursor = connectToDatabase()
-    cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 0, %s);", (globals.userID, name, notifications_status))
+    cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 0, %s);", (global_vars.userID, name,
+                                                                              notifications_status))
     db.commit()

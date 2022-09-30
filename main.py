@@ -13,12 +13,14 @@ from kivy.uix.stacklayout import StackLayout
 # SECTION FOR MODULES IMPORT, CONTAIN PARTS OF APP
 from modules import dbactions
 from modules import auth_view_logics
-from modules import globals
+from modules import global_vars
 from modules import recovery_email
 from modules import workplace_chooser
 from modules import new_workplace
 from modules import main_workplace
 from modules import cameras
+from modules import rules
+from modules import alerts
 
 
 class ScreenManagement(ScreenManager):
@@ -69,7 +71,7 @@ class EmployeeSafetySystemApp(App):
         objects
         """
         changed = False
-        for hoverObj in globals.hoverEventObjects:
+        for hoverObj in global_vars.hoverEventObjects:
             if hoverObj.collide_point(*pos):
                 changed = True
                 Window.set_system_cursor('hand')

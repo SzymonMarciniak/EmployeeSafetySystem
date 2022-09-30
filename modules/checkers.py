@@ -5,7 +5,7 @@ from kivy.app import App
 from kivy.garden.iconfonts import icon
 from kivy.uix.screenmanager import FadeTransition
 
-from modules import globals
+from modules import global_vars
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
 
 
@@ -131,7 +131,7 @@ def checkCredintialsInDatabase(login, password, errorBox):
     results = cursor.fetchone()
     if results is not None:
         disableErrorMsg(errorBox)
-        globals.userID = results[0]
+        global_vars.userID = results[0]
         App.get_running_app().root.transition = FadeTransition()
         App.get_running_app().root.current = 'choose_workplace_screen'
     else:

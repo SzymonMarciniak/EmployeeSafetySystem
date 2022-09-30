@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import Screen, FadeTransition
 from kivy.uix.togglebutton import ToggleButton
 
 from modules.dbactions import insertNewWorkplace
-from modules.globals import DECORATION_COLOR_NOALPHA, ERROR_COLOR, BG_COLOR, MAIN_COLOR, SECONDARY_COLOR
+from modules.global_vars import DECORATION_COLOR_NOALPHA, ERROR_COLOR, BG_COLOR
 
 
 class NewWorkplaceScreen(Screen):

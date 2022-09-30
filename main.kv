@@ -20,6 +20,7 @@
 #: include main_workplace_screen.kv
 #: include workplace_screens/cameras.kv
 #: include workplace_screens/rules.kv
+#: include workplace_screens/alerts.kv
 
 <ScreenManagement>:
     id: screen_manager
@@ -85,6 +86,7 @@
             radius: [20, 20, 20, 20]
 
 <SimpleInput>:
+    canva_s1: 1
     font_size: max(15, self.height / 2)
     font_name: 'Lato'
     write_tab: False
@@ -99,4 +101,4 @@
             rgba: MAIN_COLOR
         Rectangle:
             pos: self.pos[0], self.pos[1]
-            size: [self.size[0], 1]
+            size: [self.size[0] * self.canva_s1, 1]

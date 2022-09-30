@@ -17,7 +17,7 @@ from kivy.uix.screenmanager import FadeTransition, Screen
 from kivy.uix.textinput import TextInput
 from kivy.utils import rgba
 
-from modules import globals
+from modules import global_vars
 from modules.checkers import checkForPassword
 from modules.dbactions import connectToDatabase, closeDatabaseConnection, checkIsEmailInDatabase, setNewPassword
 
@@ -31,7 +31,7 @@ class ForgotPasswordScreen(Screen):
         super().__init__(**kwargs)
 
     def on_pre_enter(self):
-        globals.hoverEventObjects = [self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
+        global_vars.hoverEventObjects = [self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
 
 
 class NewPasswordScreen(Screen):
@@ -43,8 +43,8 @@ class NewPasswordScreen(Screen):
         super().__init__(**kwargs)
 
     def on_pre_enter(self):
-        globals.hoverEventObjects = [self.forgot_new_password_box, self.forgot_repeat_new_password_box,
-                                     self.setPasswordBtn]
+        global_vars.hoverEventObjects = [self.forgot_new_password_box, self.forgot_repeat_new_password_box,
+                                         self.setPasswordBtn]
 
 
 def sendRecoveryEmail(userMail):
@@ -106,7 +106,7 @@ def sendRecoveryEmail(userMail):
     msg.attach(part2)
     smtp = smtplib.SMTP('localhost')
     smtp.sendmail(systemMail, userMail, msg.as_string())
-    globals.userID = userID
+    global_vars.userID = userID
 
 
 def checkIsSpam(userMail):
@@ -142,6 +142,7 @@ class CodeInput(TextInput):
         self.font_name = 'Lato'
         self.font_size = sp(32)
         self.background_color = [1, 1, 1, 1]
+        global_vars.hoverEventObjects.append(self)
 
 
 class SubmitCodeButton(Button):
@@ -155,6 +156,7 @@ class SubmitCodeButton(Button):
         self.text = "%s" % icon('zmdi-chevron-right')
         self.color = rgba('#ececec')
         self.size_hint_x = 1.5
+        global_vars.hoverEventObjects.append(self)
 
     def on_press(self):
         db, cursor = connectToDatabase()
@@ -164,7 +166,7 @@ class SubmitCodeButton(Button):
                 continue
             code += child.text
         cursor.execute("SELECT id FROM pswdresets WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
-                       "AND used=0", (globals.userID, code[::-1]))
+                       "AND used=0", (global_vars.userID, code[::-1]))
         results = cursor.fetchone()
         if results is None:
             self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Provided code is invalid. " \
@@ -172,7 +174,7 @@ class SubmitCodeButton(Button):
             self.parent.parent.parent.infoLabel.color = rgba("c92a1e")
         else:
             cursor.execute("UPDATE pswdresets SET used=1 WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
-                           "AND used=0", (globals.userID, code[::-1]))
+                           "AND used=0", (global_vars.userID, code[::-1]))
             db.commit()
             self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Code valid, redirecting..." \
                                                        % icon('zmdi-check-circle')
@@ -192,6 +194,7 @@ class SetPasswordButton(Button):
         super().__init__(**kwargs)
         self.ids.rectColor = self.color
         self.rectColor = "#0fafff"
+        global_vars.hoverEventObjects.append(self)
 
     def on_pressed(self):
         self.rectColor = "#0f87ff"
@@ -297,7 +300,7 @@ class SendEmailButton(Button):
 
             rmAnim.bind(on_complete=actually_remove_widget)
 
-            globals.hoverEventObjects.pop(1)
+            global_vars.hoverEventObjects.pop(1)
             sendRecoveryEmail(self.recoveryEmailBox.text)
 
         else:

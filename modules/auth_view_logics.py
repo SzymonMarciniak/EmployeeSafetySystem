@@ -1,17 +1,19 @@
 import platform
 
+from kivy.animation import Animation
+
 if platform.system() == 'Windows':
     import win32api
     import win32con
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.properties import StringProperty, ObjectProperty, ColorProperty
+from kivy.properties import StringProperty, ObjectProperty, ColorProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import FadeTransition, Screen
 from kivy.uix.textinput import TextInput
 
-from modules import globals
+from modules import global_vars
 from modules.checkers import checkDataCorrectness
 
 
@@ -32,8 +34,8 @@ class LoginScreen(Screen):
         # the IDs are not yet initalized
 
     def callback(self, dt):
-        globals.hoverEventObjects = [self.loginBox, self.passwordBox, self.loginBtn,
-                                     self.registerBtn, self.resetPswdBtn]
+        global_vars.hoverEventObjects = [self.loginBox, self.passwordBox, self.loginBtn,
+                                         self.registerBtn, self.resetPswdBtn]
         self.loginBox.text = ''
         self.passwordBox.text = ''
 
@@ -51,7 +53,7 @@ class RegisterScreen(Screen):
     resetPswdBtn = ObjectProperty()
 
     def on_pre_enter(self):
-        globals.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
+        global_vars.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
         self.loginBox.text = ''
         self.newPasswordBox.text = ''
         self.repeatPasswordBox.text = ''
@@ -69,10 +71,19 @@ class RegisterScreenLayout(BoxLayout):
 
 
 class SimpleInput(TextInput):
+    canva_s1 = NumericProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         if platform.system() == 'Windows':
             self.bind(text=self.on_entered)
+
+    def on_focus(self, instance, value):
+        if value:
+            self.canva_s1 = 0
+            anim = Animation(canva_s1=1, duration=.5, transition="in_quart")
+            anim.start(self)
+
     activated = False
 
     def on_entered(self, instance, value):
@@ -91,7 +102,7 @@ class SimpleInput(TextInput):
             current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = 'Caps ON'
-            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text =\
+            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text = \
                 'Caps ON '
             self.activated = True
 
