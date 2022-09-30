@@ -1,5 +1,7 @@
-<MainWorkplaceScreen@Screen>:
+<MainWorkplaceScreen>:
     name: 'main_workplace_screen'
+    bottom_menu: bottom_menu
+    upper_menu: upper_menu
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -28,6 +30,7 @@
                 text: 'v1.3.8-P'
         BoxLayout:
             main_screen_sm: main_screen_sm
+            bottom_menu: bottom_menu
             size_hint_y: .95
             BoxLayout:
                 orientation: 'vertical'
@@ -64,26 +67,37 @@
                             pos: self.pos
                     size_hint_y: .55
                     StackLayout:
+                        id: upper_menu
                         orientation: 'tb-lr'
                         cols: 1
                         MenuButton:
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Cameras' % icon('zmdi-camera')
                             sID: 1
                         MenuButton:
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Alerts' % icon('zmdi-notifications-active')
                             sID: 2
                         MenuButton:
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Dashboard' % icon('zmdi-view-dashboard')
                             sID: 3
                         MenuButton:
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Rules' % icon('zmdi-view-list')
                             sID: 4
                         MenuButton:
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Setup' % icon('zmdi-settings')
                             sID: 5
                 DivisionLine:
@@ -98,14 +112,19 @@
                     StackLayout:
                         orientation: 'tb-lr'
                         cols: 1
+                        id: bottom_menu
                         MenuButton:
                             size_hint: 1, .375
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Settings' % icon('zmdi-settings')
                             sID: 6
                         MenuButton:
                             size_hint: 1, .375
                             main_screen_sm: main_screen_sm
+                            bottom_menu: bottom_menu
+                            upper_menu: upper_menu
                             text: '%s   Logout' % icon('zmdi-square-right')
                             sID: 7
             DivisionLine:
@@ -114,20 +133,21 @@
                 width: 5
             ScreenManager:
                 id: main_screen_sm
-                canvas.before:
-                    Color:
-                        rgba: DM_MAIN_COLOR
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
                 size_hint_x: .795
                 Screen:
+                    canvas.before:
+                        Color:
+                            rgba: DM_MAIN_COLOR
+                        Rectangle:
+                            pos: 0,0
+                            size: 10000, 10000
                 Screen:
                     name: 'dev'
                     Button:
                         text: 'Every other option'
 
                 CamerasScreen:
+                AlertsScreen:
                 RulesScreen:
                 Screen:
                     name: "SetupScreen"
@@ -145,7 +165,7 @@
     size_hint_y: None
     height: 5
 
-<MenuButton@Button>:
+<MenuButton>:
     is_active: False
     font_size:
         (
@@ -169,19 +189,6 @@
         Rectangle:
             pos: self.pos
             size: self.width * self.canva_s1, self.height
-
-<MenuButtonActive>:
-    font_size:
-        (
-        self.width / 6.5 if app.size in 'S' else
-        32
-        )
-    size_hint: 1, .15
-    markup: True
-    background_normal: ''
-    background_down: ''
-    background_color: DECORATION_COLOR_NOALPHA
-    color: DM_MAIN_COLOR
 
 <HeaderLabel@Label>:
     font_size: self.height / 3.5
