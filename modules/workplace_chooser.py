@@ -1,18 +1,16 @@
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.graphics import Color, Line
+from kivy.garden.iconfonts import icon
 from kivy.metrics import sp
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen, FadeTransition
-from modules import globals
+
+from modules import global_vars
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
-from modules.globals import MAIN_COLOR, DECORATION_COLOR_NOALPHA, SECONDARY_COLOR
-from kivy.garden.iconfonts import icon
-from modules.globals import choosenWorkplace
+from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR
 
 
 class ChooseWorkplaceScreen(Screen):
@@ -23,7 +21,7 @@ class ChooseWorkplaceScreen(Screen):
 
     def on_pre_enter(self):
         Window.set_system_cursor('arrow')
-        globals.hoverEventObjects = []
+        global_vars.hoverEventObjects = []
         size = Window.size
         Window.size = (100, 100)
         Window.size = size
@@ -96,8 +94,8 @@ class WorkplaceChooserLayout(BoxLayout):
 
     def build_layout(self):
         db, cursor = connectToDatabase()
-        cursor.execute("SELECT name, position, state_activation, state_notifications, ID FROM workplaces WHERE userid=%s "
-                       "ORDER BY position ASC;", (globals.userID,))
+        cursor.execute("SELECT name, position, state_activation, state_notifications, ID FROM workplaces"
+                       " WHERE userID=%s ORDER BY position ASC;", (global_vars.userID,))
         results = cursor.fetchall()
         row_count = cursor.rowcount
         closeDatabaseConnection(db, cursor)
@@ -108,7 +106,12 @@ class WorkplaceChooserLayout(BoxLayout):
             self.buildNewWorkplace()
 
     def buildExistingWorkplace(self, title, pos, s_activation, s_notifications, workplaceID):
+        db, cursor = connectToDatabase()
+        cursor.execute("SELECT COUNT(ID) FROM logs WHERE workplaceID=%s", (workplaceID,))
+        results = cursor.fetchone()
+        alertsCount = results[0]
         ew = ExistingWorkplace()
+        ew.workplaceID = workplaceID
         boxlayout = BoxLayout()
         boxlayout.add_widget(EwTitle(text=title))
         boxlayout.add_widget(EwNumber(text='#' + str(pos)))
@@ -130,10 +133,16 @@ class WorkplaceChooserLayout(BoxLayout):
         #                      icon('zmdi-') if s_notifications > 0 else
         #                      icon('zmdi-notifications-active'), "No actions to be taken"
         #                      if self.s_activation > 0 else "X alerts active")
-        boxlayout.add_widget(EwStatus(text="[color=#08c48c]%s[/color] No new alerts" % icon('zmdi-check')))
+        boxlayout.add_widget(EwStatus(text="[color=%s]%s[/color] %s" % ("08c48c" if alertsCount <= 0 else "#eaa700",
+                                                                        icon('zmdi-check') if alertsCount <= 0 else
+                                                                        icon('zmdi-alert-octagon'),
+                                                                        "No new alerts" if alertsCount <= 0 else
+                                                                        "%d alerts registered!" % alertsCount)))
         division.add_widget(boxlayout)
         boxlayout = ActionButtonsLayout(orientation='vertical')
-        boxlayout.add_widget(ChooseButton(markup=True, text="%s" % icon('zmdi-chevron-right')))
+        chooseBtn = ChooseButton(markup=True, text="%s" % icon('zmdi-chevron-right'))
+        chooseBtn.workplaceID = ew.workplaceID
+        boxlayout.add_widget(chooseBtn)
         boxlayout.add_widget(EditButton())
         division.add_widget(boxlayout)
         ew.add_widget(division)
@@ -164,9 +173,10 @@ class ChooseButton(Button):
         self.background_down = ''
         self.background_color = [0, 0, 0, 0]
         self.font_size = sp(32)
+        global_vars.hoverEventObjects.append(self)
 
     def on_press(self):
-        # globals.choosenWorkplace = self.workplaceID
+        global_vars.choosenWorkplace = self.workplaceID
         app = App.get_running_app()
         app.root.transition = FadeTransition()
         app.root.current = 'main_workplace_screen'
@@ -178,6 +188,7 @@ class EditButton(Button):
         self.background_normal = ''
         self.background_down = ''
         self.background_color = [0, 0, 0, 0]
+        global_vars.hoverEventObjects.append(self)
 
 
 class LogoutButton(Button):
@@ -197,7 +208,7 @@ class LogoutButton(Button):
 
 
 def LogoutClient():
-    globals.userID = None
+    global_vars.userID = None
     app = App.get_running_app()
     app.root.transition = FadeTransition()
     app.root.current = "login_screen"
