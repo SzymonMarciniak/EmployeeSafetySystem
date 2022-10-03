@@ -1,0 +1,127 @@
+#: import mtx kivy.metrics
+
+<SetupScreen@Screen>:
+    name: 'SetupScreen'
+    floatlayout: floatlayout
+    BoxLayout:
+        id: setupScreenId
+        orientation: "vertical"
+        
+
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint: 1, .1
+
+            ToggleButton:
+                id: CreateRoomButton
+                group: 'create_room'
+                text: "Create room"
+                on_press: root.create_room_activate()
+
+            ToggleButton:
+                id: CreateDoorButton
+                group: 'create_room'
+                text: "Create door"
+                on_press: root.create_door_activate()
+
+            ToggleButton:
+                id: CreateCameraButton
+                group: 'create_room'
+                text: "Add camera"
+                on_press: root.add_camera_activate()
+
+            ToggleButton:
+                id: ShowIDButton
+                group: 'show_data'
+                text: "Show IDs"
+                on_press: root.show_ids()
+                
+
+            ToggleButton:
+                id: ShowNameButton
+                group: 'show_data'
+                text: "Show names"
+                on_press: root.show_names()
+                
+
+            Button:
+                text: "Delete widgets"
+                on_release: root.open_delete_popup()
+
+        
+            
+        FloatLayout:
+            id: floatlayout 
+            
+            
+            
+    
+
+<DeleteWidgetPopup@Popup>:
+    id: DeletePopup
+    auto_dismiss: True
+    title: "Delete widget by ID" 
+    size_hint: .3, .5
+    title_align: "center"
+    size_hint: .35, None 
+    size: 100, 200 
+    BoxLayout:
+        orientation: "vertical"
+        
+        Label:
+            text: "Write object's ID" 
+            size_hint: 1, None 
+            size: 0, 35 
+        TextInput:
+            id: deleteWidgetId
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":1}
+        
+        Button:
+            text: "Delete"
+            on_release: root.dismiss()
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":0}
+
+<GetNamePopup@Popup>:
+    id: getNamePopup 
+    auto_dismiss: False
+    title: "Names" 
+    size_hint: .3, .5
+    title_align: "center"
+    size_hint: .35, None 
+    size: 100, 200
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            text: "Write name of new object" 
+            size_hint: 1, None 
+            size: 0, 35 
+        TextInput:
+            id: getNameText
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":1}
+        
+        Button:
+            text: "Apply"
+            on_release: root.dismiss()
+            size_hint: .5, None 
+            size: 0, 35 
+            pos_hint: {"x":.25 ,"y":0}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
