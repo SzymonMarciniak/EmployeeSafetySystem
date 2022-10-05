@@ -1,13 +1,13 @@
-from kivy.graphics import Color, RoundedRectangle
 from kivy.metrics import sp
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.stacklayout import StackLayout
 
-from modules.global_vars import cameras_names, SECONDARY_COLOR, BG_COLOR
+from modules.dbactions import connectToDatabase, closeDatabaseConnection
+from modules.global_vars import cameras_dict, SECONDARY_COLOR, BG_COLOR, detection_dict, actions_dict
 
 rules_container: FloatLayout
 last_addnewrule: FloatLayout
@@ -31,10 +31,59 @@ class SpinnerButtons(SpinnerOption):
         self.color = BG_COLOR
 
 
+class CamerasListButton(Spinner):
+    def __init__(self, **kwargs):
+        super(CamerasListButton, self).__init__(**kwargs)
+        self.values = cameras_dict.values()
+        self.option_cls = SpinnerButtons
+
+
 class ActionsButton(Spinner):
     def __init__(self, **kwargs):
         super(ActionsButton, self).__init__(**kwargs)
-        self.values = cameras_names
+        self.values = detection_dict.values()
+        self.option_cls = SpinnerButtons
+
+
+class SaveButton(Button):
+    actionsListButton = ObjectProperty()
+    detectionListButton = ObjectProperty()
+    camerasListButton = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super(SaveButton, self).__init__(**kwargs)
+
+    def on_press(self):
+        db, cursor = connectToDatabase()
+        for cID, value in cameras_dict.items():
+            if value == self.camerasListButton.text:
+                cameraID = cID
+        for dID, value in detection_dict.items():
+            if value == self.detectionListButton.text:
+                detectionID = dID
+        cursor.execute("UPDATE cameras SET rules=concat(rules, '%s') WHERE generated_id=%s", (detectionID, cameraID))
+        db.commit()
+        closeDatabaseConnection(db, cursor)
+
+
+class DeleteRule(Button):
+    actionsListButton = ObjectProperty()
+    detectionListButton = ObjectProperty()
+    camerasListButton = ObjectProperty()
+
+    def __init__(self, **kwargs):
+        super(DeleteRule, self).__init__(**kwargs)
+
+    # def on_press(self):
+    #     db, cursor = connectToDatabase()
+    #     cursor.execute("SELECT rules from cameras WHERE")
+    #     closeDatabaseConnection(db, cursor)
+
+
+class ActionsButton2(Spinner):
+    def __init__(self, **kwargs):
+        super(ActionsButton2, self).__init__(**kwargs)
+        self.values = actions_dict.values()
         self.option_cls = SpinnerButtons
 
 

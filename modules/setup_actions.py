@@ -13,6 +13,7 @@ from kivy import Config
 
 
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
+from modules.global_vars import cameras_dict
 
 
 class DeleteWidgetPopup(Popup):
@@ -150,13 +151,12 @@ class SetupScreen(Screen):
             cameras_names.append(load_camera[3])
             print(x1, y1)
             cameras_list.append(camera)
+            cameras_dict[load_camera[4]] = load_camera[3]
             circle1_list.append(circle1)
             circle2_list.append(circle2)
             
             if load_camera[4] > self.new_cam_id:
                 self.new_cam_id = load_camera[4]
-           
-        
 
         cursor.execute("SELECT * FROM doors")
         doors_results = cursor.fetchall()
@@ -396,6 +396,7 @@ class SetupScreen(Screen):
                     camera.pos_hint = {"x": -10, "y":-10}
                     cameras_list.remove(camera)
                     camera_points.pop(nr)
+                    cameras_dict.pop(int(my_id))
                     c1 = circle1_list.pop(nr)
                     c2 = circle2_list.pop(nr)
                     
@@ -442,6 +443,7 @@ class SetupScreen(Screen):
             with self.canvas:
                 Color(1,1,1,1, mode='rgba')
                 camera = Camera(size=(20, 20), deleteId=self.new_cam_id, name=new_name)
+                cameras_dict[self.new_cam_id] = new_name
                 Color(0,0,0,1, mode='rgba')
                 circle1 = Ellipse(size=(10, 10))
                 Color(1,1,1,1, mode='rgba')
@@ -454,13 +456,12 @@ class SetupScreen(Screen):
             cameras_to_move.append(len(cameras_list)-1)
 
             db, cursor = connectToDatabase()
-            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id})""")
+            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id}, '')""")
             db.commit()
             closeDatabaseConnection(db, cursor)
             cameras_names.append(new_name)
             print(camera_points)
             self.cameras_refresh()
-
         elif new_created == "room":
 
             with self.canvas.before:

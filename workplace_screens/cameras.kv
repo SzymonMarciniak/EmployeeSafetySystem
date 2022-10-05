@@ -15,20 +15,12 @@
             do_scroll_y: True
             do_scroll_x: False
             scroll_wheel_distance: 40
-            StackLayout:
+            CamerasLayout:
                 height: self.minimum_height
                 size_hint: 1, None
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
-                RLayout:
 
-<RLayout@RelativeLayout>:
+<RLayout>:
+    camera_view_parent: camera_view_parent
     size:
         (
         [app.width * .7, app.width * .4] if app.width < 700 else
@@ -40,14 +32,7 @@
         pos_hint: {'center_x': .5, 'center_y': .5}
         BoxLayout:
             BoxLayout:
-                CameraView:
-                    size_hint_x: .8
-                    canvas.before:
-                        Color:
-                            rgba: BG_COLOR
-                        Line:
-                            rectangle: self.x, self.y, self.width, self.height
-                            width: 1
+                id: camera_view_parent
                 BoxLayout:
                     size_hint_x: .2
                     orientation: 'vertical'
@@ -87,3 +72,12 @@
                                 width: 1
                     Widget:
                         size_hint_y: .4
+
+<CameraView>:
+    size_hint_x: .8
+    canvas.before:
+        Color:
+            rgba: BG_COLOR
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: 1
