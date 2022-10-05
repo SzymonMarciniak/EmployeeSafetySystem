@@ -67,6 +67,9 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
                 cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())",
                                ([login, password, fullName]))
                 db.commit()
+                app = App.get_running_app()
+                app.root.transition = FadeTransition()
+                app.root.current = 'login_screen'
                 return True
             else:
                 ErrorBox().showError(errorBox=errorBox, reason="Account already registered for this E-mail")
