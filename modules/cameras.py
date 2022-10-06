@@ -54,7 +54,7 @@ class PopupContent(BoxLayout):
     def __init__(self, **kwargs):
         super(PopupContent, self).__init__(**kwargs)
         self.orientation = 'vertical'
-        self.add_widget(Label(text="ID: 7"))
+        self.add_widget(Label(text="Camera ID: 7"))
         self.add_widget(Label(text="Room ID: 3"))
         self.add_widget(Label(text="Rules: 4"))
 
