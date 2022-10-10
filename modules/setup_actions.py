@@ -456,7 +456,7 @@ class SetupScreen(Screen):
             cameras_to_move.append(len(cameras_list)-1)
 
             db, cursor = connectToDatabase()
-            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id}, '')""")
+            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id}, '', '')""")
             db.commit()
             closeDatabaseConnection(db, cursor)
             cameras_names.append(new_name)

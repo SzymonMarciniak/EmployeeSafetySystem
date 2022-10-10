@@ -80,7 +80,8 @@ def connectToDatabase(firstConnect=False):
                                 y1 float NOT NULL,
                                 name varchar(20) COLLATE utf8_polish_ci NOT NULL,
                                 generated_id int(11) NOT NULL,
-                                rules VARCHAR(16) NOT NULL DEFAULT '')"""
+                                rules VARCHAR(16) NOT NULL DEFAULT '',
+                                actions VARCHAR(16) NOT NULL DEFAULT '')"""
                                )
 
                 cursor.execute("""
