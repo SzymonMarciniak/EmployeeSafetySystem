@@ -2,7 +2,7 @@ from kivy import Config
 from kivy.app import App
 from kivy.core.text import LabelBase
 from kivy.core.window import Window
-from kivy.garden.iconfonts import iconfonts
+from iconfonts import iconfonts
 from kivy.lang import Builder
 from kivy.properties import OptionProperty, NumericProperty
 
@@ -21,11 +21,11 @@ from modules import main_workplace
 from modules import cameras
 from modules import rules
 from modules import alerts
-from modules import setup_actions
+from modules import setup_actions 
 
 
 class ScreenManagement(ScreenManager):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs): 
         super().__init__(**kwargs)
 
 

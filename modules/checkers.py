@@ -2,7 +2,7 @@ import re
 
 from kivy.animation import Animation
 from kivy.app import App
-from kivy.garden.iconfonts import icon
+from iconfonts.iconfonts import icon
 from kivy.uix.screenmanager import FadeTransition
 
 from modules import global_vars

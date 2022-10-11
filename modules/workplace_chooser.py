@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.core.window import Window
-from kivy.garden.iconfonts import icon
+from iconfonts.iconfonts import icon
 from kivy.metrics import sp
 from kivy.properties import ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
@@ -10,7 +10,7 @@ from kivy.uix.screenmanager import Screen, FadeTransition
 
 from modules import global_vars
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
-from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR
+from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR 
 
 
 class ChooseWorkplaceScreen(Screen):
@@ -176,6 +176,7 @@ class ChooseButton(Button):
         global_vars.hoverEventObjects.append(self)
 
     def on_press(self):
+        print(self.workplaceID)
         global_vars.choosenWorkplace = self.workplaceID
         app = App.get_running_app()
         app.root.transition = FadeTransition()

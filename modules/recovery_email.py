@@ -7,7 +7,7 @@ from random import randint
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.garden.iconfonts import icon
+from iconfonts.iconfonts import icon
 from kivy.metrics import sp
 from kivy.properties import StringProperty, ObjectProperty, NumericProperty
 from kivy.uix.boxlayout import BoxLayout

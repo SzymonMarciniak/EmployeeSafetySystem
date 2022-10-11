@@ -36,7 +36,7 @@ def connectToDatabase(firstConnect=False):
         Object of MySQL database cursor. Needed for query processing
     """
     try:
-        db = mysql.connector.connect(host='localhost', user='root', password='root', database="employee_safety_system")
+        db = mysql.connector.connect(host='localhost', user='root', password='', database="employee_safety_system")
     except mysql.connector.Error as error:
         if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             raise ConnectionError(
@@ -71,28 +71,35 @@ def connectToDatabase(firstConnect=False):
                     x2 float NOT NULL,
                     y2 float NOT NULL,
                     name varchar(20),
-                    generated_id int(11) NOT NULL COLLATE utf8_polish_ci NOT NULL)"""
+                    generated_id int(11) NOT NULL,
+                    floor INT(2) NOT NULL,
+                    workspace_id INT(5) NOT NULL
+                    )""" 
                 )
                 cursor.execute("""
-                                CREATE TABLE IF NOT EXISTS cameras (
-                                ID int(11) NOT NULL auto_increment PRIMARY KEY,
-                                x1 float NOT NULL,
-                                y1 float NOT NULL,
-                                name varchar(20) COLLATE utf8_polish_ci NOT NULL,
-                                generated_id int(11) NOT NULL,
-                                rules VARCHAR(16) NOT NULL DEFAULT '',
-                                actions VARCHAR(16) NOT NULL DEFAULT '')"""
-                               )
+                    CREATE TABLE IF NOT EXISTS cameras (
+                    ID int(11) NOT NULL auto_increment PRIMARY KEY,
+                    x1 float NOT NULL,
+                    y1 float NOT NULL,
+                    name varchar(20) COLLATE utf8_polish_ci NOT NULL,
+                    generated_id int(11) NOT NULL,
+                    rules VARCHAR(16) NOT NULL DEFAULT '',
+                    floor INT(2) NOT NULL,
+                    workspace_id INT(5) NOT NULL
+                    )"""
+                )
 
                 cursor.execute("""
-                                CREATE TABLE IF NOT EXISTS doors (
-                                ID int(11) NOT NULL auto_increment PRIMARY KEY,
-                                x1 float NOT NULL,
-                                y1 float NOT NULL,
-                                x2 float NOT NULL,
-                                y2 float NOT NULL,
-                                name varchar(20) COLLATE utf8_polish_ci NOT NULL,
-                                generated_id int(11) NOT NULL)"""
+                    CREATE TABLE IF NOT EXISTS doors (
+                    ID int(11) NOT NULL auto_increment PRIMARY KEY,
+                    x1 float NOT NULL,
+                    y1 float NOT NULL,
+                    x2 float NOT NULL,
+                    y2 float NOT NULL,
+                    generated_id int(11) NOT NULL,
+                    floor INT(2) NOT NULL,
+                    workspace_id INT(5) NOT NULL
+                    )"""
                                )
             except mysql.connector.Error as error:
                 raise TimeoutError("Cannot process query. Reason: %s" % error)
