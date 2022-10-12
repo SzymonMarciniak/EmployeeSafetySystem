@@ -1,8 +1,10 @@
 from kivy.metrics import sp
 from kivy.properties import NumericProperty, ObjectProperty
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.stacklayout import StackLayout
 
@@ -54,6 +56,15 @@ class SaveButton(Button):
         super(SaveButton, self).__init__(**kwargs)
 
     def on_press(self):
+        if self.actionsListButton.text == '' or self.detectionListButton.text == '' or self.camerasListButton.text == '':
+            popup_content = BoxLayout(orientation='vertical')
+            popup_content.add_widget(Label(text='You have omitted one or more values in a rule you are trying to save'))
+            btn = Button(text="Understood", size_hint_y=.2)
+            popup_content.add_widget(btn)
+            popup = Popup(size_hint=[None, None], size=[500, 300], title='Warning', content=popup_content)
+            btn.bind(on_press=popup.dismiss)
+            popup.open()
+            return
         db, cursor = connectToDatabase()
         for cID, value in cameras_dict.items():
             if value == self.camerasListButton.text:

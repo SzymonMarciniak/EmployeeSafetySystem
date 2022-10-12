@@ -1,5 +1,11 @@
 <RulesScreen@Screen>:
     name: 'rules_screen'
+    canvas.before:
+        Color:
+            rgba: DM_MAIN_COLOR
+        Rectangle:
+            pos: 0,0
+            size: 10000, 10000
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
@@ -33,6 +39,7 @@
     actionsListButton: actionsListButton
     detectionListButton: detectionListButton
     camerasListButton: camerasListButton
+    delete_rule: delete_rule
     size_hint: 1, None
     BoxLayout:
         pos_hint: {'center_x': .5, 'center_y': .5}
@@ -50,7 +57,6 @@
                 text: 'IF'
             ActionsButton:
                 id: detectionListButton
-
         BoxLayout:
             orientation:
                 (
@@ -73,7 +79,7 @@
             camerasListButton: camerasListButton
 
 
-<DeleteRule@Button>:
+<DeleteRule>:
     size_hint_x: .1
     markup: True
     font_size: self.height / 3

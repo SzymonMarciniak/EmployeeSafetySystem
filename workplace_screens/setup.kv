@@ -1,6 +1,6 @@
 #: import mtx kivy.metrics
 
-<SetupScreen@Screen>:
+<SetupScreen>:
     name: 'SetupScreen'
     floatlayout: floatlayout
 
@@ -100,7 +100,7 @@
             
             
             
-<SelectFloorPopup@Popup>:
+<SelectFloorPopup>:
     id: FloorPopup 
     auto_dismiss: True 
     title: "Please select floor"
@@ -119,7 +119,7 @@
 
             
 
-<DeleteWidgetPopup@Popup>:
+<DeleteWidgetPopup>:
     id: DeletePopup
     auto_dismiss: True
     title: "Delete widget by ID" 
@@ -147,7 +147,7 @@
             size: 0, 35 
             pos_hint: {"x":.25 ,"y":0}
 
-<GetNamePopup@Popup>:
+<GetNamePopup>:
     id: getNamePopup 
     auto_dismiss: False
     title: "Names" 
