@@ -35,14 +35,14 @@ class RulesContainer(StackLayout):
             global title_label
             title_label.active_rules += 1
             name = row[0]
-            rules_str = row[1].split()
-            actions_str = row[2].split()
+            rules_str = row[1]
+            actions_str = row[2]
             for i in range(len(rules_str)):
                 rule_name = detection_dict.get(int(rules_str[i]))
                 action_name = actions_dict.get(int(actions_str[i]))
-            rule_creator = NewRuleCreator(isGenerated=True, camera_name=name, rule_name=rule_name,
+                rule_creator = NewRuleCreator(isGenerated=True, camera_name=name, rule_name=rule_name,
                                           action_name=action_name)
-            self.add_widget(rule_creator)
+                self.add_widget(rule_creator)
 
         closeDatabaseConnection(db, cursor)
 
