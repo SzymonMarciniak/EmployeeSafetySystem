@@ -235,7 +235,7 @@ class SetupScreen(Screen):
             y1 = y1 * self.height
             with self.floatlayout.canvas:
                 Color(1,1,1,1, mode='rgba')
-                camera = Camera(pos=(x1, y1), size=(20, 20), deleteId=load_camera[4], name=load_camera[3], floor=load_camera[6])
+                camera = Camera(pos=(x1, y1), size=(20, 20), deleteId=load_camera[4], name=load_camera[3], floor=load_camera[7])
                 Color(0,0,0,1, mode='rgba')
                 circle1 = Ellipse(pos=(camera.pos[0] + 5, camera.pos[1] + 5), size=(10, 10))
                 Color(1,1,1,1, mode='rgba')
@@ -559,7 +559,7 @@ class SetupScreen(Screen):
             cameras_to_move.append(len(cameras_list)-1)
 
             db, cursor = connectToDatabase()
-            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id}, '', {self.current_floor}, {global_vars.choosenWorkplace})""")
+            cursor.execute(f"""INSERT INTO cameras VALUES (null, {new_points[0]}, {new_points[1]}, '{new_name}' ,{new_id}, '', '', {self.current_floor}, {global_vars.choosenWorkplace})""")
             db.commit()
             closeDatabaseConnection(db, cursor)
             cameras_names.append(new_name)
