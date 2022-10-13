@@ -51,10 +51,12 @@ class RLayout(RelativeLayout):
 
 
 class PopupContent(BoxLayout):
+    generatedID = NumericProperty()
+
     def __init__(self, **kwargs):
         super(PopupContent, self).__init__(**kwargs)
         self.orientation = 'vertical'
-        self.add_widget(Label(text="Camera ID: 7"))
+        self.add_widget(Label(text=str(self.generatedID)))
         self.add_widget(Label(text="Room ID: 3"))
         self.add_widget(Label(text="Rules: 4"))
 
@@ -64,6 +66,6 @@ class InfoButton(Button):
         super(InfoButton, self).__init__(**kwargs)
 
     def on_press(self):
-        content = PopupContent()
+        content = PopupContent(generatedID=self.parent.generatedID)
         popup = Popup(title='Info about camera', content=content, auto_dismiss=True, size_hint=[.7, .7])
         popup.open()

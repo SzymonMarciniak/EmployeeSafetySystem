@@ -9,6 +9,7 @@ from kivy.uix.screenmanager import FadeTransition, Screen
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules import global_vars
 from modules.cameras import CamerasLayout
+from modules.global_vars import cameras_dict
 
 choices = {
     1: 'cameras_screen',
@@ -42,12 +43,16 @@ class MainWorkplaceScreen(Screen):
         db, cursor = connectToDatabase()
         cursor.execute("SELECT name FROM accounts WHERE id=%s", (userid,))
         userData = cursor.fetchone()
+        cursor.execute(f"SELECT generated_id, name FROM cameras WHERE workspace_id={global_vars.choosenWorkplace}")
+        results = cursor.fetchall()
+        for row in results:
+            cameras_dict[row[0]] = row[1]
         closeDatabaseConnection(db, cursor)
 
         userName = ""
         for l in userData[0]:
             if l == " ":
-                break 
+                break
             userName += l
         self.hello_text = f"Hello {userName}"
 

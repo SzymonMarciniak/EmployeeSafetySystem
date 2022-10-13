@@ -81,13 +81,12 @@ circle2_list = []
 
 first_time = True
 
+
 class SetupScreen(Screen):
     floatlayout = ObjectProperty()
 
-    
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
         LabelBase.register(name='Lato',
                            fn_regular='fonts/Lato-Regular.ttf',
                            fn_bold='fonts/Lato-Bold.ttf')
@@ -115,7 +114,7 @@ class SetupScreen(Screen):
         self.new_door_id = 200 
 
         self.current_floor = None
-        self.to_create = False 
+        self.to_create = False
 
     def on_pre_leave(self, *args):
         self.clear_floors()
@@ -210,7 +209,7 @@ class SetupScreen(Screen):
     def load_objects(self, work=None):
         
         db, cursor = connectToDatabase()
-        cursor.execute(f"SELECT * FROM rooms WHERE workspace_id = {global_vars.choosenWorkplace}")
+        cursor.execute(f"SELECT * FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
         rooms_results = cursor.fetchall()
 
         for load_room in rooms_results:
@@ -243,7 +242,7 @@ class SetupScreen(Screen):
 
             cameras_names.append(load_camera[3])
             cameras_list.append(camera)
-            cameras_dict[load_camera[4]] = load_camera[3]
+            # cameras_dict[load_camera[4]] = load_camera[3] | NIE MOŻEMY TEGO ŁADOWAĆ TAK PÓŹNO!
             circle1_list.append(circle1)
             circle2_list.append(circle2)
             

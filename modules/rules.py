@@ -33,11 +33,11 @@ class RulesContainer(StackLayout):
         results = cursor.fetchall()
         for row in results:
             global title_label
-            title_label.active_rules += 1
             name = row[0]
             rules_str = row[1]
             actions_str = row[2]
             for i in range(len(rules_str)):
+                title_label.active_rules += 1
                 rule_name = detection_dict.get(int(rules_str[i]))
                 action_name = actions_dict.get(int(actions_str[i]))
                 rule_creator = NewRuleCreator(isGenerated=True, camera_name=name, rule_name=rule_name,
@@ -130,7 +130,9 @@ class DeleteRule(Button):
         for aID, value in actions_dict.items():
             if value == self.actionsListButton.text:
                 actionID = aID
+        print(cameraID)
         if cameraID is not None:
+            print("NOT NONE")
             db, cursor = connectToDatabase()
             cursor.execute("SELECT rules, actions FROM cameras WHERE generated_id=%s", (cameraID,))
             results = cursor.fetchone()
@@ -138,6 +140,7 @@ class DeleteRule(Button):
             actions_str = results[1]
             cursor.execute("UPDATE cameras SET rules=%s, actions=%s WHERE generated_id=%s",
                            (rules_str.replace(str(detectionID), ''), actions_str.replace(str(actionID), ''), cameraID))
+            db.commit()
             closeDatabaseConnection(db, cursor)
 
 
