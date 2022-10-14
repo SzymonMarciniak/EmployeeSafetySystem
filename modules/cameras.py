@@ -7,11 +7,13 @@ from kivy.uix.popup import Popup
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.graphics.texture import Texture
-from PoseModule.yolov7.utils.datasets import LoadStreams, LoadImages
+from PoseModule.yolov7.utils.datasets import LoadImages
 import cv2
 import numpy as np
 from kivy.clock import Clock
+import time
 from tensorflow.keras.models import load_model
+import tensorflow as tf
 
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from PoseModule.yolov7.detect import detect as PoseDetect
@@ -23,7 +25,7 @@ view_img = True
 imgsz = 640 
 half_precision = True 
 kpt_label = True 
-device = 'cpu' # GPU, if cpu = 'cpu'
+device = '' # GPU, if cpu = 'cpu'
 conf_thres = .75
 iou_thres = .45
 classes = False 
@@ -61,6 +63,7 @@ class CamerasLayout(StackLayout):
 
 cam_view = []
 cam_list = []
+
 class RLayout(RelativeLayout):
     camera_view_parent = ObjectProperty()
     cameraID = NumericProperty()
@@ -82,13 +85,39 @@ class RLayout(RelativeLayout):
 
         img_list, mask_lists, helmet_lists, img0_list = [], [], [], []
 
+        t0= time.time()
         for dataset in datasets:
             img, mask_list, helmet_list, img0 = p_detect.detect2(dataset)
             img_list.append(img)
             mask_lists.append(mask_list)
             helmet_lists.append(helmet_list)
             img0_list.append(img0)
-        print(f"RRRRRRR {len(img_list)} ------ {img_list[0]}")
+        t1 = time.time() 
+        print("Time elapsed detect2: ", t1 - t0)
+        
+        t0= time.time()
+        for nr0, mask_list in enumerate(mask_lists):
+            is_mask = True
+            if mask_list != empty:
+                try:
+                    for nr, img_m in enumerate(mask_lists[1]):
+                        resize = tf.image.resize(img_m, (256,256))
+                        pred = model.predict(np.expand_dims(resize/255, 0))
+                        if pred < 0.5: 
+                            print(f'Predicted class is Mask')
+                        else:
+                            print(f'Predicted class is No mask')
+                            is_mask = False
+                except: print("Failed to load mask image")
+            else: pass
+        
+            
+            if not is_mask:
+                cam_id = cam_view[nr0].cameraID
+                print(f"On camera if id: {cam_id} detect no mask!!!")
+        t1 = time.time() 
+        print("Time elapsed mask: ", t1 - t0)
+
         for nr, camera_image in enumerate(cam_view):
             if cam_nr < len(datasets):
                 cam_nr += 1
@@ -97,14 +126,12 @@ class RLayout(RelativeLayout):
                         if img_list[nr].any():
                             img = img_list[nr]
                             buffer = cv2.flip(img, 0).tobytes()
-                            print(f"fopopopoo {img.shape[1], img.shape[0]}")
                             texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='bgr')
                             texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
                             camera_image.texture = texture
                         else:
                             camera_image.source = 'img/pl.png'
-                    except Exception as err: 
-                        print(f"OUT OFF INDEXX {err}")
+                    except: 
                         camera_image.source = 'img/pl.png'
                 else:
                     try:
@@ -118,10 +145,8 @@ class RLayout(RelativeLayout):
                             camera_image.texture = texture
                         else:
                             camera_image.source = 'img/pl.png'
-                    except Exception as err: 
-                        print(f"OUT OFF INDEXX {err}")
+                    except: 
                         camera_image.source = 'img/pl.png'
-
             else:
                 camera_image.source = 'img/pl.png'
         cam_nr = 0

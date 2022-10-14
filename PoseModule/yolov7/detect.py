@@ -1,6 +1,5 @@
 import cv2
 import torch
-import time
 import numpy as np 
 import torch.backends.cudnn as cudnn
 import os
@@ -27,155 +26,153 @@ class detect:
         self.line_thickness = line_thickness
         self.classes = classes
         self.weights = weights
-        self.half_precision = half_precision
+        self.half_precision = half_precision 
         self.device = device
 
     def setup(self):
         # Initialize
-        cameras = []
-        cam_list = self.check_available_cameras()
-        for filename in os.listdir("videos/"):
-            if filename.endswith(".mp4"):
-                cam_list.append(f"videos/{filename}")
+        with torch.no_grad():
+            cameras = []
+            cam_list = self.check_available_cameras()
+            for filename in os.listdir("videos/"):
+                if filename.endswith(".mp4"):
+                    cam_list.append(f"videos/{filename}")
 
-        
-        set_logging()
-        self.device = select_device(self.device)
-        self.half = self.device.type != 'cpu' and self.half_precision  # half precision only supported on CUDA
+            
+            set_logging()
+            self.device = select_device(self.device)
+            self.half = self.device.type != 'cpu' and self.half_precision  # half precision only supported on CUDA
 
-        # Load model
-        self.model = attempt_load(self.weights, map_location=self.device)  # load FP32 model
-        self.stride = int(self.model.stride.max())  # model stride
+            # Load model
+            self.model = attempt_load(self.weights, map_location=self.device)  # load FP32 model
+            self.stride = int(self.model.stride.max())  # model stride
 
 
-        if isinstance(self.imgsz, (list,tuple)):
-            assert len(self.imgsz) ==2; "height and width of image has to be specified"
-            self.imgsz[0] = check_img_size(self.imgsz[0], s=self.stride)
-            self.imgsz[1] = check_img_size(self.imgsz[1], s=self.stride)
-        else:
-            self.imgsz = check_img_size(self.imgsz, s=self.stride)  # check img_size
-        self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
-        
-
-        if self.half:
-            self.model.half()  # to FP16
-
-        # Second-stage classifier
-        self.classify = False
-        if self.classify:
-            self.modelc = load_classifier(name='resnet101', n=2)  # initialize
-            self.modelc.load_state_dict(torch.load('weights/resnet101.pt', map_location=self.device)['model']).to(self.device).eval()
-
-        # Set Dataloader
-        
-
-        # Run inference
-        if self.device.type != 'cpu':
-            self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
-
-        for source in cam_list:
-            source = str(source)
-            #source = "imgs/vid7.mp4"
-            self.webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
-                        ('rtsp://', 'rtmp://', 'http://', 'https://'))  
-            if self.webcam:
-                print(f"VIDDDD:{source}")
-                cudnn.benchmark = True  # set True to speed up constant image size inference
-                dataset = LoadStreams(source, img_size=self.imgsz, stride=self.stride)
+            if isinstance(self.imgsz, (list,tuple)):
+                assert len(self.imgsz) ==2; "height and width of image has to be specified"
+                self.imgsz[0] = check_img_size(self.imgsz[0], s=self.stride)
+                self.imgsz[1] = check_img_size(self.imgsz[1], s=self.stride)
             else:
-                dataset = LoadImages(source, img_size=self.imgsz, stride=self.stride)
-            cameras.append(dataset)
-        return cameras
+                self.imgsz = check_img_size(self.imgsz, s=self.stride)  # check img_size
+            self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
+            
+
+            if self.half:
+                self.model.half()  # to FP16
+
+            # Second-stage classifier
+            self.classify = False
+            if self.classify:
+                self.modelc = load_classifier(name='resnet101', n=2)  # initialize
+                self.modelc.load_state_dict(torch.load('weights/resnet101.pt', map_location=self.device)['model']).to(self.device).eval()
+
+            # Set Dataloader
+            
+
+            # Run inference
+            if self.device.type != 'cpu':
+                self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
+
+            for source in cam_list:
+                source = str(source)
+                #source = "imgs/vid7.mp4"
+                self.webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
+                            ('rtsp://', 'rtmp://', 'http://', 'https://'))  
+                if self.webcam:
+                    cudnn.benchmark = True  # set True to speed up constant image size inference
+                    dataset = LoadStreams(source, img_size=self.imgsz, stride=self.stride)
+                else:
+                    dataset = LoadImages(source, img_size=self.imgsz, stride=self.stride)
+                cameras.append(dataset)
+            return cameras
 
     def detect2(self, dataset):
-        i = 0
-        for path, img, im0s, vid_cap  in dataset:
-            i += 1
-            if i % 30 == 0:
-                # im0s = cv2.rotate(im0s, cv2.ROTATE_180)
-                img = torch.from_numpy(img).to(self.device)
-                img = img.half() if self.half else img.float()  # uint8 to fp16/32
-                img /= 255.0  # 0 - 255 to 0.0 - 1.0
-                if img.ndimension() == 3:
-                    img = img.unsqueeze(0)
-                pred = []
-                # Inference
-                # pred = self.model(img, augment=False)[0]
+        with torch.no_grad():
+            i = 0
+            for path, img, im0s, vid_cap  in dataset:
+                i += 1
+                if i % 2 == 0:
+                    # im0s = cv2.rotate(im0s, cv2.ROTATE_180)
+                    img = torch.from_numpy(img).to(self.device)
+                    img = img.half() if self.half else img.float()  # uint8 to fp16/32
+                    img /= 255.0  # 0 - 255 to 0.0 - 1.0
+                    if img.ndimension() == 3:
+                        img = img.unsqueeze(0)
+                    pred = []
+                    # Inference
+                    pred = self.model(img, augment=False)[0]
 
-                # # Apply NMS
-                
-                # pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, classes=self.classes, agnostic=self.agnostic_nms, kpt_label=self.kpt_label)
-                
+                    # Apply NMS
+                    
+                    pred = non_max_suppression(pred, self.conf_thres, self.iou_thres, classes=self.classes, agnostic=self.agnostic_nms, kpt_label=self.kpt_label)
+                    
 
-                # # Apply Classifier
-                # if self.classify:
-                #     pred = apply_classifier(pred, self.modelc, img, im0s)
-                
-                mask_list = []
-                helmet_list = []
+                    # Apply Classifier
+                    if self.classify:
+                        pred = apply_classifier(pred, self.modelc, img, im0s)
+                    
+                    mask_list = []
+                    helmet_list = []
 
-                # Process detections
-                for i, det in enumerate(pred):  # detections per image
-                    if self.webcam:  # batch_size >= 1
-                        im0 = im0s[i].copy()
-                    else:
-                        im0 = im0s.copy()
+                    # Process detections
+                    for i, det in enumerate(pred):  # detections per image
+                        if self.webcam:  # batch_size >= 1
+                            im0 = im0s[i].copy()
+                        else:
+                            im0 = im0s.copy()
+                        if len(det):
+                            # Rescale boxes from img_size to im0 size
+                            scale_coords(img.shape[2:], det[:, :4], im0.shape, kpt_label=False)
+                            scale_coords(img.shape[2:], det[:, 6:], im0.shape, kpt_label=self.kpt_label, step=3)
 
-                    if len(det):
-                        print("HEREEEe PREDDD")
-                        # Rescale boxes from img_size to im0 size
-                        scale_coords(img.shape[2:], det[:, :4], im0.shape, kpt_label=False)
-                        scale_coords(img.shape[2:], det[:, 6:], im0.shape, kpt_label=self.kpt_label, step=3)
+                            # Write results
+                            for det_index, (*xyxy, conf, cls) in enumerate(reversed(det[:,:6])):
+                                if self.view_img:  # Add bbox to image
+                                    c = int(cls)  # integer class
+                                    label = None if False else (self.names[c] if False else f'{self.names[c]} {conf:.2f}')
+                                    kpts = det[det_index, 6:]
+                                    step=3
+                                    nr = 0  #0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder
 
-                        # Write results
-                        for det_index, (*xyxy, conf, cls) in enumerate(reversed(det[:,:6])):
-                            if self.view_img:  # Add bbox to image
-                                c = int(cls)  # integer class
-                                label = None if False else (self.names[c] if False else f'{self.names[c]} {conf:.2f}')
-                                kpts = det[det_index, 6:]
-                                step=3
-                                nr = 0  #0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder
+                                    # mouth point - for mask 
+                                    x_center, y_nose = kpts[step * nr], kpts[step * nr + 1]
+                                    y_shouder_l, y_shouder_r =  kpts[step * 5 + 1], kpts[step * 6 + 1]
+                                    y_shouders = ((y_shouder_l + y_shouder_r) /2) 
+                                    y_center = abs((y_shouders - y_nose) / 2.0) + y_nose
+                                    #cv2.circle(im0, (int(x_center), int(y_center)), 6, (0,0,255), -1)
 
-                                # mouth point - for mask 
-                                x_center, y_nose = kpts[step * nr], kpts[step * nr + 1]
-                                y_shouder_l, y_shouder_r =  kpts[step * 5 + 1], kpts[step * 6 + 1]
-                                y_shouders = ((y_shouder_l + y_shouder_r) /2) 
-                                y_center = abs((y_shouders - y_nose) / 2.0) + y_nose
-                                #cv2.circle(im0, (int(x_center), int(y_center)), 6, (0,0,255), -1)
+                                    #mask zone 
+                                    x_start_mask = int(kpts[step * 3])
+                                    x_end_mask = int(kpts[step * 4])
+                                    y_start_mask = int(y_nose)
+                                    y_end_height = int(y_center)
+                                    # cv2.circle(im0, (x_start_mask, y_start_mask), 8, (255,255,0), -1)
+                                    # cv2.circle(im0, (x_end_mask, y_end_height), 8, (255,255,0), -1)
+                                    #print(y_start_mask,y_end_height, x_start_mask,x_end_mask)
+                                    mask_zone_img = im0s[y_start_mask:y_end_height, x_end_mask:x_start_mask]
+                                    mask_list.append(mask_zone_img)
 
-                                #mask zone 
-                                x_start_mask = int(kpts[step * 3])
-                                x_end_mask = int(kpts[step * 4])
-                                y_start_mask = int(y_nose)
-                                y_end_height = int(y_center)
-                                # cv2.circle(im0, (x_start_mask, y_start_mask), 8, (255,255,0), -1)
-                                # cv2.circle(im0, (x_end_mask, y_end_height), 8, (255,255,0), -1)
-                                #print(y_start_mask,y_end_height, x_start_mask,x_end_mask)
-                                mask_zone_img = im0s[y_start_mask:y_end_height, x_end_mask:x_start_mask]
-                                mask_list.append(mask_zone_img)
-
-                                #helmet zone 
-                                x_start_helmet = int(kpts[step * 3])
-                                x_end_helmet = int(kpts[step * 4])
-                                dis = abs(((kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2) - ((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2))
-                                height_helmet = int(dis * 1.618) #phi number - gold proportion 
-                                y_start_helmet = int(((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet)
-                                y_end_helmet = int((kpts[step * 1 + 1] + kpts[step * 2 + 1]) /2)
-                                #print(y_start_helmet,y_end_helmet, x_start_helmet,x_end_helmet)
-                                helmet_zone_img = im0s[y_start_helmet:y_end_helmet, x_end_helmet:x_start_helmet]
-                                # cv2.circle(im0, (x_start_helmet, y_start_helmet), 8, (0,255,255), -1)
-                                # cv2.circle(im0, (x_end_helmet, y_end_helmet), 8, (0,255,255), -1)
-                                helmet_list.append(helmet_zone_img)
+                                    #helmet zone 
+                                    x_start_helmet = int(kpts[step * 3])
+                                    x_end_helmet = int(kpts[step * 4])
+                                    dis = abs(((kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2) - ((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2))
+                                    height_helmet = int(dis * 1.618) #phi number - gold proportion 
+                                    y_start_helmet = int(((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet)
+                                    y_end_helmet = int((kpts[step * 1 + 1] + kpts[step * 2 + 1]) /2)
+                                    #print(y_start_helmet,y_end_helmet, x_start_helmet,x_end_helmet)
+                                    helmet_zone_img = im0s[y_start_helmet:y_end_helmet, x_end_helmet:x_start_helmet]
+                                    # cv2.circle(im0, (x_start_helmet, y_start_helmet), 8, (0,255,255), -1)
+                                    # cv2.circle(im0, (x_end_helmet, y_end_helmet), 8, (0,255,255), -1)
+                                    helmet_list.append(helmet_zone_img)
 
 
-                                #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
-                        
+                                    #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
+                            
 
-                    # Stream results
-                    if self.view_img:
-                        return im0, mask_list, helmet_list, im0s
-            else:
-                return im0s, [], [], im0s
+                        # Stream results
+                        if self.view_img:
+                            return im0, mask_list, helmet_list, im0s
+             
     @staticmethod
     def check_available_cameras():
         cam_list = []
@@ -184,5 +181,4 @@ class detect:
             if cap is None or not cap.isOpened(): print("Ignore this")  
             else: cam_list.append(i)
         return cam_list
-                
 
