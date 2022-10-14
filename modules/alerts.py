@@ -1,4 +1,4 @@
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
@@ -8,6 +8,8 @@ from modules import global_vars
 
 
 class AlertsScreen(Screen):
+    alerts_count_label = ObjectProperty()
+
     def __init__(self, **kwargs):
         super(AlertsScreen, self).__init__(**kwargs)
         self.logs_layout = None
@@ -22,14 +24,17 @@ class AlertsScreen(Screen):
         self.build_logs()
 
     def build_logs(self):
+        self.alerts_count_label.unseen_alerts = 0
         db, cursor = connectToDatabase()
         cursor.execute("SELECT cameraID, alertReason, alertAction, date, seen FROM logs WHERE workplaceID=%s"
                        " ORDER BY date DESC;", (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
-        closeDatabaseConnection(db, cursor)
         if results is not None:
             for row in results:
                 self.generateLog(row)
+        cursor.execute("UPDATE logs SET seen=1 WHERE workplaceID=%s;", (global_vars.choosenWorkplace,))
+        db.commit()
+        closeDatabaseConnection(db, cursor)
 
     def generateLog(self, row):
         self.last_id += 1
@@ -39,6 +44,7 @@ class AlertsScreen(Screen):
         string = str(row[3]).split(' ')
         logLabel.append(LogLabel(text=string[0] + '\n' + string[1]))
         if row[4] != 1:
+            self.alerts_count_label.unseen_alerts += 1
             logObject.unseen = 1
         for label in logLabel:
             logObject.add_widget(label)

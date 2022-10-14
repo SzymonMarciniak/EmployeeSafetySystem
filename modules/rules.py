@@ -130,9 +130,7 @@ class DeleteRule(Button):
         for aID, value in actions_dict.items():
             if value == self.actionsListButton.text:
                 actionID = aID
-        print(cameraID)
         if cameraID is not None:
-            print("NOT NONE")
             db, cursor = connectToDatabase()
             cursor.execute("SELECT rules, actions FROM cameras WHERE generated_id=%s", (cameraID,))
             results = cursor.fetchone()
@@ -160,6 +158,7 @@ class NewRuleCreator(FloatLayout):
     camera_name = StringProperty()
     rule_name = StringProperty()
     action_name = StringProperty()
+    save_rule = ObjectProperty()
 
     def __init__(self, **kwargs):
         super(NewRuleCreator, self).__init__(**kwargs)
@@ -174,6 +173,10 @@ class NewRuleCreator(FloatLayout):
             self.actionsListButton.disabled = True
             self.detectionListButton.disabled = True
             self.camerasListButton.disabled = True
+            print(self.children)
+
+            self.save_rule.parent.remove_widget(self.save_rule)
+            print(self.children)
 
     def delete_pressed(self, widget):
         self.parent.remove_widget(self)

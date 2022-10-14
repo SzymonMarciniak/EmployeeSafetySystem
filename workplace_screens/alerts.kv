@@ -1,5 +1,6 @@
 <AlertsScreen>:
     name: 'alerts_screen'
+    alerts_count_label: alerts_count_label
     size_hint_x: 1
     canvas.before:
         Color:
@@ -14,8 +15,9 @@
             TitleLabel_Alerts:
                 text: 'Alerts log'
             TitleLabel_Alerts:
-#                unseen_alerts: 0
-                text: 'Unseen: 5'
+                id: alerts_count_label
+                unseen_alerts: 0
+                text: 'Unseen:' + str(self.unseen_alerts)
         BoxLayout:
             orientation: 'vertical'
             padding: 30, 0, 30, 20

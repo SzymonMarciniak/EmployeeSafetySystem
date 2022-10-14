@@ -107,7 +107,7 @@ class WorkplaceChooserLayout(BoxLayout):
 
     def buildExistingWorkplace(self, title, pos, s_activation, s_notifications, workplaceID):
         db, cursor = connectToDatabase()
-        cursor.execute("SELECT COUNT(ID) FROM logs WHERE workplaceID=%s", (workplaceID,))
+        cursor.execute("SELECT COUNT(ID) FROM logs WHERE workplaceID=%s AND seen=0", (workplaceID,))
         results = cursor.fetchone()
         alertsCount = results[0]
         ew = ExistingWorkplace()
