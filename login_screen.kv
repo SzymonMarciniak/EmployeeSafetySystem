@@ -28,18 +28,18 @@
             rgba: SECONDARY_COLOR
         Triangle:
             points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .73 * self.size[1]]
+    ChangeLanguage:
+        background_normal: "img/gb.png"
+        background_down: "img/gb.png"
+        size: 50, 38
+        size_hint: None, None
+        pos: root.width - (self.width + 10), root.height - (self.height + 10)
     BoxLayout:
         orientation: 'vertical'
         Widget:
             size_hint_y: .15
         RelativeLayout:
             size_hint_y: .1
-            ChangeLanguage:
-                background_normal: "img/gb.png"
-                background_down: "img/gb.png"
-                size: 50, 38
-                size_hint: None, None
-                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
         Label:
             text: "Log in"

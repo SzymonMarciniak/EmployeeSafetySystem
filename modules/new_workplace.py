@@ -5,7 +5,8 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import Screen, FadeTransition
 from kivy.uix.togglebutton import ToggleButton
 
-from modules.dbactions import insertNewWorkplace
+from modules import global_vars
+from modules.dbactions import insertNewWorkplace, connectToDatabase, closeDatabaseConnection
 from modules.global_vars import DECORATION_COLOR_NOALPHA, ERROR_COLOR, BG_COLOR
 
 
@@ -24,7 +25,19 @@ class StatusToggleButton(ToggleButton):
     def __init__(self, **kwargs):
         super(StatusToggleButton, self).__init__(**kwargs)
 
-    def on_toggled(self, button_obj: ToggleButton):
+    def on_toggled(self, button_obj: ToggleButton, setting_type):
+        state = 1 if button_obj.state == 'down' else 0
+        db, cursor = connectToDatabase()
+        if setting_type == 'notifications_state':
+            cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+            db.commit()
+        elif setting_type == 'activation_state':
+            print("here")
+            print("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+            cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+            db.commit()
+        closeDatabaseConnection(db, cursor)
+
         if button_obj.state == 'down':
             button_obj.text = "ON"
             anim = Animation(p1=self.x, p2=self.y, s1=self.width, s2=self.height, toggle_color=DECORATION_COLOR_NOALPHA,

@@ -123,10 +123,10 @@ class WorkplaceChooserLayout(BoxLayout):
                                      icon('zmdi-circle'), "Active" if s_activation > 0 else "Disabled")
         boxlayout.add_widget(EwStatus(text=label_text))
         label_text = "[color=%s]%s[/color] " \
-                     "Notifications: %s" % ("#08c48c" if s_notifications < 0 else "#c92a1e",
-                                            icon('zmdi-notifications-off') if s_notifications > 0 else
-                                            icon('zmdi-notifications-active'), "Active"
-                                            if s_activation > 0 else "Disabled")
+                     "Notifications: %s" % ("#08c48c" if s_notifications > 0 else "#c92a1e",
+                                            icon('zmdi-notifications-active') if s_notifications > 0 else
+                                            icon('zmdi-notifications-off'), "Active"
+                                            if s_notifications > 0 else "Disabled")
         boxlayout.add_widget(EwStatus(text=label_text))
         # label_text = "[color=%s]%s[/color] " \
         #              "%s" % ("#08c48c" if s_notifications > 0 else "#c92a1e",

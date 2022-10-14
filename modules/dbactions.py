@@ -160,6 +160,6 @@ def setNewPassword(password):
 
 def insertNewWorkplace(name, notifications_status):
     db, cursor = connectToDatabase()
-    cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 0, %s);", (global_vars.userID, name,
-                                                                              notifications_status))
+    cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 1, %s);", (global_vars.userID, name,
+                                                                              1 if notifications_status else 0))
     db.commit()

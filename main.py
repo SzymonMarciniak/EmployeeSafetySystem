@@ -21,7 +21,8 @@ from modules import main_workplace
 from modules import cameras
 from modules import rules
 from modules import alerts
-from modules import setup_actions 
+from modules import setup_actions
+from modules import settings
 
 
 class ScreenManagement(ScreenManager):

@@ -1,6 +1,7 @@
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.window import Window
 from kivy.properties import ObjectProperty, NumericProperty, StringProperty
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -17,7 +18,7 @@ choices = {
     3: 'dev',
     4: 'rules_screen',
     5: 'SetupScreen',
-    6: 'dev',
+    6: 'settings_screen',
     7: 'login_screen'
 }
 
@@ -31,6 +32,9 @@ class MainWorkplaceScreen(Screen):
         super(MainWorkplaceScreen, self).__init__(**kwargs)
         userName = global_vars.userID
         self.hello_text = f"Hello {userName}"
+
+    def on_enter(self, *args):
+        Window.fullscreen = 'auto'
 
     def on_pre_enter(self):
         global_vars.hoverEventObjects = []
@@ -67,12 +71,14 @@ class MenuButton(Button):
     main_screen_sm = ObjectProperty()
     bottom_menu = ObjectProperty()
     upper_menu = ObjectProperty()
+    canva_s1 = NumericProperty()
     active = False
     sID = NumericProperty()
 
     def on_press(self):
-        anim = Animation(canva_s1=1, duration=.3, transition='in_out_quad')
-        anim.start(self)
+        if self.sID != 7:
+            anim = Animation(canva_s1=1, duration=.3, transition='in_out_quad')
+            anim.start(self)
         for children in self.upper_menu.children:
             if children == self:
                 continue
@@ -91,6 +97,7 @@ class MenuButton(Button):
             app = App.get_running_app()
             app.root.transition = FadeTransition()
             app.root.current = choices.get(self.sID)
+            self.main_screen_sm.current = 'default'
             self.active = False
             return
         self.main_screen_sm.transition = FadeTransition()

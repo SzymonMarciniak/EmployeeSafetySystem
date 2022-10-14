@@ -87,31 +87,8 @@
                     font_size: min(72, self.width / 7)
                 StatusToggleButton:
                     id: status_toggle
-                    p1: self.x
-                    p2: self.y
-                    s1: self.width
-                    s2: self.height
-                    rect_color: DECORATION_COLOR_NOALPHA
-                    toggle_color: DECORATION_COLOR_NOALPHA
-                    text: "ON"
-                    font_name: 'Lato'
-                    font_size: min(72, self.width / 7)
-                    state: 'down'
-                    background_normal: ''
-                    background_down: ''
-                    background_color: [0, 0, 0, 0]
-                    on_press: self.on_toggled(self)
-                    canvas.before:
-                        Color:
-                            rgba: self.rect_color
-                        Rectangle:
-                            pos: self.p1, self.p2
-                            size: self.s1, self.s2
-                        Color:
-                            rgba: self.toggle_color
-                        Line:
-                            rectangle: self.x, self.y, self.width, self.height
-                            width: 2
+                    on_press: self.on_toggled(self, None)
+
             Widget:
                 size_hint_y: .1
             BoxLayout:
@@ -126,6 +103,33 @@
                     text: "Go back"
         Widget:
             size_hint_y: .1
+
+<StatusToggleButton>:
+    p1: self.x
+    p2: self.y
+    s1: self.width
+    s2: self.height
+    rect_color: DECORATION_COLOR_NOALPHA
+    toggle_color: DECORATION_COLOR_NOALPHA
+    text: "ON"
+    markup: True
+    font_name: 'Lato'
+    state: 'down'
+    background_normal: ''
+    background_down: ''
+    background_color: [0, 0, 0, 0]
+    canvas.before:
+        Color:
+            rgba: self.rect_color
+        RoundedRectangle:
+            pos: self.p1, self.p2
+            size: self.s1, self.s2
+            radius: 15,15,15,15
+        Color:
+            rgba: self.toggle_color
+        Line:
+            rectangle: self.x, self.y, self.width, self.height
+            width: 2
 
 <CreateWorkplaceButton>:
     background_color: [0,0,0,0]
