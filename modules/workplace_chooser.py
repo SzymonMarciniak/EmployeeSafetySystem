@@ -176,7 +176,6 @@ class ChooseButton(Button):
         global_vars.hoverEventObjects.append(self)
 
     def on_press(self):
-        print(self.workplaceID)
         global_vars.choosenWorkplace = self.workplaceID
         app = App.get_running_app()
         app.root.transition = FadeTransition()

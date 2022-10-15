@@ -32,8 +32,6 @@ class StatusToggleButton(ToggleButton):
             cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
             db.commit()
         elif setting_type == 'activation_state':
-            print("here")
-            print("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
             cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
             db.commit()
         closeDatabaseConnection(db, cursor)

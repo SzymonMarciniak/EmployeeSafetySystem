@@ -173,10 +173,8 @@ class NewRuleCreator(FloatLayout):
             self.actionsListButton.disabled = True
             self.detectionListButton.disabled = True
             self.camerasListButton.disabled = True
-            print(self.children)
 
             self.save_rule.parent.remove_widget(self.save_rule)
-            print(self.children)
 
     def delete_pressed(self, widget):
         self.parent.remove_widget(self)
