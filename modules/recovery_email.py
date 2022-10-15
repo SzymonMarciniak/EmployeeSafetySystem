@@ -110,6 +110,21 @@ def sendRecoveryEmail(userMail):
 
 
 def checkIsSpam(userMail):
+    """
+    Checks whether user have sent a recovery E-Mail within the last 180 seconds.
+
+    Params
+    -------------------
+    userMail: str
+        User's e-mail address
+
+    Return value
+    -------------------
+    True: bool
+        If the mail is a spam
+    False: bool
+        Otherwise
+    """
     db, cursor = connectToDatabase()
     cursor.execute("SELECT id FROM accounts WHERE login=%s", (userMail,))
     results = cursor.fetchone()
@@ -159,6 +174,9 @@ class SubmitCodeButton(Button):
         global_vars.hoverEventObjects.append(self)
 
     def on_press(self):
+        """
+        Checks whether provided recovery code is valid. If not, inform user about this case
+        """
         db, cursor = connectToDatabase()
         code = ''
         for i, child in enumerate(self.parent.children):

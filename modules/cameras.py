@@ -22,18 +22,19 @@ print("9999999999999999999999")
 cam_nr = 0
 first_time = True
 weights_pose = "PoseModule/yolov7/yolov7-w6-pose.pt"
-view_img = True 
-imgsz = 640 
-half_precision = True 
-kpt_label = True 
-device = '' # GPU, if cpu = 'cpu'
+view_img = True
+imgsz = 640
+half_precision = True
+kpt_label = True
+device = ''  # GPU, if cpu = 'cpu'
 conf_thres = .75
 iou_thres = .45
-classes = False 
-agnostic_nms = False 
+classes = False
+agnostic_nms = False
 line_thickness = 8
 empty = []
-p_detect = PoseDetect(weights_pose, view_img, imgsz, half_precision, kpt_label, device, conf_thres, iou_thres,classes, agnostic_nms, line_thickness)
+p_detect = PoseDetect(weights_pose, view_img, imgsz, half_precision, kpt_label, device, conf_thres, iou_thres, classes,
+                      agnostic_nms, line_thickness)
 datasets = p_detect.setup()
 
 mask_model = load_model('models/mask_binar_classifier.h5')
@@ -42,6 +43,7 @@ vest_model = load_model('models/vest_binar_classifier.h5')
 cap_model = load_model('models/cap_binar_classifier.h5')
 
 failed_load_camera_img = 'img/pl.png'
+
 
 class CameraView(Image):
     cameraID = NumericProperty()
@@ -66,20 +68,21 @@ class CamerasLayout(StackLayout):
             self.add_widget(rlayout)
         closeDatabaseConnection(db, cursor)
 
+
 cam_view = []
 cam_list = []
+
 
 class RLayout(RelativeLayout):
     camera_view_parent = ObjectProperty()
     cameraID = NumericProperty()
-    
+
     def __init__(self, **kwargs):
         super(RLayout, self).__init__(**kwargs)
         global cam_view
         camera = CameraView(cameraID=self.cameraID)
         self.camera_view_parent.add_widget(camera)
         cam_view.append(camera)
-        
 
     @staticmethod
     def set_interval():
@@ -99,11 +102,10 @@ class RLayout(RelativeLayout):
                     mask_lists.append(mask_list)
                     helmet_cap_lists.append(helmet_cap_list)
                     vest_lists.append(vest_list)
-                    img0_list.append(img0) 
+                    img0_list.append(img0)
                 except:
-                    print("Failed to load camera or video is over") 
+                    print("Failed to load camera or video is over")
 
-            
             db, cursor = connectToDatabase()
             cursor.execute(f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
             rules_list = cursor.fetchall()
@@ -210,7 +212,7 @@ class RLayout(RelativeLayout):
                                 camera_image.texture = texture
                             else:
                                 camera_image.source = failed_load_camera_img
-                        except: 
+                        except:
                             camera_image.source = failed_load_camera_img
                     else:
                         try:
@@ -219,12 +221,12 @@ class RLayout(RelativeLayout):
                                 img = np.array(img)
                                 img = np.rot90(img, 2)
                                 buffer = img.tobytes()
-                                texture = Texture.create(size=(640,480 ), colorfmt='bgr')
+                                texture = Texture.create(size=(640, 480), colorfmt='bgr')
                                 texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
                                 camera_image.texture = texture
                             else:
                                 camera_image.source = failed_load_camera_img
-                        except: 
+                        except:
                             camera_image.source = failed_load_camera_img
                 else:
                     camera_image.source = failed_load_camera_img
@@ -238,15 +240,15 @@ class RLayout(RelativeLayout):
                 entire_img = object_lists[nr0]
                 if entire_img != empty:
                     for crop_image in entire_img:
-                        resize = tf.image.resize(crop_image, (256,256))
-                        pred = model.predict(np.expand_dims(resize/255, 0))
-                        if pred < ((0.5 + alignment) * equation): 
+                        resize = tf.image.resize(crop_image, (256, 256))
+                        pred = model.predict(np.expand_dims(resize / 255, 0))
+                        if pred < ((0.5 + alignment) * equation):
                             # print(f'Predicted class is {object_name}')
                             pass
                         else:
                             # print(f'Predicted class is No {object_name}')
                             danger = True
-            except Exception as err: 
+            except Exception as err:
                 print(f"Failed to load {object_name} image --- {err}")
         if reverse:
             danger = not danger
