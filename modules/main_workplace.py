@@ -38,6 +38,10 @@ class MainWorkplaceScreen(Screen):
         Window.fullscreen = 'auto'
 
     def on_pre_enter(self):
+        """
+        Reset mouseover effect and apply it to newly loaded objects.
+        Also add cameras to global list and show user's name on the main screen.
+        """
         global_vars.hoverEventObjects = []
         for children in self.upper_menu.children:
             global_vars.hoverEventObjects.append(children)
@@ -77,7 +81,6 @@ class MenuButton(Button):
     sID = NumericProperty()
 
     def on_press(self):
-        global first
         if self.sID != 7:
             anim = Animation(canva_s1=1, duration=.3, transition='in_out_quad')
             anim.start(self)
@@ -96,8 +99,9 @@ class MenuButton(Button):
         self.active = True
         if (self.sID == 1) or (self.sID == 2):
             if not global_vars.AI_run:
+                global first
                 if first:
-                    t1.run()    
+                    t1.run()
                     first = False
                 global_vars.AI_run = True
         else:
