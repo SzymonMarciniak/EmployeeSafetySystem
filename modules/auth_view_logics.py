@@ -1,6 +1,7 @@
 import platform
 
 from kivy.animation import Animation
+from kivy.core.window import Window
 
 if platform.system() == 'Windows':
     import win32api
@@ -27,6 +28,9 @@ class LoginScreen(Screen):
     loginBtn = ObjectProperty()
     resetPswdBtn = ObjectProperty()
 
+    def on_enter(self, *args):
+        Window.fullscreen = False
+
     def on_pre_enter(self):
         Clock.schedule_once(self.callback)
         # It is necessary to call function one frame later.
@@ -34,6 +38,10 @@ class LoginScreen(Screen):
         # the IDs are not yet initalized
 
     def callback(self, dt):
+        """
+        Resets whole screen right before user can see it. Also provides login screen's mouseover effect on certain
+        objects
+        """
         global_vars.hoverEventObjects = [self.loginBox, self.passwordBox, self.loginBtn,
                                          self.registerBtn, self.resetPswdBtn]
         self.loginBox.text = ''
@@ -53,6 +61,10 @@ class RegisterScreen(Screen):
     resetPswdBtn = ObjectProperty()
 
     def on_pre_enter(self):
+        """
+        Resets whole screen right before user can see it. Also provides register screen's mouseover effect on certain
+        objects
+        """
         global_vars.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
         self.loginBox.text = ''
         self.newPasswordBox.text = ''
@@ -79,6 +91,9 @@ class SimpleInput(TextInput):
             self.bind(text=self.on_entered)
 
     def on_focus(self, instance, value):
+        """
+        Creates smooth animation of text inputs all over the application.
+        """
         if value:
             self.canva_s1 = 0
             anim = Animation(canva_s1=1, duration=.5, transition="in_quart")
@@ -87,6 +102,10 @@ class SimpleInput(TextInput):
     activated = False
 
     def on_entered(self, instance, value):
+        """
+        Changes caps lock indicator state when text is entered in any text input.
+        Works only on Windows.
+        """
         caps_status = win32api.GetKeyState(win32con.VK_CAPITAL)
         if caps_status == 0 and self.activated:
             current_app = App.get_running_app()
@@ -153,6 +172,9 @@ class ResetPasswordButton(Button):
         super().__init__(**kwargs)
 
     def on_press(self):
+        """
+        Go to password reseting screen whether clicked
+        """
         App.get_running_app().root.transition = FadeTransition()
         App.get_running_app().root.current = 'forgot_password_screen'
 

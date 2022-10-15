@@ -146,6 +146,23 @@ def checkCredintialsInDatabase(login, password, errorBox):
 
 
 def checkForPassword(password, repeatPassword, errorBox):
+    """
+    Params
+    ------------------
+    password: str
+        Password provided in passsword's text input
+    repeatPassword: str
+        Repeated password inputed in text input
+    errorBox: ObjectProperty
+        Object of the errorBox; the container handling all error messages and showing them
+
+    Return value
+    ------------------
+    True: bool
+        Password matched all requirements such as length
+    False: bool
+        Requirements not met
+    """
     if len(password) < 8 or len(password) > 64:
         ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
         return False

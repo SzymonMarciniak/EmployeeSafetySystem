@@ -15,7 +15,6 @@ class CameraView(Image):
 
     def __init__(self, **kwargs):
         super(CameraView, self).__init__(**kwargs)
-        print("XD: " + str(self.cameraID))
 
 
 class CamerasLayout(StackLayout):

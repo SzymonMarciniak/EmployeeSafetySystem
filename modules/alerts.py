@@ -2,6 +2,7 @@ from kivy.properties import NumericProperty, ObjectProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.screenmanager import Screen
+from mysql.connector.cursor_cext import CMySQLCursor
 
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules import global_vars
@@ -24,6 +25,9 @@ class AlertsScreen(Screen):
         self.build_logs()
 
     def build_logs(self):
+        """
+        Builds alerts log container and changes 'seen' indicator to 1
+        """
         self.alerts_count_label.unseen_alerts = 0
         db, cursor = connectToDatabase()
         cursor.execute("SELECT cameraID, alertReason, alertAction, date, seen FROM logs WHERE workplaceID=%s"
@@ -37,6 +41,15 @@ class AlertsScreen(Screen):
         closeDatabaseConnection(db, cursor)
 
     def generateLog(self, row):
+        """
+        Generates alert log object and adds it to the container. Provides whole information such as reason,
+        taken action, date etc.
+
+        Params
+        ------------------
+        row: List
+            Row from the results containing needed information
+        """
         self.last_id += 1
         logObject = Log()
         logLabel = [LogLabel(text=str(self.last_id), size_hint_x=.6), LogLabel(text=str(row[0])),

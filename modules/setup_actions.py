@@ -209,7 +209,7 @@ class SetupScreen(Screen):
     def load_objects(self, work=None):
         
         db, cursor = connectToDatabase()
-        cursor.execute(f"SELECT * FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+        cursor.execute(f"SELECT * FROM rooms WHERE workspace_id = {global_vars.choosenWorkplace}")
         rooms_results = cursor.fetchall()
 
         for load_room in rooms_results:

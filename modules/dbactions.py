@@ -152,6 +152,14 @@ def checkIsEmailInDatabase(recoveryEmail):
 
 
 def setNewPassword(password):
+    """
+    Updates user's password after he successfully managed to input verification code
+
+    Params
+    ------------------
+    password: str
+        New password provided by the user
+    """
     db, cursor = connectToDatabase()
     cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, global_vars.userID))
     db.commit()
@@ -163,3 +171,5 @@ def insertNewWorkplace(name, notifications_status):
     cursor.execute("INSERT INTO workplaces VALUES(null, %s, %s, 1, 1, %s);", (global_vars.userID, name,
                                                                               1 if notifications_status else 0))
     db.commit()
+    closeDatabaseConnection(db, cursor)
+
