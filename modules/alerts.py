@@ -52,7 +52,7 @@ class AlertsScreen(Screen):
         """
         self.last_id += 1
         logObject = Log()
-        logLabel = [LogLabel(text=str(self.last_id), size_hint_x=.6), LogLabel(text=str(row[0])),
+        logLabel = [LogLabel(text=str(self.last_id), size_hint_x=.6), LogLabel(text=global_vars.cameras_dict[row[0]]),
                     LogLabel(text=str(row[1])), LogLabel(text=str(row[2]))]
         string = str(row[3]).split(' ')
         logLabel.append(LogLabel(text=string[0] + '\n' + string[1]))

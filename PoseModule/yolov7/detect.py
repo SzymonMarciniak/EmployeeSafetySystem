@@ -113,6 +113,7 @@ class detect:
                     
                     mask_list = []
                     helmet_list = []
+                    vest_list = []
 
                     # Process detections
                     for i, det in enumerate(pred):  # detections per image
@@ -132,7 +133,7 @@ class detect:
                                     label = None if False else (self.names[c] if False else f'{self.names[c]} {conf:.2f}')
                                     kpts = det[det_index, 6:]
                                     step=3
-                                    nr = 0  #0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder
+                                    nr = 0  #0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder, 11-left hip, 12-rught hip
 
                                     # mouth point - for mask 
                                     x_center, y_nose = kpts[step * nr], kpts[step * nr + 1]
@@ -146,12 +147,9 @@ class detect:
                                     x_end_mask = int(kpts[step * 4])
                                     y_start_mask = int(y_nose)
                                     y_end_height = int(y_center)
-                                    # cv2.circle(im0, (x_start_mask, y_start_mask), 8, (255,255,0), -1)
-                                    # cv2.circle(im0, (x_end_mask, y_end_height), 8, (255,255,0), -1)
-                                    cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(0,255,255), thickness=2)
-                                    #print(y_start_mask,y_end_height, x_start_mask,x_end_mask)
                                     mask_zone_img = im0s[y_start_mask:y_end_height, x_end_mask:x_start_mask]
                                     mask_list.append(mask_zone_img)
+                                    cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(0,255,255), thickness=2)
 
                                     #helmet zone 
                                     x_start_helmet = int(kpts[step * 3])
@@ -160,20 +158,24 @@ class detect:
                                     height_helmet = int(dis * 1.618) #phi number - gold proportion 
                                     y_start_helmet = int(((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet * 1.2)
                                     y_end_helmet = int((kpts[step * 1 + 1] + kpts[step * 2 + 1]) /2)
-                                    #print(y_start_helmet,y_end_helmet, x_start_helmet,x_end_helmet)
                                     helmet_zone_img = im0s[y_start_helmet:y_end_helmet, x_end_helmet:x_start_helmet]
-                                    # cv2.circle(im0, (x_start_helmet, y_start_helmet), 8, (0,255,255), -1)
-                                    # cv2.circle(im0, (x_end_helmet, y_end_helmet), 8, (0,255,255), -1)
-                                    cv2.rectangle(im0, (x_start_helmet, y_start_helmet), (x_end_helmet, y_end_helmet), color=(0,255,255), thickness=2)
                                     helmet_list.append(helmet_zone_img)
+                                    cv2.rectangle(im0, (x_start_helmet, y_start_helmet), (x_end_helmet, y_end_helmet), color=(0,255,255), thickness=2)
 
+                                    #vest zone
+                                    x_shouder_l, y_shouder_l = int(kpts[step * 5]), int(kpts[step * 5 + 1])
+                                    x_hip_r, y_hip_r = int(kpts[step * 12]), int(kpts[step * 12 + 1])
+                                    helmet_zone_img = im0s[y_shouder_l:y_hip_r, x_hip_r:x_shouder_l]
+                                    vest_list.append(helmet_zone_img)
+                                    cv2.rectangle(im0, (x_shouder_l, y_shouder_l), (x_hip_r, y_hip_r), color=(255,0,0), thickness=2)
 
+                                    #Entire body:
                                     #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
                             
 
                         # Stream results
                         if self.view_img:
-                            return im0, mask_list, helmet_list, im0s
+                            return im0, mask_list, helmet_list, vest_list, im0s
              
     @staticmethod
     def check_available_cameras():

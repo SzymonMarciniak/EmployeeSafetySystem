@@ -38,6 +38,8 @@ datasets = p_detect.setup()
 
 mask_model = load_model('models/mask_binar_classifier.h5')
 helmet_model = load_model('models/helmet_binar_classifier.h5')
+vest_model = load_model('models/vest_binar_classifier.h5')
+cap_model = load_model('models/cap_binar_classifier.h5')
 
 failed_load_camera_img = 'img/pl.png'
 
@@ -87,15 +89,16 @@ class RLayout(RelativeLayout):
     def iterate_images(dt):
         global cam_nr
 
-        img_list, mask_lists, helmet_lists, img0_list = [], [], [], []
+        img_list, mask_lists, helmet_cap_lists, vest_lists, img0_list = [], [], [], [], []
 
         if global_vars.AI_run:
             for dataset in datasets:
                 try:
-                    img, mask_list, helmet_list, img0 = p_detect.detect2(dataset)
+                    img, mask_list, helmet_cap_list, vest_list, img0 = p_detect.detect2(dataset)
                     img_list.append(img)
                     mask_lists.append(mask_list)
-                    helmet_lists.append(helmet_list)
+                    helmet_cap_lists.append(helmet_cap_list)
+                    vest_lists.append(vest_list)
                     img0_list.append(img0) 
                 except:
                     print("Failed to load camera or video is over") 
@@ -104,6 +107,8 @@ class RLayout(RelativeLayout):
             db, cursor = connectToDatabase()
             cursor.execute(f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
             rules_list = cursor.fetchall()
+            cursor.execute(f"SELECT actions FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+            action_list = cursor.fetchall()
             closeDatabaseConnection(db, cursor)
 
             for nr0, img in enumerate(img_list):
@@ -116,20 +121,76 @@ class RLayout(RelativeLayout):
 
                     if is_danger:
                         cam_id = cam_view[nr0].cameraID
-                        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
-                        alert_color = [1,1,0,1]
+                        action = action_list[nr0][0]
+                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+                        db, cursor = connectToDatabase()
+                        reason = "No " + object_name + " detected"
+                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+                        db.commit()
+                        closeDatabaseConnection(db, cursor)
+                        alert_color = [1, 1, 0, 1]
                 
                 if "2" in rules_list[nr0]:
                     object_name = "helmet"
-                    object_lists = helmet_lists
+                    object_lists = helmet_cap_lists
                     model = helmet_model
 
                     is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
 
                     if is_danger:
                         cam_id = cam_view[nr0].cameraID
-                        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
-                        alert_color = [1,1,0,1]
+                        action = action_list[nr0][0]
+                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+                        db, cursor = connectToDatabase()
+                        reason = "No " + object_name + " detected"
+                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+                        db.commit()
+                        closeDatabaseConnection(db, cursor)
+                        alert_color = [1, 1, 0, 1]
+
+                elif "3" in rules_list[nr0]: #if helmets detecting do not detect caps
+                    object_name = "cap"
+                    object_lists = helmet_cap_lists
+                    model = cap_model
+
+                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, alignment=0.2)
+
+                    if is_danger: #support detection by helmet model to better results
+                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, helmet_model)
+
+                    if is_danger:
+                        cam_id = cam_view[nr0].cameraID
+                        action = action_list[nr0][0]
+                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+                        db, cursor = connectToDatabase()
+                        reason = "No " + object_name + " detected"
+                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+                        db.commit()
+                        closeDatabaseConnection(db, cursor)
+                        alert_color = [1, 1, 0, 1]
+
+                if "4" in rules_list[nr0]:
+                    object_name = "vest"
+                    object_lists = vest_lists 
+                    model = vest_model
+                    equation = 10 ** 15
+                    alignment = 0.5
+                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, equation, alignment, reverse=True)
+
+                    if is_danger:
+                        cam_id = cam_view[nr0].cameraID
+                        action = action_list[nr0][0]
+                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+                        db, cursor = connectToDatabase()
+                        reason = "No " + object_name + " detected"
+                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+                        db.commit()
+                        closeDatabaseConnection(db, cursor)
+                        alert_color = [1, 1, 0, 1]
 
 
 
@@ -170,7 +231,7 @@ class RLayout(RelativeLayout):
             cam_nr = 0
 
     @staticmethod
-    def do_predictions(object_lists, object_name, nr0, model):
+    def do_predictions(object_lists, object_name, nr0, model, equation=1, alignment=0, reverse=False):
         danger = False
         if object_lists != empty:
             try:
@@ -179,14 +240,16 @@ class RLayout(RelativeLayout):
                     for crop_image in entire_img:
                         resize = tf.image.resize(crop_image, (256,256))
                         pred = model.predict(np.expand_dims(resize/255, 0))
-                        print(f"\n\n\n {pred}")
-                        if pred < 0.5: 
-                            print(f'Predicted class is {object_name}')
+                        if pred < ((0.5 + alignment) * equation): 
+                            # print(f'Predicted class is {object_name}')
+                            pass
                         else:
-                            print(f'Predicted class is No {object_name}')
+                            # print(f'Predicted class is No {object_name}')
                             danger = True
             except Exception as err: 
                 print(f"Failed to load {object_name} image --- {err}")
+        if reverse:
+            danger = not danger
         return danger
 
 
