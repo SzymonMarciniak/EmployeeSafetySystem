@@ -37,7 +37,11 @@ line_thickness = 8
 empty = []
 p_detect = PoseDetect(weights_pose, view_img, imgsz, half_precision, kpt_label, device, conf_thres, iou_thres,classes, agnostic_nms, line_thickness)
 datasets = p_detect.setup()
-model = load_model('imageclassifier.h5')
+
+mask_model = load_model('models/mask_binar_classifier.h5')
+helmet_model = load_model('models/helmet_binar_classifier.h5')
+
+failed_load_camera_img = 'img/pl.png'
 
 class CameraView(Image):
     cameraID = NumericProperty()
@@ -53,12 +57,12 @@ class CamerasLayout(StackLayout):
 
     def load_cameras(self):
         db, cursor = connectToDatabase()
-        cursor.execute("SELECT generated_id FROM cameras")
+        cursor.execute(f"SELECT generated_id FROM cameras WHERE workspace_id")
         results = cursor.fetchall()
         for row in results:
             rlayout = RLayout(cameraID=row[0])
             rlayout.cameraID = row[0]
-            rlayout.source = 'img/pl.png'
+            rlayout.source = failed_load_camera_img
             self.add_widget(rlayout)
         closeDatabaseConnection(db, cursor)
 
@@ -96,28 +100,43 @@ class RLayout(RelativeLayout):
                     helmet_lists.append(helmet_list)
                     img0_list.append(img0) 
                 except:
-                    pass 
+                    print("Failed to load camera or video is over") 
+
             
-            for nr0, mask_list in enumerate(mask_lists):
-                is_mask = True
-                if mask_list != empty:
-                    try:
-                        for nr, img_m in enumerate(mask_lists[1]):
-                            resize = tf.image.resize(img_m, (256,256))
-                            pred = model.predict(np.expand_dims(resize/255, 0))
-                            if pred < 0.5: 
-                                print(f'Predicted class is Mask')
-                            else:
-                                print(f'Predicted class is No mask')
-                                is_mask = False
-                    except: print("Failed to load mask image")
-                else: pass
-            
+            db, cursor = connectToDatabase()
+            cursor.execute(f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+            rules_list = cursor.fetchall()
+            closeDatabaseConnection(db, cursor)
+
+            for nr0, img in enumerate(img_list):
+                if "1" in rules_list[nr0]:
+                    object_name = "mask"
+                    object_lists = mask_lists
+                    model = mask_model
+
+                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+
+                    if is_danger:
+                        cam_id = cam_view[nr0].cameraID
+                        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
+                        alert_color = [1,1,0,1]
                 
-                if not is_mask:
-                    cam_id = cam_view[nr0].cameraID
-                    print(f"On camera if id: {cam_id} detect no mask!!!") 
-                    alert_color = [1,1,0,1]
+                if "2" in rules_list[nr0]:
+                    object_name = "helmet"
+                    object_lists = helmet_lists
+                    model = helmet_model
+
+                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+
+                    if is_danger:
+                        cam_id = cam_view[nr0].cameraID
+                        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
+                        alert_color = [1,1,0,1]
+
+
+
+
+                        
 
             for nr, camera_image in enumerate(cam_view):
                 if cam_nr < len(datasets):
@@ -131,9 +150,9 @@ class RLayout(RelativeLayout):
                                 texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
                                 camera_image.texture = texture
                             else:
-                                camera_image.source = 'img/pl.png'
+                                camera_image.source = failed_load_camera_img
                         except: 
-                            camera_image.source = 'img/pl.png'
+                            camera_image.source = failed_load_camera_img
                     else:
                         try:
                             if img0_list[nr]:
@@ -145,12 +164,32 @@ class RLayout(RelativeLayout):
                                 texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
                                 camera_image.texture = texture
                             else:
-                                camera_image.source = 'img/pl.png'
+                                camera_image.source = failed_load_camera_img
                         except: 
-                            camera_image.source = 'img/pl.png'
+                            camera_image.source = failed_load_camera_img
                 else:
-                    camera_image.source = 'img/pl.png'
+                    camera_image.source = failed_load_camera_img
             cam_nr = 0
+
+    @staticmethod
+    def do_predictions(object_lists, object_name, nr0, model):
+        danger = False
+        if object_lists != empty:
+            try:
+                entire_img = object_lists[nr0]
+                if entire_img != empty:
+                    for crop_image in entire_img:
+                        resize = tf.image.resize(crop_image, (256,256))
+                        pred = model.predict(np.expand_dims(resize/255, 0))
+                        print(f"\n\n\n {pred}")
+                        if pred < 0.5: 
+                            print(f'Predicted class is {object_name}')
+                        else:
+                            print(f'Predicted class is No {object_name}')
+                            danger = True
+            except Exception as err: 
+                print(f"Failed to load {object_name} image --- {err}")
+        return danger
      
 
 class PopupContent(BoxLayout):
