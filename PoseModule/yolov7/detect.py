@@ -91,7 +91,7 @@ class detect:
             i = 0
             for path, img, im0s, vid_cap  in dataset:
                 i += 1
-                if i % 2 == 0:
+                if i % 20 == 0:
                     # im0s = cv2.rotate(im0s, cv2.ROTATE_180)
                     img = torch.from_numpy(img).to(self.device)
                     img = img.half() if self.half else img.float()  # uint8 to fp16/32
@@ -148,6 +148,7 @@ class detect:
                                     y_end_height = int(y_center)
                                     # cv2.circle(im0, (x_start_mask, y_start_mask), 8, (255,255,0), -1)
                                     # cv2.circle(im0, (x_end_mask, y_end_height), 8, (255,255,0), -1)
+                                    cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(0,255,255), thickness=2)
                                     #print(y_start_mask,y_end_height, x_start_mask,x_end_mask)
                                     mask_zone_img = im0s[y_start_mask:y_end_height, x_end_mask:x_start_mask]
                                     mask_list.append(mask_zone_img)
@@ -157,12 +158,13 @@ class detect:
                                     x_end_helmet = int(kpts[step * 4])
                                     dis = abs(((kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2) - ((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2))
                                     height_helmet = int(dis * 1.618) #phi number - gold proportion 
-                                    y_start_helmet = int(((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet)
+                                    y_start_helmet = int(((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet * 1.2)
                                     y_end_helmet = int((kpts[step * 1 + 1] + kpts[step * 2 + 1]) /2)
                                     #print(y_start_helmet,y_end_helmet, x_start_helmet,x_end_helmet)
                                     helmet_zone_img = im0s[y_start_helmet:y_end_helmet, x_end_helmet:x_start_helmet]
                                     # cv2.circle(im0, (x_start_helmet, y_start_helmet), 8, (0,255,255), -1)
                                     # cv2.circle(im0, (x_end_helmet, y_end_helmet), 8, (0,255,255), -1)
+                                    cv2.rectangle(im0, (x_start_helmet, y_start_helmet), (x_end_helmet, y_end_helmet), color=(0,255,255), thickness=2)
                                     helmet_list.append(helmet_zone_img)
 
 
@@ -176,7 +178,7 @@ class detect:
     @staticmethod
     def check_available_cameras():
         cam_list = []
-        for i in range(0,50):
+        for i in range(0,10):
             cap = cv2.VideoCapture(i) 
             if cap is None or not cap.isOpened(): print("Ignore this")  
             else: cam_list.append(i)

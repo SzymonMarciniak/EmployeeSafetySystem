@@ -1,3 +1,4 @@
+from threading import Thread
 from kivy.animation import Animation
 from kivy.app import App
 from kivy.clock import Clock
@@ -9,7 +10,8 @@ from kivy.uix.screenmanager import FadeTransition, Screen
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules import global_vars
 from modules.cameras import CamerasLayout
-
+from modules.cameras import RLayout
+import multiprocessing
 choices = {
     1: 'cameras_screen',
     2: 'alerts_screen',
@@ -20,7 +22,7 @@ choices = {
     7: 'login_screen'
 }
 
-
+t1 = Thread(target=RLayout.set_interval)
 class MainWorkplaceScreen(Screen):
     upper_menu = ObjectProperty()
     bottom_menu = ObjectProperty()
@@ -57,7 +59,7 @@ class CamerasGrid(GridLayout):
     def __init__(self, **kwargs):
         super(CamerasGrid, self).__init__(**kwargs)
 
-
+first = True
 class MenuButton(Button):
     main_screen_sm = ObjectProperty()
     bottom_menu = ObjectProperty()
@@ -66,6 +68,7 @@ class MenuButton(Button):
     sID = NumericProperty()
 
     def on_press(self):
+        global first
         anim = Animation(canva_s1=1, duration=.3, transition='in_out_quad')
         anim.start(self)
         for children in self.upper_menu.children:
@@ -81,6 +84,16 @@ class MenuButton(Button):
                 anim = Animation(canva_s1=0, duration=.3, transition='in_out_quad')
                 anim.start(children)
         self.active = True
+        if (self.sID == 1) or (self.sID == 2):
+            if not global_vars.AI_run:
+                if first:
+                    t1.run()    
+                    first = False
+                global_vars.AI_run = True
+        else:
+            global_vars.AI_run = False
+                
+        
         if self.sID == 7:
             global_vars.userID = None
             app = App.get_running_app()
