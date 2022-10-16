@@ -26,6 +26,8 @@ class RulesScreen(Screen):
         super(RulesScreen, self).__init__(**kwargs)
 
     def on_pre_enter(self, *args):
+        global existing_rules
+        existing_rules = {}
         global rules_container
         rules_container.load_rules()
 
@@ -48,7 +50,7 @@ class RulesContainer(StackLayout):
         title_label.active_rules = 0
         db, cursor = connectToDatabase()
 
-        cursor.execute("SELECT name, rules, actions FROM cameras WHERE rules!='' AND workspace_id=%s",
+        cursor.execute("SELECT name, rules, actions, generated_id FROM cameras WHERE rules!='' AND workspace_id=%s",
                        (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
         for row in results:
@@ -62,6 +64,13 @@ class RulesContainer(StackLayout):
                 rule_creator = NewRuleCreator(isGenerated=True, camera_name=name, rule_name=rule_name,
                                               action_name=action_name)
                 self.add_widget(rule_creator)
+                cameraID = row[3]
+                if cameraID not in existing_rules:
+                    print("not in")
+                    existing_rules[cameraID] = list()
+                existing_rules[cameraID].append(int(rules_str[i]))
+                print("DICT AFTER")
+                print(existing_rules)
         self.add_widget(AddNewRule())
         closeDatabaseConnection(db, cursor)
 
