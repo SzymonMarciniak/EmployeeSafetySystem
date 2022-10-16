@@ -24,8 +24,9 @@ class StatusToggleButton(ToggleButton):
 
     def __init__(self, **kwargs):
         super(StatusToggleButton, self).__init__(**kwargs)
+        
 
-    def on_toggled(self, button_obj: ToggleButton, setting_type):
+    def on_toggled(self, button_obj: ToggleButton, setting_type, first_load=False):
         """
         Changes state of specific workplace options; notifications and activation.
 
@@ -36,15 +37,16 @@ class StatusToggleButton(ToggleButton):
         setting_type: int
             Type of state (as an integer)
         """
-        state = 1 if button_obj.state == 'down' else 0
-        db, cursor = connectToDatabase()
-        if setting_type == 'notifications_state':
-            cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
-            db.commit()
-        elif setting_type == 'activation_state':
-            cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
-            db.commit()
-        closeDatabaseConnection(db, cursor)
+        if not first_load:
+            state = 1 if button_obj.state == 'down' else 0
+            db, cursor = connectToDatabase()
+            if setting_type == 'notifications_state':
+                cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+                db.commit()
+            elif setting_type == 'activation_state':
+                cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+                db.commit()
+            closeDatabaseConnection(db, cursor)
 
         if button_obj.state == 'down':
             button_obj.text = "ON"
