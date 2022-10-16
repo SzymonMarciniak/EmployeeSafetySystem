@@ -65,6 +65,20 @@ class MainWorkplaceScreen(Screen):
             userName += l
         self.hello_text = f"Hello {userName}"
 
+        # db, cursor = connectToDatabase()
+        # cursor.execute(f"SELECT state_activation FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
+        # AI_enabled = cursor.fetchall()[0][0]
+        # cursor.execute(f"SELECT state_notifications FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
+        # notification_enabled = cursor.fetchall()[0][0]
+        # closeDatabaseConnection(db, cursor)
+
+        # if not AI_enabled:
+        #     self.settingsID.ids.toog1.state = "normal"
+        #     self.on_toggled(self.ids.toog1, "", True)
+        # if not notification_enabled:
+        #     self.settingsID.ids.toog2.state = "normal"
+        #     self.on_toggled(self.ids.toog2, "", True)
+
 
 class CamerasGrid(GridLayout):
 
@@ -113,6 +127,6 @@ class MenuButton(Button):
             app.root.current = choices.get(self.sID)
             self.main_screen_sm.current = 'default'
             self.active = False
-            return
+            return           
         self.main_screen_sm.transition = FadeTransition()
         self.main_screen_sm.current = choices.get(self.sID)

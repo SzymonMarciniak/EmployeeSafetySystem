@@ -12,6 +12,7 @@
             InfoLabelSettings:
                 text: 'Enable workspace functionality'
             StatusToggleButton:
+                id: togg1
                 on_press: self.on_toggled(self, 'activation_state')
                 font_size: max(15, self.width / 10)
                 size_hint: .6, 1
@@ -19,6 +20,7 @@
             InfoLabelSettings:
                 text: 'Enable workspace notifications'
             StatusToggleButton:
+                id: togg2
                 on_press: self.on_toggled(self, 'notifications_state')
                 font_size: max(15, self.width / 10)
                 size_hint: .6, 1
@@ -40,10 +42,8 @@
             text: 'Contact me'
         SettingsElement:
             InfoLabelSettings:
-                text: 'Szymon Marciniak'
-        SettingsElement:
-            InfoLabelSettings:
-                text: 'szymonmarciniak22@gmail.com'
+                text: 'Szymon Marciniak - szymonmarciniak22@gmail.com'
+        
 
 <InfoLabelSettings@Label>:
     font_size: max(13, min(42, self.width / 16))
