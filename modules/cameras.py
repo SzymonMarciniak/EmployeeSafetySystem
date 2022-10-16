@@ -1,5 +1,6 @@
 from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.screenmanager import Screen
 from tensorflow.keras.models import load_model
 from kivy.uix.stacklayout import StackLayout
 from kivy.graphics.texture import Texture
@@ -19,6 +20,16 @@ from PoseModule.yolov7.detect import detect as PoseDetect
 from PoseModule.yolov7.utils.datasets import LoadImages
 from modules import global_vars
 
+cameras_layout: StackLayout
+
+
+class CamerasScreen(Screen):
+    def __init__(self, **kwargs):
+        super(CamerasScreen, self).__init__(**kwargs)
+
+    def on_pre_enter(self):
+        cameras_layout.load_cameras()
+
 
 class CameraView(Image):
     cameraID = NumericProperty()
@@ -31,14 +42,16 @@ class CameraView(Image):
 class CamerasLayout(StackLayout):
     def __init__(self, **kwargs):
         super(CamerasLayout, self).__init__(**kwargs)
-        self.load_cameras()
+        global cameras_layout
+        cameras_layout = self
 
     def load_cameras(self):
         db, cursor = connectToDatabase()
-        cursor.execute("SELECT generated_id FROM cameras")
+        cursor.execute("SELECT generated_id FROM cameras WHERE workspace_id=%s", (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
         for row in results:
             rlayout = RLayout(cameraID=row[0])
+            print("CAM_ID" + str(row[0]))
             rlayout.cameraID = row[0]
             rlayout.source = 'img/test.png'
             self.add_widget(rlayout)
@@ -310,9 +323,8 @@ class PopupContent(BoxLayout):
     def __init__(self, **kwargs):
         super(PopupContent, self).__init__(**kwargs)
         self.orientation = 'vertical'
-        self.add_widget(Label(text=str(self.generatedID)))
-        self.add_widget(Label(text="Room ID: 3"))
-        self.add_widget(Label(text="Rules: 4"))
+        self.add_widget(Label(text=("Camera ID: " + str(self.generatedID))))
+        self.add_widget(Label(text=("Camera name: " + global_vars.cameras_dict[self.generatedID])))
 
 
 class InfoButton(Button):
@@ -320,7 +332,8 @@ class InfoButton(Button):
         super(InfoButton, self).__init__(**kwargs)
 
     def on_press(self):
-        content = PopupContent(generatedID=self.parent.generatedID)
+        generatedID = self.parent.parent.parent.parent.parent.cameraID
+        content = PopupContent(generatedID=generatedID)
         popup = Popup(title='Info about camera', content=content,
                       auto_dismiss=True, size_hint=[.7, .7])
         popup.open()
