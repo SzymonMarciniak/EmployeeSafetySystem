@@ -121,6 +121,8 @@ class DeleteRule(Button):
 
     def on_press(self):
         cameraID = None
+        detectionID = None
+        actionID = None
         for cID, value in cameras_dict.items():
             if value == self.camerasListButton.text:
                 cameraID = cID
@@ -130,7 +132,7 @@ class DeleteRule(Button):
         for aID, value in actions_dict.items():
             if value == self.actionsListButton.text:
                 actionID = aID
-        if cameraID is not None:
+        if cameraID is not None and detectionID is not None and actionID is not None:
             db, cursor = connectToDatabase()
             cursor.execute("SELECT rules, actions FROM cameras WHERE generated_id=%s", (cameraID,))
             results = cursor.fetchone()
