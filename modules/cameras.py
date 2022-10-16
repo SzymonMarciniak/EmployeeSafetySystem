@@ -141,101 +141,102 @@ class RLayout(RelativeLayout):
 
                 if notification_enabled:
                     for nr0, img in enumerate(img_list):
-                        if abs(cam_view[nr0].last_alarm - time.time()) > 60: #Alarm every 1 minute
-                            cam_view[nr0].last_alarm = time.time()
-                            alert_color = [0, 1, 0, 1]
-                            if "1" in rules_list[nr0][0]:
-                                object_name = "mask"
-                                object_lists = mask_lists
-                                model = mask_model
-                                is_danger = RLayout.do_predictions(
-                                    object_lists, object_name, nr0, model)
-                                if is_danger:
-                                    RLayout.do_alert(
-                                        action_list, object_name, nr0)
-                                    alert_color = [1, 1, 0, 1]
-
-                            if "2" in rules_list[nr0][0]:
-                                object_name = "helmet"
-                                object_lists = helmet_cap_lists
-                                model = helmet_model
-                                is_danger = RLayout.do_predictions(
-                                    object_lists, object_name, nr0, model)
-                                if is_danger:
-                                    RLayout.do_alert(
-                                        action_list, object_name, nr0)
-                                    alert_color = [1, 1, 0, 1]
-
-                            # if helmets detecting do not detect caps
-                            elif "3" in rules_list[nr0][0]:
-                                object_name = "cap"
-                                object_lists = helmet_cap_lists
-                                model = cap_model
-                                is_danger = RLayout.do_predictions(
-                                    object_lists, object_name, nr0, model, alignment=0.2)
-                                if is_danger:  # support detection by helmet model to better results
+                        if nr0+1 <= len(cam_view):
+                            if abs(cam_view[nr0].last_alarm - time.time()) > 60: #Alarm every 1 minute
+                                cam_view[nr0].last_alarm = time.time()
+                                alert_color = [0, 1, 0, 1]
+                                if "1" in rules_list[nr0][0]:
+                                    object_name = "mask"
+                                    object_lists = mask_lists
+                                    model = mask_model
                                     is_danger = RLayout.do_predictions(
-                                        object_lists, object_name, nr0, helmet_model)
+                                        object_lists, object_name, nr0, model)
+                                    if is_danger:
+                                        RLayout.do_alert(
+                                            action_list, object_name, nr0)
+                                        alert_color = [1, 1, 0, 1]
 
-                                if is_danger:
-                                    RLayout.do_alert(
-                                        action_list, object_name, nr0)
-                                    alert_color = [1, 1, 0, 1]
+                                if "2" in rules_list[nr0][0]:
+                                    object_name = "helmet"
+                                    object_lists = helmet_cap_lists
+                                    model = helmet_model
+                                    is_danger = RLayout.do_predictions(
+                                        object_lists, object_name, nr0, model)
+                                    if is_danger:
+                                        RLayout.do_alert(
+                                            action_list, object_name, nr0)
+                                        alert_color = [1, 1, 0, 1]
 
-                            if "4" in rules_list[nr0][0]:
-                                object_name = "vest"
-                                object_lists = vest_lists
-                                model = vest_model
-                                equation = 10 ** 15
-                                alignment = 0.5
-                                is_danger = RLayout.do_predictions(
-                                    object_lists, object_name, nr0, model, equation, alignment, reverse=True)
+                                # if helmets detecting do not detect caps
+                                elif "3" in rules_list[nr0][0]:
+                                    object_name = "cap"
+                                    object_lists = helmet_cap_lists
+                                    model = cap_model
+                                    is_danger = RLayout.do_predictions(
+                                        object_lists, object_name, nr0, model, alignment=0.2)
+                                    if is_danger:  # support detection by helmet model to better results
+                                        is_danger = RLayout.do_predictions(
+                                            object_lists, object_name, nr0, helmet_model)
 
-                                if is_danger:
-                                    RLayout.do_alert(
-                                        action_list, object_name, nr0)
-                                    alert_color = [1, 1, 0, 1]
+                                    if is_danger:
+                                        RLayout.do_alert(
+                                            action_list, object_name, nr0)
+                                        alert_color = [1, 1, 0, 1]
 
-                            if "7" in rules_list[nr0][0]:
-                                fall = False
-                                diff_x_list = diff_x_lists[nr0]
-                                diff_y_list = diff_y_lists[nr0]
-                                diff_z_list = diff_z_lists[nr0]
+                                if "4" in rules_list[nr0][0]:
+                                    object_name = "vest"
+                                    object_lists = vest_lists
+                                    model = vest_model
+                                    equation = 10 ** 15
+                                    alignment = 0.5
+                                    is_danger = RLayout.do_predictions(
+                                        object_lists, object_name, nr0, model, equation, alignment, reverse=True)
 
-                                for diff_x in diff_x_list:
-                                    if diff_x > 80:
-                                        fall = True
+                                    if is_danger:
+                                        RLayout.do_alert(
+                                            action_list, object_name, nr0)
+                                        alert_color = [1, 1, 0, 1]
 
-                                for diff_y in diff_y_list:
-                                    if diff_y > 0:
-                                        fall = True
+                                if "7" in rules_list[nr0][0]:
+                                    fall = False
+                                    diff_x_list = diff_x_lists[nr0]
+                                    diff_y_list = diff_y_lists[nr0]
+                                    diff_z_list = diff_z_lists[nr0]
 
-                                for diff_z in diff_z_list:
-                                    if 0.2 < diff_z < 0.4:
-                                        fall = True
+                                    for diff_x in diff_x_list:
+                                        if diff_x > 80:
+                                            fall = True
 
-                                if fall:
-                                    cam_id = cam_view[nr0].cameraID
-                                    action = str(action_list[nr0][0])
-                                    if "2" in action:
-                                        action = 2
-                                    elif "1" in action:
-                                        action = 1
-                                    else:
-                                        action = 3
-                                    db, cursor = connectToDatabase()
-                                    cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                                   (global_vars.choosenWorkplace, cam_id, "Fall", global_vars.actions_dict[int(action)]))
-                                    db.commit()
-                                    closeDatabaseConnection(db, cursor)
-                                    print(
-                                        f"On camera of id: {cam_id} detect FALL!!!")
-                                    alarms.flash_alarm_on(2)
-                                    alarms.start_buzzer()
-                                    alert_color = [1, 0, 0, 1]
+                                    for diff_y in diff_y_list:
+                                        if diff_y > 0:
+                                            fall = True
 
-                            if True == False:  # HERE set circle color to 'alert_color'
-                                alert_color = alert_color
+                                    for diff_z in diff_z_list:
+                                        if 0.2 < diff_z < 0.4:
+                                            fall = True
+
+                                    if fall:
+                                        cam_id = cam_view[nr0].cameraID
+                                        action = str(action_list[nr0][0])
+                                        if "2" in action:
+                                            action = 2
+                                        elif "1" in action:
+                                            action = 1
+                                        else:
+                                            action = 3
+                                        db, cursor = connectToDatabase()
+                                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                                                    (global_vars.choosenWorkplace, cam_id, "Fall", global_vars.actions_dict[int(action)]))
+                                        db.commit()
+                                        closeDatabaseConnection(db, cursor)
+                                        print(
+                                            f"On camera of id: {cam_id} detect FALL!!!")
+                                        alarms.flash_alarm_on(2)
+                                        alarms.start_buzzer()
+                                        alert_color = [1, 0, 0, 1]
+
+                                if True == False:  # HERE set circle color to 'alert_color'
+                                    alert_color = alert_color
 
                 for nr, camera_image in enumerate(cam_view):
                     if cam_nr < len(datasets):
