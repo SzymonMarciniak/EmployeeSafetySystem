@@ -29,15 +29,13 @@ class Alarms:
 
 if __name__ == "__main__":
     alert = Alarms()
-
-    alert.start_buzzer()
     time.sleep(6)
-    
-
     alert.flash_alarm_on(1)
-    time.sleep(6)
+    time.sleep(9)
     
-
     alert.flash_alarm_on(2)
-    time.sleep(6)
+    
+    
+    
+   
     
