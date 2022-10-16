@@ -4,11 +4,11 @@
 #define BUZZER 4
 #define LIGHT1 5
 #define LIGHT2 13
-const char *ssid = "";                      // Write your wifi ssid here 
-const char *password = "";                  // Write your wifi password here 
+const char *ssid = "multimedia_komputer"; // Write your wifi ssid here 
+const char *password = "mariusz7419";     // Write your wifi password here 
 
 ESP8266WebServer server(80); 
- IPAddress local_IP(192, 168, 0, 9);        // Change IP to your local IP
+ IPAddress local_IP(192, 168, 0, 9);
  IPAddress gateway(192, 168, 0, 1);
  IPAddress subnet(255, 255, 255, 224);
 
@@ -19,6 +19,8 @@ void buzzerOn(){
    pinMode(BUZZER,OUTPUT);
    digitalWrite(BUZZER,LOW);
    server.send(200, "text/html", "<h2>Buzzer wlaczony <3 </h2>");
+   delay(5000);
+   buzzerOff();
 }
 
 void buzzerOff(){
@@ -31,18 +33,25 @@ void flashAllertOn(){
    pinMode(LIGHT1,OUTPUT);
    digitalWrite(LIGHT1,HIGH);
    server.send(200, "text/html", "<h2>Flash 1 On ;)</h2>"); 
+   delay(5000);
+   flashAllertOff();
 }
 
 void flashAllertOff(){
    pinMode(LIGHT1,OUTPUT);
    digitalWrite(LIGHT1,LOW);
    server.send(200, "text/html", "<h2>Flash 1 Off ;)</h2>"); 
+   
 }
 
 void flashAllertOn2(){
    pinMode(LIGHT2,OUTPUT);
    digitalWrite(LIGHT2,HIGH);
    server.send(200, "text/html", "<h2>Flash 2 On ;)</h2>"); 
+   buzzerOn();
+   delay(5000);
+   flashAllertOff2();
+   buzzerOff();
 }
 void flashAllertOff2(){
    pinMode(LIGHT2,OUTPUT);
