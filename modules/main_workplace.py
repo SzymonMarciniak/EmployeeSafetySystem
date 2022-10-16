@@ -57,8 +57,12 @@ class MainWorkplaceScreen(Screen):
         cursor.execute(
             f"SELECT generated_id, name FROM cameras WHERE workspace_id={global_vars.choosenWorkplace}")
         results = cursor.fetchall()
+
+        global_vars.cameras_dict = {}
         for row in results:
-            cameras_dict[row[0]] = row[1]
+            global_vars.cameras_dict[row[0]] = row[1]
+
+        print(global_vars.cameras_dict)
         closeDatabaseConnection(db, cursor)
 
         userName = ""
@@ -66,7 +70,7 @@ class MainWorkplaceScreen(Screen):
             if l == " ":
                 break
             userName += l
-        self.hello_text = f"Hello {userName}"
+        self.hello_text = f"Hello, {userName}"
 
         # db, cursor = connectToDatabase()
         # cursor.execute(f"SELECT state_activation FROM workplaces WHERE id = {global_vars.choosenWorkplace}")

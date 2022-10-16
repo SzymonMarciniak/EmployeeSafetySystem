@@ -88,7 +88,7 @@ class SpinnerButtons(SpinnerOption):
 class CamerasListButton(Spinner):
     def __init__(self, **kwargs):
         super(CamerasListButton, self).__init__(**kwargs)
-        self.values = cameras_dict.values()
+        self.values = global_vars.cameras_dict.values()
         self.option_cls = SpinnerButtons
         self.disabled_color = rgba('ff0000')
 
@@ -128,7 +128,7 @@ class SaveButton(Button):
         detectionID = None
         actionID = None
         db, cursor = connectToDatabase()
-        for cID, value in cameras_dict.items():
+        for cID, value in global_vars.cameras_dict.items():
             if value == self.camerasListButton.text:
                 cameraID = cID
         for dID, value in detection_dict.items():
@@ -191,7 +191,7 @@ class DeleteRule(Button):
         cameraID = None
         detectionID = None
         actionID = None
-        for cID, value in cameras_dict.items():
+        for cID, value in global_vars.cameras_dict.items():
             if value == self.camerasListButton.text:
                 cameraID = cID
         for dID, value in detection_dict.items():
