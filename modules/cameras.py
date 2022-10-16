@@ -21,8 +21,8 @@ from PoseModule.yolov7.utils.datasets import LoadImages
 from alarms.alarms import Alarms
 from modules import global_vars
 
-cameras_layout: StackLayout
 alarms = Alarms()
+
 
 class CamerasScreen(Screen):
     alreadyLoaded = False
@@ -31,7 +31,7 @@ class CamerasScreen(Screen):
         super(CamerasScreen, self).__init__(**kwargs)
 
     def on_pre_enter(self):
-        cameras_layout.load_cameras()
+        global_vars.cameras_layout.load_cameras()
 
 
 class CameraView(Image):
@@ -45,8 +45,7 @@ class CameraView(Image):
 class CamerasLayout(StackLayout):
     def __init__(self, **kwargs):
         super(CamerasLayout, self).__init__(**kwargs)
-        global cameras_layout
-        cameras_layout = self
+        global_vars.cameras_layout = self
 
     def load_cameras(self):
         db, cursor = connectToDatabase()
