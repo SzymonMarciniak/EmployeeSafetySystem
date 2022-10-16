@@ -182,7 +182,7 @@ class detect:
         cam_list = []
         for i in range(0,10):
             cap = cv2.VideoCapture(i) 
-            if cap is None or not cap.isOpened(): print("Ignore this")  
+            if cap is None or not cap.isOpened(): pass
             else: cam_list.append(i)
         return cam_list
 

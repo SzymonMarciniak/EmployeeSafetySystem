@@ -12,6 +12,7 @@ from kivy.clock import Clock
 import tensorflow as tf
 import cv2
 import numpy as np
+import time
 
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from PoseModule.yolov7.detect import detect as PoseDetect
@@ -48,8 +49,9 @@ failed_load_camera_img = 'img/pl.png'
 class CameraView(Image):
     cameraID = NumericProperty()
 
-    def __init__(self, **kwargs):
+    def __init__(self, last_alarm=0, **kwargs):
         super(CameraView, self).__init__(**kwargs)
+        self.last_alarm = last_alarm
 
 
 class CamerasLayout(StackLayout):
@@ -114,85 +116,58 @@ class RLayout(RelativeLayout):
             closeDatabaseConnection(db, cursor)
 
             for nr0, img in enumerate(img_list):
-                if "1" in rules_list[nr0]:
-                    object_name = "mask"
-                    object_lists = mask_lists
-                    model = mask_model
+                if abs(cam_view[nr0].last_alarm - time.time()) > 300:
+                    cam_view[nr0].last_alarm = time.time()
 
-                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+                    if "1" in rules_list[nr0][0]:
+                        object_name = "mask"
+                        object_lists = mask_lists
+                        model = mask_model
 
-                    if is_danger:
-                        cam_id = cam_view[nr0].cameraID
-                        action = action_list[nr0][0]
-                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
-                        db, cursor = connectToDatabase()
-                        reason = "No " + object_name + " detected"
-                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
-                        db.commit()
-                        closeDatabaseConnection(db, cursor)
-                        alert_color = [1, 1, 0, 1]
-                
-                if "2" in rules_list[nr0]:
-                    object_name = "helmet"
-                    object_lists = helmet_cap_lists
-                    model = helmet_model
+                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
 
-                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+                        if is_danger:
+                            RLayout.do_alert(action_list, object_name, nr0)
+                            alert_color = [1, 1, 0, 1]
+                            
+                    
+                    if "2" in rules_list[nr0][0]:
+                        object_name = "helmet"
+                        object_lists = helmet_cap_lists
+                        model = helmet_model
 
-                    if is_danger:
-                        cam_id = cam_view[nr0].cameraID
-                        action = action_list[nr0][0]
-                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
-                        db, cursor = connectToDatabase()
-                        reason = "No " + object_name + " detected"
-                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
-                        db.commit()
-                        closeDatabaseConnection(db, cursor)
-                        alert_color = [1, 1, 0, 1]
+                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
 
-                elif "3" in rules_list[nr0]: #if helmets detecting do not detect caps
-                    object_name = "cap"
-                    object_lists = helmet_cap_lists
-                    model = cap_model
+                        if is_danger:
+                            RLayout.do_alert(action_list, object_name, nr0)
+                            alert_color = [1, 1, 0, 1]
+                            
+                    elif "3" in rules_list[nr0][0]: #if helmets detecting do not detect caps
+                        object_name = "cap"
+                        object_lists = helmet_cap_lists
+                        model = cap_model
 
-                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, alignment=0.2)
+                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, alignment=0.2)
 
-                    if is_danger: #support detection by helmet model to better results
-                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, helmet_model)
+                        if is_danger: #support detection by helmet model to better results
+                            is_danger = RLayout.do_predictions(object_lists, object_name, nr0, helmet_model)
 
-                    if is_danger:
-                        cam_id = cam_view[nr0].cameraID
-                        action = action_list[nr0][0]
-                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
-                        db, cursor = connectToDatabase()
-                        reason = "No " + object_name + " detected"
-                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
-                        db.commit()
-                        closeDatabaseConnection(db, cursor)
-                        alert_color = [1, 1, 0, 1]
+                        if is_danger:
+                            RLayout.do_alert(action_list, object_name, nr0)
+                            alert_color = [1, 1, 0, 1]
+                            
+                    if "4" in rules_list[nr0][0]:
+                        object_name = "vest"
+                        object_lists = vest_lists 
+                        model = vest_model
+                        equation = 10 ** 15
+                        alignment = 0.5
+                        is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, equation, alignment, reverse=True)
 
-                if "4" in rules_list[nr0]:
-                    object_name = "vest"
-                    object_lists = vest_lists 
-                    model = vest_model
-                    equation = 10 ** 15
-                    alignment = 0.5
-                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, equation, alignment, reverse=True)
-
-                    if is_danger:
-                        cam_id = cam_view[nr0].cameraID
-                        action = action_list[nr0][0]
-                        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
-                        db, cursor = connectToDatabase()
-                        reason = "No " + object_name + " detected"
-                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
-                        db.commit()
-                        closeDatabaseConnection(db, cursor)
-                        alert_color = [1, 1, 0, 1]
+                        if is_danger:
+                            RLayout.do_alert(action_list, object_name, nr0)
+                            alert_color = [1, 1, 0, 1]
+                        
 
 
 
@@ -253,6 +228,25 @@ class RLayout(RelativeLayout):
         if reverse:
             danger = not danger
         return danger
+    
+    @staticmethod
+    def do_alert(action_list, object_name, nr0):
+        cam_id = cam_view[nr0].cameraID
+        action = str(action_list[nr0][0])
+        if "2" in action:
+            action = 2
+        elif "1" in action:
+            action = 1
+        else:
+            action = 3
+        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+        db, cursor = connectToDatabase()
+        reason = "No " + object_name + " detected"
+        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                        (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+        db.commit()
+        closeDatabaseConnection(db, cursor)
+        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
 
 
 class PopupContent(BoxLayout):
