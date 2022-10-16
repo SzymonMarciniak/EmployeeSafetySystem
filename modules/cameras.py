@@ -18,9 +18,11 @@ import cv2
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from PoseModule.yolov7.detect import detect as PoseDetect
 from PoseModule.yolov7.utils.datasets import LoadImages
+from alarms.alarms import Alarms
 from modules import global_vars
 
 cameras_layout: StackLayout
+alarms = Alarms()
 
 
 class CamerasScreen(Screen):
@@ -139,7 +141,7 @@ class RLayout(RelativeLayout):
 
                 if notification_enabled:
                     for nr0, img in enumerate(img_list):
-                        if abs(cam_view[nr0].last_alarm - time.time()) > 300:
+                        if abs(cam_view[nr0].last_alarm - time.time()) > 60: #Alarm every 1 minute
                             cam_view[nr0].last_alarm = time.time()
                             alert_color = [0, 1, 0, 1]
                             if "1" in rules_list[nr0][0]:
@@ -228,6 +230,8 @@ class RLayout(RelativeLayout):
                                     closeDatabaseConnection(db, cursor)
                                     print(
                                         f"On camera of id: {cam_id} detect FALL!!!")
+                                    alarms.flash_alarm_on(2)
+                                    alarms.start_buzzer()
                                     alert_color = [1, 0, 0, 1]
 
                             if True == False:  # HERE set circle color to 'alert_color'
@@ -302,8 +306,11 @@ class RLayout(RelativeLayout):
         action = str(action_list[nr0][0])
         if "2" in action:
             action = 2
+            alarms.flash_alarm_on(2)
+            alarms.start_buzzer()
         elif "1" in action:
             action = 1
+            alarms.flash_alarm_on(1)                             
         else:
             action = 3
         print(
