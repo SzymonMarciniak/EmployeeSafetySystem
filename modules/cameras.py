@@ -83,7 +83,7 @@ mask_model = load_model('models/mask_binar_classifier.h5')
 helmet_model = load_model('models/helmet_binar_classifier.h5')
 vest_model = load_model('models/vest_binar_classifier.h5')
 cap_model = load_model('models/cap_binar_classifier.h5')
-failed_load_camera_img = 'img/pl.png'
+failed_load_camera_img = 'img/no_camera.jpg'
 
 
 class RLayout(RelativeLayout):
@@ -231,8 +231,8 @@ class RLayout(RelativeLayout):
                                         closeDatabaseConnection(db, cursor)
                                         print(
                                             f"On camera of id: {cam_id} detect FALL!!!")
-                                        alarms.flash_alarm_on(2)
-                                        alarms.start_buzzer()
+                                        # alarms.flash_alarm_on(2)
+                                        # alarms.start_buzzer()
                                         alert_color = [1, 0, 0, 1]
 
                                 if True == False:  # HERE set circle color to 'alert_color'
@@ -307,11 +307,11 @@ class RLayout(RelativeLayout):
         action = str(action_list[nr0][0])
         if "2" in action:
             action = 2
-            alarms.flash_alarm_on(2)
-            alarms.start_buzzer()
+            # alarms.flash_alarm_on(2)
+            # alarms.start_buzzer()
         elif "1" in action:
             action = 1
-            alarms.flash_alarm_on(1)                             
+            # alarms.flash_alarm_on(1)                             
         else:
             action = 3
         print(

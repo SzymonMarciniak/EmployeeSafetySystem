@@ -6,26 +6,34 @@ class Alarms:
         self.ip = "192.168.0.9"
 
     def start_buzzer(self):
-        requests.get(f"http://{self.ip}/BuzzerOn")
+        try:
+            requests.get(f"http://{self.ip}/BuzzerOn")
+        except: pass 
     
     def stop_buzzer(self):
-        requests.get(f"http://{self.ip}/BuzzerOff")
+        try:
+            requests.get(f"http://{self.ip}/BuzzerOff")
+        except: pass 
 
     def flash_alarm_on(self, id=1):
-        if id==1:
-            nr = ""
-        elif id == 2:
-            nr = "2"
+        try:
+            if id==1:
+                nr = ""
+            elif id == 2:
+                nr = "2"
 
-        requests.get(f"http://{self.ip}/FlashOn{nr}")
+            requests.get(f"http://{self.ip}/FlashOn{nr}")
+        except: pass 
 
     def flash_alarm_off(self, id=1):
-        if id==1:
-            nr = ""
-        elif id == 2:
-            nr = "2"
+        try:
+            if id==1:
+                nr = ""
+            elif id == 2:
+                nr = "2"
 
-        requests.get(f"http://{self.ip}/FlashOff{nr}")
+            requests.get(f"http://{self.ip}/FlashOff{nr}")
+        except: pass 
 
 if __name__ == "__main__":
     alert = Alarms()
