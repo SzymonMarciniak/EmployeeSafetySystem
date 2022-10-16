@@ -36,13 +36,15 @@ def connectToDatabase(firstConnect=False):
         Object of MySQL database cursor. Needed for query processing
     """
     try:
-        db = mysql.connector.connect(host='localhost', user='root', password='root', database="employee_safety_system")
+        db = mysql.connector.connect(
+            host='localhost', user='root', password='', database="employee_safety_system")
     except mysql.connector.Error as error:
         if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             raise ConnectionError(
                 "Connection was not successful. The access was denied. Recheck the login and password.")
         else:
-            raise ConnectionError("Cannot establish connection. Reason: %s" % error)
+            raise ConnectionError(
+                "Cannot establish connection. Reason: %s" % error)
     else:
         cursor = db.cursor(buffered=True)
         if firstConnect:
@@ -74,7 +76,7 @@ def connectToDatabase(firstConnect=False):
                     generated_id int(11) NOT NULL,
                     floor INT(2) NOT NULL,
                     workspace_id INT(5) NOT NULL
-                    )""" 
+                    )"""
                 )
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS cameras (
@@ -88,7 +90,7 @@ def connectToDatabase(firstConnect=False):
                     floor INT(2) NOT NULL,
                     workspace_id INT(5) NOT NULL
                     )"""
-                )
+                               )
 
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS doors (
@@ -127,7 +129,8 @@ def closeDatabaseConnection(db: CMySQLConnection, cursor: CMySQLCursor):
         db.close()
         cursor.close()
     except mysql.connector.Error as error:
-        raise Exception("Couldn't close connection. Maybe it is closed already or was never opened? Reason: %s" % error)
+        raise Exception(
+            "Couldn't close connection. Maybe it is closed already or was never opened? Reason: %s" % error)
 
 
 def checkIsEmailInDatabase(recoveryEmail):
@@ -161,7 +164,8 @@ def setNewPassword(password):
         New password provided by the user
     """
     db, cursor = connectToDatabase()
-    cursor.execute("UPDATE accounts SET password=%s WHERE id=%s", (password, global_vars.userID))
+    cursor.execute("UPDATE accounts SET password=%s WHERE id=%s",
+                   (password, global_vars.userID))
     db.commit()
     closeDatabaseConnection(db, cursor)
 
@@ -172,4 +176,3 @@ def insertNewWorkplace(name, notifications_status):
                                                                               1 if notifications_status else 0))
     db.commit()
     closeDatabaseConnection(db, cursor)
-

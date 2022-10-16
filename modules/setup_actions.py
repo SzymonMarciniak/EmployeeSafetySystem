@@ -72,6 +72,8 @@ cameras_to_move = []
 circle1_list = []
 circle2_list = []
 first_time = True
+
+
 class SetupScreen(Screen):
     floatlayout = ObjectProperty()
 
@@ -80,7 +82,8 @@ class SetupScreen(Screen):
         LabelBase.register(name='Lato',
                            fn_regular='fonts/Lato-Regular.ttf',
                            fn_bold='fonts/Lato-Bold.ttf')
-        iconfonts.register("default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
+        iconfonts.register(
+            "default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
         Config.set('kivy', 'default_font', 'Lato')
 
         self.choose = "None"
@@ -182,13 +185,15 @@ class SetupScreen(Screen):
 
     def load_objects(self, work=None):
         db, cursor = connectToDatabase()
-        cursor.execute(f"SELECT * FROM rooms WHERE workspace_id = {global_vars.choosenWorkplace}")
+        cursor.execute(
+            f"SELECT * FROM rooms WHERE workspace_id = {global_vars.choosenWorkplace}")
         rooms_results = cursor.fetchall()
 
         for load_room in rooms_results:
             with self.floatlayout.canvas.before:
                 Color(255 / 255, 255 / 255, 255 / 255)
-                line = Room(width=1.5, deleteId=load_room[6], name=load_room[5], floor=load_room[7])
+                line = Room(
+                    width=1.5, deleteId=load_room[6], name=load_room[5], floor=load_room[7])
             x1, y1, x2, y2 = load_room[1], load_room[2], load_room[3], load_room[4]
             cx1, cx2 = x1 * self.width, x2 * self.width
             cy1, cy2 = y1 * self.height, y2 * self.height
@@ -198,7 +203,8 @@ class SetupScreen(Screen):
             if load_room[6] > self.new_room_id:
                 self.new_room_id = load_room[6]
 
-        cursor.execute(f"SELECT * FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+        cursor.execute(
+            f"SELECT * FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
         cameras_results = cursor.fetchall()
         for load_camera in cameras_results:
             x1, y1 = load_camera[1], load_camera[2]
@@ -210,9 +216,11 @@ class SetupScreen(Screen):
                 camera = Camera(pos=(x1, y1), size=(20, 20), deleteId=load_camera[4], name=load_camera[3],
                                 floor=load_camera[7])
                 Color(0, 0, 0, 1, mode='rgba')
-                circle1 = Ellipse(pos=(camera.pos[0] + 5, camera.pos[1] + 5), size=(10, 10))
+                circle1 = Ellipse(
+                    pos=(camera.pos[0] + 5, camera.pos[1] + 5), size=(10, 10))
                 Color(1, 1, 1, 1, mode='rgba')
-                circle2 = Ellipse(pos=(circle1.pos[0] + 2.5, circle1.pos[1] + 2.5), size=(5, 5))
+                circle2 = Ellipse(
+                    pos=(circle1.pos[0] + 2.5, circle1.pos[1] + 2.5), size=(5, 5))
 
             cameras_names.append(load_camera[3])
             cameras_list.append(camera)
@@ -222,7 +230,8 @@ class SetupScreen(Screen):
             if load_camera[4] > self.new_cam_id:
                 self.new_cam_id = load_camera[4]
 
-        cursor.execute(f"SELECT * FROM doors WHERE workspace_id = {global_vars.choosenWorkplace}")
+        cursor.execute(
+            f"SELECT * FROM doors WHERE workspace_id = {global_vars.choosenWorkplace}")
         doors_results = cursor.fetchall()
         for load_door in doors_results:
             with self.floatlayout.canvas.before:
@@ -242,7 +251,6 @@ class SetupScreen(Screen):
         if self.ids["CreateRoomButton"].state == "down":
             self.choose = "new_room"
 
-
         else:
             self.choose = "spectate"
 
@@ -253,9 +261,10 @@ class SetupScreen(Screen):
                 if p != id:
                     x_move = 0
                     if id in rooms_to_move:
-                        x_move = .254 
+                        x_move = .254
                     ckx1, cky1, ckx2, cky2 = rooms_points[id]
-                    x1, x2 = (ckx1+ x_move) * self.width, (ckx2 + x_move) * self.width
+                    x1, x2 = (ckx1 + x_move) * \
+                        self.width, (ckx2 + x_move) * self.width
                     y1, y2 = cky1 * self.height, cky2 * self.height
                     room.points = x1, y2, x1, y1, x2, y1, x2, y2, x1, y2
 
@@ -287,9 +296,10 @@ class SetupScreen(Screen):
                 if p != id:
                     x_move = 0
                     if id in doors_to_move:
-                        x_move = .254                                
+                        x_move = .254
                     ckx1, cky1, ckx2, cky2 = doors_points[id]
-                    x1, x2 = (ckx1 + x_move) * self.width , (ckx2 + x_move) * self.width 
+                    x1, x2 = (ckx1 + x_move) * \
+                        self.width, (ckx2 + x_move) * self.width
                     y1, y2 = cky1 * self.height, cky2 * self.height
                     door.points = x1, y1, x2, y2
 
@@ -301,9 +311,9 @@ class SetupScreen(Screen):
                 if p != id:
                     x_move = 0
                     if id in cameras_to_move:
-                        x_move = .254 
+                        x_move = .254
                     ckx1, cky1 = camera_points[id]
-                    x1 = (ckx1+ x_move) * self.width
+                    x1 = (ckx1 + x_move) * self.width
                     y1 = cky1 * self.height
                     camera.pos = x1, y1
                     circle1.pos = camera.pos[0] + 5, camera.pos[1] + 5
@@ -345,9 +355,11 @@ class SetupScreen(Screen):
                     x1, x2 = ckx1 * self.floatlayout.width, ckx2 * self.floatlayout.width
                     center_x = ((abs(x1) + abs(x2)) / 2 / self.width) - .5
                     y1, y2 = cky1 * self.height, cky2 * self.height
-                    y1, y2 = y1 / self.floatlayout.height * self.height, y2 / self.floatlayout.height * self.height
+                    y1, y2 = y1 / self.floatlayout.height * \
+                        self.height, y2 / self.floatlayout.height * self.height
                     center_y = ((abs(y1) + abs(y2)) / 2 / self.height) - .5
-                    label = Label(text=str(room.deleteId), pos_hint={"x": center_x, "y": center_y})
+                    label = Label(text=str(room.deleteId), pos_hint={
+                                  "x": center_x, "y": center_y})
                     self.floatlayout.add_widget(label)
                     idsLabels.append(label)
 
@@ -357,9 +369,11 @@ class SetupScreen(Screen):
                     x1, x2 = ckx1 * self.width, ckx2 * self.width
                     center_x = ((x1 + x2) / 2 / self.width) - .5
                     y1, y2 = cky1 * self.height, cky2 * self.height
-                    y1, y2 = y1 / self.floatlayout.height * self.height, y2 / self.floatlayout.height * self.height
+                    y1, y2 = y1 / self.floatlayout.height * \
+                        self.height, y2 / self.floatlayout.height * self.height
                     center_y = ((abs(y1) + abs(y2)) / 2 / self.height) - .5
-                    label = Label(text=str(door.deleteId), pos_hint={"x": center_x, "y": center_y})
+                    label = Label(text=str(door.deleteId), pos_hint={
+                                  "x": center_x, "y": center_y})
                     self.floatlayout.add_widget(label)
                     idsLabels.append(label)
 
@@ -371,7 +385,8 @@ class SetupScreen(Screen):
                     y1 = cky1 * self.height
                     y1 = y1 / self.floatlayout.height * self.height
                     center_y = (y1 / self.height) - .5 - .012
-                    label = Label(text=str(camera.deleteId), pos_hint={"x": center_x, "y": center_y})
+                    label = Label(text=str(camera.deleteId), pos_hint={
+                                  "x": center_x, "y": center_y})
                     self.floatlayout.add_widget(label)
                     idsLabels.append(label)
         else:
@@ -395,9 +410,11 @@ class SetupScreen(Screen):
                     x1, x2 = ckx1 * self.width, ckx2 * self.width
                     center_x = ((x1 + x2) / 2 / self.width) - .5
                     y1, y2 = cky1 * self.height, cky2 * self.height
-                    y1, y2 = y1 / self.floatlayout.height * self.height, y2 / self.floatlayout.height * self.height
+                    y1, y2 = y1 / self.floatlayout.height * \
+                        self.height, y2 / self.floatlayout.height * self.height
                     center_y = ((abs(y1) + abs(y2)) / 2 / self.height) - .5
-                    label = Label(text=str(room.name), pos_hint={"x": center_x, "y": center_y})
+                    label = Label(text=str(room.name), pos_hint={
+                                  "x": center_x, "y": center_y})
                     self.floatlayout.add_widget(label)
                     nameLabels.append(label)
 
@@ -409,7 +426,8 @@ class SetupScreen(Screen):
                     y1 = cky1 * self.height
                     y1 = y1 / self.floatlayout.height * self.height
                     center_y = (y1 / self.height) - .5 - 0.012
-                    label = Label(text=str(camera.name), pos_hint={"x": center_x, "y": center_y})
+                    label = Label(text=str(camera.name), pos_hint={
+                                  "x": center_x, "y": center_y})
                     self.floatlayout.add_widget(label)
                     nameLabels.append(label)
 
@@ -432,7 +450,8 @@ class SetupScreen(Screen):
                     rooms_list.remove(room)
                     rooms_points.pop(nr)
                     db, cursor = connectToDatabase()
-                    cursor.execute(f"""DELETE FROM rooms WHERE generated_id={my_id}""")
+                    cursor.execute(
+                        f"""DELETE FROM rooms WHERE generated_id={my_id}""")
                     db.commit()
                     closeDatabaseConnection(db, cursor)
                     self.show_ids(clear=True)
@@ -453,7 +472,8 @@ class SetupScreen(Screen):
                     c1.pos = -1000, -1000
                     c2.pos = -1000, -1000
                     db, cursor = connectToDatabase()
-                    cursor.execute(f"""DELETE FROM cameras WHERE generated_id={my_id}""")
+                    cursor.execute(
+                        f"""DELETE FROM cameras WHERE generated_id={my_id}""")
                     db.commit()
                     closeDatabaseConnection(db, cursor)
                     self.show_ids(clear=True)
@@ -465,7 +485,8 @@ class SetupScreen(Screen):
                     door_list.remove(door)
                     doors_points.pop(nr)
                     db, cursor = connectToDatabase()
-                    cursor.execute(f"""DELETE FROM doors WHERE generated_id={my_id}""")
+                    cursor.execute(
+                        f"""DELETE FROM doors WHERE generated_id={my_id}""")
                     db.commit()
                     closeDatabaseConnection(db, cursor)
                     self.show_ids(clear=True)
@@ -483,7 +504,8 @@ class SetupScreen(Screen):
         if new_created == "camera":
             with self.canvas.after:
                 Color(1, 1, 1, 1, mode='rgba')
-                camera = Camera(size=(20, 20), deleteId=self.new_cam_id, name=new_name, floor=self.current_floor)
+                camera = Camera(size=(20, 20), deleteId=self.new_cam_id,
+                                name=new_name, floor=self.current_floor)
                 cameras_dict[self.new_cam_id] = new_name
                 Color(0, 0, 0, 1, mode='rgba')
                 circle1 = Ellipse(size=(10, 10))
@@ -506,7 +528,8 @@ class SetupScreen(Screen):
         elif new_created == "room":
             with self.canvas.after:
                 Color(200 / 255, 200 / 255, 200 / 255)
-                line = Room(width=1.5, deleteId=self.new_room_id, name=new_name, floor=self.current_floor)
+                line = Room(width=1.5, deleteId=self.new_room_id,
+                            name=new_name, floor=self.current_floor)
             rooms_list.append(line)
             rooms_names.append(new_name)
             rooms_to_move.append(len(rooms_list) - 1)
@@ -534,7 +557,8 @@ class SetupScreen(Screen):
                 if self.choose == "new_room":
                     self.new_room_id += 1
                     new_id = self.new_room_id
-                    if self.new_room_id == 199: self.new_room_id = 100
+                    if self.new_room_id == 199:
+                        self.new_room_id = 100
                     touch.grab(self)
                     x = touch.pos[0] / self.width - .254
                     y = touch.pos[1] / self.height
@@ -545,7 +569,8 @@ class SetupScreen(Screen):
                 elif self.choose == "create_door":
                     self.new_door_id += 1
                     new_id = self.new_door_id
-                    if self.new_door_id == 299: self.new_door_id = 200
+                    if self.new_door_id == 299:
+                        self.new_door_id = 200
                     touch.grab(self)
                     x = touch.pos[0] / self.width - .254
                     y = touch.pos[1] / self.height
@@ -560,7 +585,8 @@ class SetupScreen(Screen):
                     self.points = (x, y)
                     self.new_cam_id += 1
                     new_id = self.new_cam_id
-                    if self.new_cam_id == 99: self.new_cam_id = 1
+                    if self.new_cam_id == 99:
+                        self.new_cam_id = 1
 
                     self.kx1, self.ky1 = self.points
             else:
@@ -598,10 +624,12 @@ class SetupScreen(Screen):
                 if self.choose == "new_room":
                     if self.to_create:
                         self.to_create = False
-                        rooms_points.append([self.kx1, self.ky1, self.kx2, self.ky2])
+                        rooms_points.append(
+                            [self.kx1, self.ky1, self.kx2, self.ky2])
                         self.main_room.points = 0, 0
                         self.show_ids(clear=True)
-                        self.get_object_name("room", [self.kx1, self.ky1, self.kx2, self.ky2])
+                        self.get_object_name(
+                            "room", [self.kx1, self.ky1, self.kx2, self.ky2])
                         self.rooms_refresh()
 
                 if self.choose == "create_door":
@@ -616,9 +644,11 @@ class SetupScreen(Screen):
                         closeDatabaseConnection(db, cursor)
                         with self.canvas.after:
                             Color(40 / 255, 42 / 255, 53 / 255)
-                            door = Door(width=8, cap="square", deleteId=self.new_door_id, floor=self.current_floor)
+                            door = Door(
+                                width=8, cap="square", deleteId=self.new_door_id, floor=self.current_floor)
                         door_list.append(door)
-                        doors_points.append([self.kx1, self.ky1, self.kx2, self.ky2])
+                        doors_points.append(
+                            [self.kx1, self.ky1, self.kx2, self.ky2])
                         doors_to_move.append(len(door_list) - 1)
                         self.doors_refresh()
 

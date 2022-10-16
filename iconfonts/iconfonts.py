@@ -74,4 +74,3 @@ def _parse(data):
             continue
         res[key] = value
     return res
-

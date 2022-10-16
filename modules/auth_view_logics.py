@@ -65,7 +65,8 @@ class RegisterScreen(Screen):
         Resets whole screen right before user can see it. Also provides register screen's mouseover effect on certain
         objects
         """
-        global_vars.hoverEventObjects = [self.registerBtn, self.loginBtn, self.resetPswdBtn]
+        global_vars.hoverEventObjects = [
+            self.registerBtn, self.loginBtn, self.resetPswdBtn]
         self.loginBox.text = ''
         self.newPasswordBox.text = ''
         self.repeatPasswordBox.text = ''
@@ -109,18 +110,27 @@ class SimpleInput(TextInput):
         caps_status = win32api.GetKeyState(win32con.VK_CAPITAL)
         if caps_status == 0 and self.activated:
             current_app = App.get_running_app()
-            current_app.root.get_screen('login_screen').ids.capsLockLabel.text = ''
-            current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = ''
-            current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = ''
-            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = ''
-            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text = ''
+            current_app.root.get_screen(
+                'login_screen').ids.capsLockLabel.text = ''
+            current_app.root.get_screen(
+                'register_screen').ids.capsLockLabel_newPasswordBox.text = ''
+            current_app.root.get_screen(
+                'register_screen').ids.capsLockLabel_repeatPasswordBox.text = ''
+            current_app.root.get_screen(
+                'new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = ''
+            current_app.root.get_screen(
+                'new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text = ''
             self.activated = False
         elif caps_status == 1 and not self.activated:
             current_app = App.get_running_app()
-            current_app.root.get_screen('login_screen').ids.capsLockLabel.text = 'Caps ON'
-            current_app.root.get_screen('register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
-            current_app.root.get_screen('register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
-            current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = 'Caps ON'
+            current_app.root.get_screen(
+                'login_screen').ids.capsLockLabel.text = 'Caps ON'
+            current_app.root.get_screen(
+                'register_screen').ids.capsLockLabel_newPasswordBox.text = 'Caps ON'
+            current_app.root.get_screen(
+                'register_screen').ids.capsLockLabel_repeatPasswordBox.text = 'Caps ON'
+            current_app.root.get_screen(
+                'new_password_screen').ids.capsLockLabel_forgotNewPasswordBox.text = 'Caps ON'
             current_app.root.get_screen('new_password_screen').ids.capsLockLabel_forgotRepeatNewPasswordBox.text = \
                 'Caps ON '
             self.activated = True
@@ -139,7 +149,8 @@ class LoginButton(Button):
 
     def on_pressed(self):
         self.rectColor = "#0f87ff"
-        checkDataCorrectness(self.loginBox.text, self.passwordBox.text, self.errorBox)
+        checkDataCorrectness(self.loginBox.text,
+                             self.passwordBox.text, self.errorBox)
 
     def on_released(self):
         self.rectColor = "#0fafff"

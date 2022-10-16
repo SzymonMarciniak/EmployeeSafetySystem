@@ -31,7 +31,8 @@ class ForgotPasswordScreen(Screen):
         super().__init__(**kwargs)
 
     def on_pre_enter(self):
-        global_vars.hoverEventObjects = [self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
+        global_vars.hoverEventObjects = [
+            self.recoveryEmailBox, self.sendRecoveryEmailButton, self.backToLoginBtn]
 
 
 class NewPasswordScreen(Screen):
@@ -85,7 +86,8 @@ def sendRecoveryEmail(userMail):
 
     text = "Employee Safety System\n\nHello, %s!\nWe received password reset request for your account\nIf you want to" \
            "proceed, please input following code on the screen: %s \nNot your request? " \
-           "Ignore this message" % (fullName.split()[0], ' '.join(generatedCode))
+           "Ignore this message" % (
+               fullName.split()[0], ' '.join(generatedCode))
     html = """
     <html>
         <head></head>
@@ -188,7 +190,8 @@ class SubmitCodeButton(Button):
         results = cursor.fetchone()
         if results is None:
             self.parent.parent.parent.infoLabel.text = "[size=24]%s[/size] Provided code is invalid. " \
-                                                       "Recheck your input" % icon('zmdi-alert-circle')
+                                                       "Recheck your input" % icon(
+                                                           'zmdi-alert-circle')
             self.parent.parent.parent.infoLabel.color = rgba("c92a1e")
         else:
             cursor.execute("UPDATE pswdresets SET used=1 WHERE userid=%s AND code=%s AND expDate > UNIX_TIMESTAMP()"
@@ -247,12 +250,18 @@ class BottomLayout(BoxLayout):
             self.add_widget(inputC)
         submitBtn = SubmitCodeButton()
         self.add_widget(submitBtn)
-        codeInputs[0].bind(text=lambda instance, value: self.on_text_typed(instance, value, 0, codeInputs))
-        codeInputs[1].bind(text=lambda instance, value: self.on_text_typed(instance, value, 1, codeInputs))
-        codeInputs[2].bind(text=lambda instance, value: self.on_text_typed(instance, value, 2, codeInputs))
-        codeInputs[3].bind(text=lambda instance, value: self.on_text_typed(instance, value, 3, codeInputs))
-        codeInputs[4].bind(text=lambda instance, value: self.on_text_typed(instance, value, 4, codeInputs))
-        codeInputs[5].bind(text=lambda instance, value: self.on_text_typed(instance, value, 5, codeInputs))
+        codeInputs[0].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 0, codeInputs))
+        codeInputs[1].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 1, codeInputs))
+        codeInputs[2].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 2, codeInputs))
+        codeInputs[3].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 3, codeInputs))
+        codeInputs[4].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 4, codeInputs))
+        codeInputs[5].bind(text=lambda instance, value: self.on_text_typed(
+            instance, value, 5, codeInputs))
 
     def on_text_typed(self, instance, value, num, codeInputs):
         if len(instance.text) < 1:
@@ -304,7 +313,8 @@ class SendEmailButton(Button):
                 self.infoLabel.opacity = 1
                 self.infoLabel.color = rgba("c92a1e")
                 self.infoLabel.text = "[size=24]%s[/size] You've sent another request within the last 120 seconds." \
-                                      "Try again later" % icon('zmdi-alert-circle')
+                                      "Try again later" % icon(
+                                          'zmdi-alert-circle')
                 return
             self.set_info_label()
             self.disabled = True

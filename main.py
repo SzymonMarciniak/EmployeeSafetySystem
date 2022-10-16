@@ -26,7 +26,7 @@ from modules import settings
 
 
 class ScreenManagement(ScreenManager):
-    def __init__(self, **kwargs): 
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
 
@@ -47,7 +47,8 @@ class EmployeeSafetySystemApp(App):
         LabelBase.register(name='Lato',
                            fn_regular='fonts/Lato-Regular.ttf',
                            fn_bold='fonts/Lato-Bold.ttf')
-        iconfonts.register("default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
+        iconfonts.register(
+            "default_font", 'fonts/Material-Design-Iconic-Font.ttf', 'fonts/zmd.fontd')
         Config.set('kivy', 'default_font', 'Lato')
         db, cursor = dbactions.connectToDatabase(True)
         db.close()
@@ -56,8 +57,10 @@ class EmployeeSafetySystemApp(App):
         width, height = size
         self.width = width
         self.height = height
-        App.get_running_app().root.get_screen("choose_workplace_screen").ids.test_label.f_width = width
-        App.get_running_app().root.get_screen("choose_workplace_screen").ids.test_label.f_height = height
+        App.get_running_app().root.get_screen(
+            "choose_workplace_screen").ids.test_label.f_width = width
+        App.get_running_app().root.get_screen(
+            "choose_workplace_screen").ids.test_label.f_height = height
         self.size = (
             'S' if width < 1050 else
             'L'

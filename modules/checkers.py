@@ -43,7 +43,8 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         ErrorBox().showError(errorBox=errorBox, reason="E-mail structure is incorrect")
         return False
     elif len(password) < 8 or len(password) > 64:
-        ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
+        ErrorBox().showError(errorBox=errorBox,
+                             reason="Password should be 8-64 characters long")
         return False
     elif repeatPassword is not None:
         splitted = fullName.split(' ')
@@ -54,7 +55,8 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
             ErrorBox().showError(errorBox=errorBox, reason="You did not provide your full name")
             return False
         elif len(splitted) <= 1:
-            ErrorBox().showError(errorBox=errorBox, reason="Separate first and last name with a gap")
+            ErrorBox().showError(errorBox=errorBox,
+                                 reason="Separate first and last name with a gap")
             return False
         for s in splitted:
             if len(s) <= 3:
@@ -72,7 +74,8 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
                 app.root.current = 'login_screen'
                 return True
             else:
-                ErrorBox().showError(errorBox=errorBox, reason="Account already registered for this E-mail")
+                ErrorBox().showError(errorBox=errorBox,
+                                     reason="Account already registered for this E-mail")
                 return False
     else:
         checkCredintialsInDatabase(login, password, errorBox)
@@ -130,7 +133,8 @@ def checkCredintialsInDatabase(login, password, errorBox):
         Invalid credintials; error shown
     """
     db, cursor = connectToDatabase()
-    cursor.execute("SELECT id FROM accounts WHERE login=%s AND password=%s;", (login, password))
+    cursor.execute(
+        "SELECT id FROM accounts WHERE login=%s AND password=%s;", (login, password))
     results = cursor.fetchone()
     if results is not None:
         disableErrorMsg(errorBox)
@@ -164,7 +168,8 @@ def checkForPassword(password, repeatPassword, errorBox):
         Requirements not met
     """
     if len(password) < 8 or len(password) > 64:
-        ErrorBox().showError(errorBox=errorBox, reason="Password should be 8-64 characters long")
+        ErrorBox().showError(errorBox=errorBox,
+                             reason="Password should be 8-64 characters long")
         return False
     elif password != repeatPassword:
         ErrorBox().showError(errorBox=errorBox, reason="Passwords do not match")
@@ -197,7 +202,8 @@ class ErrorBox:
 
     def showError(self, errorBox, reason):
         errorBox.disabled = False
-        errorBox.text = ("[size=40]%s[/size]\n" + reason) % icon('zmdi-alert-circle')
+        errorBox.text = ("[size=40]%s[/size]\n" +
+                         reason) % icon('zmdi-alert-circle')
         anim1 = Animation(opacity=1, duration=0.7)
         anim1.start(errorBox)
         self.errorBox = errorBox

@@ -115,10 +115,12 @@ class SaveButton(Button):
         """
         if self.actionsListButton.text == '' or self.detectionListButton.text == '' or self.camerasListButton.text == '':
             popup_content = BoxLayout(orientation='vertical')
-            popup_content.add_widget(Label(text='You have omitted one or more values in a rule you are trying to save'))
+            popup_content.add_widget(Label(
+                text='You have omitted one or more values in a rule you are trying to save'))
             btn = Button(text="Understood", size_hint_y=.2)
             popup_content.add_widget(btn)
-            popup = Popup(size_hint=[None, None], size=[500, 300], title='Warning', content=popup_content)
+            popup = Popup(size_hint=[None, None], size=[
+                          500, 300], title='Warning', content=popup_content)
             btn.bind(on_press=popup.dismiss)
             popup.open()
             return
@@ -149,7 +151,8 @@ class SaveButton(Button):
                                                         'Please remove colliding rule before trying again.'))
                     btn = Button(text="Understood", size_hint_y=.2)
                     popup_content.add_widget(btn)
-                    popup = Popup(size_hint=[None, None], size=[700, 350], title='Warning', content=popup_content)
+                    popup = Popup(size_hint=[None, None], size=[
+                                  700, 350], title='Warning', content=popup_content)
                     btn.bind(on_press=popup.dismiss)
                     popup.open()
                     return

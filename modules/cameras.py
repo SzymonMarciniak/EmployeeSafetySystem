@@ -69,6 +69,8 @@ helmet_model = load_model('models/helmet_binar_classifier.h5')
 vest_model = load_model('models/vest_binar_classifier.h5')
 cap_model = load_model('models/cap_binar_classifier.h5')
 failed_load_camera_img = 'img/pl.png'
+
+
 class RLayout(RelativeLayout):
     camera_view_parent = ObjectProperty()
     cameraID = NumericProperty()
@@ -88,7 +90,8 @@ class RLayout(RelativeLayout):
     def iterate_images(dt):
         global cam_nr
         db, cursor = connectToDatabase()
-        cursor.execute(f"SELECT state_activation FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
+        cursor.execute(
+            f"SELECT state_activation FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
         AI_enabled = cursor.fetchall()[0][0]
 
         if AI_enabled:
@@ -97,7 +100,8 @@ class RLayout(RelativeLayout):
             if global_vars.AI_run:
                 for dataset in datasets:
                     try:
-                        img, mask_list, helmet_cap_list, vest_list, img0, diff_x, diff_y, diff_z = p_detect.detect2(dataset)
+                        img, mask_list, helmet_cap_list, vest_list, img0, diff_x, diff_y, diff_z = p_detect.detect2(
+                            dataset)
                         img_list.append(img)
                         mask_lists.append(mask_list)
                         helmet_cap_lists.append(helmet_cap_list)
@@ -109,11 +113,14 @@ class RLayout(RelativeLayout):
                     except:
                         print("Failed to load camera or video is over")
 
-                cursor.execute(f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+                cursor.execute(
+                    f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
                 rules_list = cursor.fetchall()
-                cursor.execute(f"SELECT actions FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
+                cursor.execute(
+                    f"SELECT actions FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
                 action_list = cursor.fetchall()
-                cursor.execute(f"SELECT state_notifications FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
+                cursor.execute(
+                    f"SELECT state_notifications FROM workplaces WHERE id = {global_vars.choosenWorkplace}")
                 notification_enabled = cursor.fetchall()[0][0]
                 closeDatabaseConnection(db, cursor)
 
@@ -126,42 +133,52 @@ class RLayout(RelativeLayout):
                                 object_name = "mask"
                                 object_lists = mask_lists
                                 model = mask_model
-                                is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+                                is_danger = RLayout.do_predictions(
+                                    object_lists, object_name, nr0, model)
                                 if is_danger:
-                                    RLayout.do_alert(action_list, object_name, nr0)
+                                    RLayout.do_alert(
+                                        action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
-                                    
+
                             if "2" in rules_list[nr0][0]:
                                 object_name = "helmet"
                                 object_lists = helmet_cap_lists
                                 model = helmet_model
-                                is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model)
+                                is_danger = RLayout.do_predictions(
+                                    object_lists, object_name, nr0, model)
                                 if is_danger:
-                                    RLayout.do_alert(action_list, object_name, nr0)
+                                    RLayout.do_alert(
+                                        action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
-                                    
-                            elif "3" in rules_list[nr0][0]: #if helmets detecting do not detect caps
+
+                            # if helmets detecting do not detect caps
+                            elif "3" in rules_list[nr0][0]:
                                 object_name = "cap"
                                 object_lists = helmet_cap_lists
                                 model = cap_model
-                                is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, alignment=0.2)
-                                if is_danger: #support detection by helmet model to better results
-                                    is_danger = RLayout.do_predictions(object_lists, object_name, nr0, helmet_model)
+                                is_danger = RLayout.do_predictions(
+                                    object_lists, object_name, nr0, model, alignment=0.2)
+                                if is_danger:  # support detection by helmet model to better results
+                                    is_danger = RLayout.do_predictions(
+                                        object_lists, object_name, nr0, helmet_model)
 
                                 if is_danger:
-                                    RLayout.do_alert(action_list, object_name, nr0)
+                                    RLayout.do_alert(
+                                        action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
-                                    
+
                             if "4" in rules_list[nr0][0]:
                                 object_name = "vest"
-                                object_lists = vest_lists 
+                                object_lists = vest_lists
                                 model = vest_model
                                 equation = 10 ** 15
                                 alignment = 0.5
-                                is_danger = RLayout.do_predictions(object_lists, object_name, nr0, model, equation, alignment, reverse=True)
+                                is_danger = RLayout.do_predictions(
+                                    object_lists, object_name, nr0, model, equation, alignment, reverse=True)
 
                                 if is_danger:
-                                    RLayout.do_alert(action_list, object_name, nr0)
+                                    RLayout.do_alert(
+                                        action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
 
                             if "7" in rules_list[nr0][0]:
@@ -172,16 +189,16 @@ class RLayout(RelativeLayout):
 
                                 for diff_x in diff_x_list:
                                     if diff_x > 80:
-                                        fall = True  
+                                        fall = True
 
                                 for diff_y in diff_y_list:
                                     if diff_y > 0:
-                                        fall = True 
+                                        fall = True
 
                                 for diff_z in diff_z_list:
                                     if 0.2 < diff_z < 0.4:
-                                        fall = True 
-                                    
+                                        fall = True
+
                                 if fall:
                                     cam_id = cam_view[nr0].cameraID
                                     action = str(action_list[nr0][0])
@@ -193,13 +210,14 @@ class RLayout(RelativeLayout):
                                         action = 3
                                     db, cursor = connectToDatabase()
                                     cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                                    (global_vars.choosenWorkplace, cam_id, "Fall", global_vars.actions_dict[int(action)]))
+                                                   (global_vars.choosenWorkplace, cam_id, "Fall", global_vars.actions_dict[int(action)]))
                                     db.commit()
                                     closeDatabaseConnection(db, cursor)
-                                    print(f"On camera of id: {cam_id} detect FALL!!!") 
+                                    print(
+                                        f"On camera of id: {cam_id} detect FALL!!!")
                                     alert_color = [1, 0, 0, 1]
 
-                            if True == False: #HERE set circle color to 'alert_color'
+                            if True == False:  # HERE set circle color to 'alert_color'
                                 alert_color = alert_color
 
                 for nr, camera_image in enumerate(cam_view):
@@ -210,8 +228,10 @@ class RLayout(RelativeLayout):
                                 if img_list[nr].any():
                                     img = img_list[nr]
                                     buffer = cv2.flip(img, 0).tobytes()
-                                    texture = Texture.create(size=(img.shape[1], img.shape[0]), colorfmt='bgr')
-                                    texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
+                                    texture = Texture.create(
+                                        size=(img.shape[1], img.shape[0]), colorfmt='bgr')
+                                    texture.blit_buffer(
+                                        buffer, colorfmt='bgr', bufferfmt='ubyte')
                                     camera_image.texture = texture
                                 else:
                                     camera_image.source = failed_load_camera_img
@@ -224,8 +244,10 @@ class RLayout(RelativeLayout):
                                     img = np.array(img)
                                     img = np.rot90(img, 2)
                                     buffer = img.tobytes()
-                                    texture = Texture.create(size=(640, 480), colorfmt='bgr')
-                                    texture.blit_buffer(buffer, colorfmt='bgr', bufferfmt='ubyte')
+                                    texture = Texture.create(
+                                        size=(640, 480), colorfmt='bgr')
+                                    texture.blit_buffer(
+                                        buffer, colorfmt='bgr', bufferfmt='ubyte')
                                     camera_image.texture = texture
                                 else:
                                     camera_image.source = failed_load_camera_img
@@ -260,7 +282,7 @@ class RLayout(RelativeLayout):
         if reverse:
             danger = not danger
         return danger
-    
+
     @staticmethod
     def do_alert(action_list, object_name, nr0):
         cam_id = cam_view[nr0].cameraID
@@ -271,14 +293,15 @@ class RLayout(RelativeLayout):
             action = 1
         else:
             action = 3
-        print(f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
+        print(
+            f"On camera of id: {cam_id} detect no {object_name}, action {action}!!!")
         db, cursor = connectToDatabase()
         reason = "No " + object_name
         cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                        (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
+                       (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
         db.commit()
         closeDatabaseConnection(db, cursor)
-        print(f"On camera of id: {cam_id} detect no {object_name}!!!") 
+        print(f"On camera of id: {cam_id} detect no {object_name}!!!")
 
 
 class PopupContent(BoxLayout):
@@ -298,5 +321,6 @@ class InfoButton(Button):
 
     def on_press(self):
         content = PopupContent(generatedID=self.parent.generatedID)
-        popup = Popup(title='Info about camera', content=content, auto_dismiss=True, size_hint=[.7, .7])
+        popup = Popup(title='Info about camera', content=content,
+                      auto_dismiss=True, size_hint=[.7, .7])
         popup.open()

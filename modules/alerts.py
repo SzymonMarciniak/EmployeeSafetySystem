@@ -36,7 +36,8 @@ class AlertsScreen(Screen):
         if results is not None:
             for row in results:
                 self.generateLog(row)
-        cursor.execute("UPDATE logs SET seen=1 WHERE workplaceID=%s;", (global_vars.choosenWorkplace,))
+        cursor.execute("UPDATE logs SET seen=1 WHERE workplaceID=%s;",
+                       (global_vars.choosenWorkplace,))
         db.commit()
         closeDatabaseConnection(db, cursor)
 

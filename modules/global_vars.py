@@ -11,7 +11,8 @@ DECORATION_COLOR_NOALPHA = rgba('#08c48c')
 ERROR_COLOR = rgba("#c92a1e")
 
 cameras_dict = {}
-detection_dict = {1: 'No mask', 2: 'No helmet', 3: 'No cap', 4: 'No vest', 7: 'Person falls'}
+detection_dict = {1: 'No mask', 2: 'No helmet',
+                  3: 'No cap', 4: 'No vest', 7: 'Person falls'}
 actions_dict = {1: 'Flash lights', 2: 'Start alarm', 3: 'Notificate'}
 
 AI_run = False

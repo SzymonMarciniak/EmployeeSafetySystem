@@ -24,7 +24,6 @@ class StatusToggleButton(ToggleButton):
 
     def __init__(self, **kwargs):
         super(StatusToggleButton, self).__init__(**kwargs)
-        
 
     def on_toggled(self, button_obj: ToggleButton, setting_type, first_load=False):
         """
@@ -41,10 +40,12 @@ class StatusToggleButton(ToggleButton):
             state = 1 if button_obj.state == 'down' else 0
             db, cursor = connectToDatabase()
             if setting_type == 'notifications_state':
-                cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+                cursor.execute("UPDATE workplaces SET state_notifications=%s WHERE ID=%s;",
+                               (state, global_vars.choosenWorkplace))
                 db.commit()
             elif setting_type == 'activation_state':
-                cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;", (state, global_vars.choosenWorkplace))
+                cursor.execute("UPDATE workplaces SET state_activation=%s WHERE ID=%s;",
+                               (state, global_vars.choosenWorkplace))
                 db.commit()
             closeDatabaseConnection(db, cursor)
 
@@ -75,7 +76,8 @@ class CreateWorkplaceButton(Button):
 
     def on_released(self):
         self.rectColor = '#0fafff'
-        insertNewWorkplace(self.workplace_name_textinput.text, True if self.status_toggle.state == 'down' else False)
+        insertNewWorkplace(self.workplace_name_textinput.text,
+                           True if self.status_toggle.state == 'down' else False)
         app = App.get_running_app()
         app.root.transition = FadeTransition()
         app.root.current = 'choose_workplace_screen'

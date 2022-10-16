@@ -19,13 +19,15 @@ class DeleteWorkspacePopupContent(BoxLayout):
         btn = Button(text="YES, DELETE", size_hint_y=.25, size_hint_x=.3)
         boxlayout.add_widget(btn)
         btn.bind(on_release=self.delete_workspace)
-        btn = Button(text="NO, CANCEL PROCESS", size_hint_y=.25, size_hint_x=.7)
+        btn = Button(text="NO, CANCEL PROCESS",
+                     size_hint_y=.25, size_hint_x=.7)
         boxlayout.add_widget(btn)
         self.add_widget(boxlayout)
 
     def delete_workspace(self, dt):
         db, cursor = connectToDatabase()
-        cursor.execute("DELETE FROM workplaces WHERE ID=%s", (global_vars.choosenWorkplace,))
+        cursor.execute("DELETE FROM workplaces WHERE ID=%s",
+                       (global_vars.choosenWorkplace,))
         db.commit()
         app = App.get_running_app()
         app.root.transition = FadeTransition()
@@ -40,7 +42,8 @@ class DeleteWorkspaceButton(Button):
 
     def on_press(self):
         content = DeleteWorkspacePopupContent(orientation='vertical')
-        popup = Popup(title="Warning", auto_dismiss=False, content=content, size_hint=[.7, .7])
+        popup = Popup(title="Warning", auto_dismiss=False,
+                      content=content, size_hint=[.7, .7])
         for child in content.children:
             if type(child) is BoxLayout:
                 for btn in child.children:

@@ -24,6 +24,8 @@ choices = {
 }
 
 t1 = Thread(target=RLayout.set_interval)
+
+
 class MainWorkplaceScreen(Screen):
     upper_menu = ObjectProperty()
     bottom_menu = ObjectProperty()
@@ -52,7 +54,8 @@ class MainWorkplaceScreen(Screen):
         db, cursor = connectToDatabase()
         cursor.execute("SELECT name FROM accounts WHERE id=%s", (userid,))
         userData = cursor.fetchone()
-        cursor.execute(f"SELECT generated_id, name FROM cameras WHERE workspace_id={global_vars.choosenWorkplace}")
+        cursor.execute(
+            f"SELECT generated_id, name FROM cameras WHERE workspace_id={global_vars.choosenWorkplace}")
         results = cursor.fetchall()
         for row in results:
             cameras_dict[row[0]] = row[1]
@@ -85,7 +88,10 @@ class CamerasGrid(GridLayout):
     def __init__(self, **kwargs):
         super(CamerasGrid, self).__init__(**kwargs)
 
+
 first = True
+
+
 class MenuButton(Button):
     main_screen_sm = ObjectProperty()
     bottom_menu = ObjectProperty()
@@ -102,13 +108,15 @@ class MenuButton(Button):
             if children == self:
                 continue
             if children.active is True:
-                anim = Animation(canva_s1=0, duration=.3, transition='in_out_quad')
+                anim = Animation(canva_s1=0, duration=.3,
+                                 transition='in_out_quad')
                 anim.start(children)
         for children in self.bottom_menu.children:
             if children == self:
                 continue
             if children.active is True:
-                anim = Animation(canva_s1=0, duration=.3, transition='in_out_quad')
+                anim = Animation(canva_s1=0, duration=.3,
+                                 transition='in_out_quad')
                 anim.start(children)
         self.active = True
         if (self.sID == 1) or (self.sID == 2):
@@ -127,6 +135,6 @@ class MenuButton(Button):
             app.root.current = choices.get(self.sID)
             self.main_screen_sm.current = 'default'
             self.active = False
-            return           
+            return
         self.main_screen_sm.transition = FadeTransition()
         self.main_screen_sm.current = choices.get(self.sID)

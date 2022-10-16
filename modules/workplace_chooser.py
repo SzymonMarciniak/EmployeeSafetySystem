@@ -10,7 +10,7 @@ from kivy.uix.screenmanager import Screen, FadeTransition
 
 from modules import global_vars
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
-from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR 
+from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR
 
 
 class ChooseWorkplaceScreen(Screen):
@@ -101,13 +101,15 @@ class WorkplaceChooserLayout(BoxLayout):
         closeDatabaseConnection(db, cursor)
         if results is not None:
             for row in results:
-                self.buildExistingWorkplace(row[0], row[1], row[2], row[3], row[4])
+                self.buildExistingWorkplace(
+                    row[0], row[1], row[2], row[3], row[4])
         for i in range(row_count, 3):
             self.buildNewWorkplace()
 
     def buildExistingWorkplace(self, title, pos, s_activation, s_notifications, workplaceID):
         db, cursor = connectToDatabase()
-        cursor.execute("SELECT COUNT(ID) FROM logs WHERE workplaceID=%s AND seen=0", (workplaceID,))
+        cursor.execute(
+            "SELECT COUNT(ID) FROM logs WHERE workplaceID=%s AND seen=0", (workplaceID,))
         results = cursor.fetchone()
         alertsCount = results[0]
         ew = ExistingWorkplace()
@@ -125,7 +127,8 @@ class WorkplaceChooserLayout(BoxLayout):
         label_text = "[color=%s]%s[/color] " \
                      "Notifications: %s" % ("#08c48c" if s_notifications > 0 else "#c92a1e",
                                             icon('zmdi-notifications-active') if s_notifications > 0 else
-                                            icon('zmdi-notifications-off'), "Active"
+                                            icon(
+                                                'zmdi-notifications-off'), "Active"
                                             if s_notifications > 0 else "Disabled")
         boxlayout.add_widget(EwStatus(text=label_text))
         # label_text = "[color=%s]%s[/color] " \
@@ -135,12 +138,14 @@ class WorkplaceChooserLayout(BoxLayout):
         #                      if self.s_activation > 0 else "X alerts active")
         boxlayout.add_widget(EwStatus(text="[color=%s]%s[/color] %s" % ("08c48c" if alertsCount <= 0 else "#eaa700",
                                                                         icon('zmdi-check') if alertsCount <= 0 else
-                                                                        icon('zmdi-alert-octagon'),
+                                                                        icon(
+                                                                            'zmdi-alert-octagon'),
                                                                         "No new alerts" if alertsCount <= 0 else
                                                                         "%d alerts registered!" % alertsCount)))
         division.add_widget(boxlayout)
         boxlayout = ActionButtonsLayout(orientation='vertical')
-        chooseBtn = ChooseButton(markup=True, text="%s" % icon('zmdi-chevron-right'))
+        chooseBtn = ChooseButton(markup=True, text="%s" %
+                                 icon('zmdi-chevron-right'))
         chooseBtn.workplaceID = ew.workplaceID
         boxlayout.add_widget(chooseBtn)
         boxlayout.add_widget(EditButton())

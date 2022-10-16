@@ -8,4 +8,3 @@ def check_anchor_order(m):
         print('Reversing anchor order')
         m.anchors[:] = m.anchors.flip(0)
         m.anchor_grid[:] = m.anchor_grid.flip(0)
-
