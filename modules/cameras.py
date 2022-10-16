@@ -119,7 +119,7 @@ class RLayout(RelativeLayout):
 
                 if notification_enabled:
                     for nr0, img in enumerate(img_list):
-                        if abs(cam_view[nr0].last_alarm - time.time()) > 3:
+                        if abs(cam_view[nr0].last_alarm - time.time()) > 300:
                             cam_view[nr0].last_alarm = time.time()
                             alert_color = [0, 1, 0, 1]
                             if "1" in rules_list[nr0][0]:
