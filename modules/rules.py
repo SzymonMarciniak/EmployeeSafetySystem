@@ -18,6 +18,8 @@ rules_container: FloatLayout
 last_addnewrule: FloatLayout
 title_label: Label
 
+existing_rules = {}
+
 
 class RulesScreen(Screen):
     def __init__(self, **kwargs):
@@ -111,6 +113,9 @@ class SaveButton(Button):
             btn.bind(on_press=popup.dismiss)
             popup.open()
             return
+        cameraID = None
+        detectionID = None
+        actionID = None
         db, cursor = connectToDatabase()
         for cID, value in cameras_dict.items():
             if value == self.camerasListButton.text:
@@ -121,8 +126,35 @@ class SaveButton(Button):
         for aID, value in actions_dict.items():
             if value == self.actionsListButton.text:
                 actionID = aID
+        global existing_rules
+        print("DICT BEFORE ANY ACTIONS")
+        print(existing_rules)
+        camera_detection_list = existing_rules.get(cameraID)
+        if camera_detection_list is not None:
+            for value in camera_detection_list:
+                if detectionID == value:
+                    popup_content = BoxLayout(orientation='vertical')
+                    popup_content.add_widget(Label(text='You may have only one action linked to one detection rule '
+                                                        'in a single camera!\n\n'
+                                                        'A rule with this detection has already been made earlier.\n'
+                                                        'Please remove colliding rule before trying again.'))
+                    btn = Button(text="Understood", size_hint_y=.2)
+                    popup_content.add_widget(btn)
+                    popup = Popup(size_hint=[None, None], size=[700, 350], title='Warning', content=popup_content)
+                    btn.bind(on_press=popup.dismiss)
+                    popup.open()
+                    return
+
+        if cameraID not in existing_rules:
+            print("not in")
+            existing_rules[cameraID] = list()
+            print(existing_rules)
+        existing_rules[cameraID].append(detectionID)
+        print("DICT AFTER")
+        print(existing_rules)
         cursor.execute("UPDATE cameras SET rules=concat(rules, '%s'), actions=concat(actions, '%s') WHERE "
-                       "generated_id=%s", (detectionID, actionID, cameraID))
+                       "generated_id=%s AND workspace_id=%s",
+                       (detectionID, actionID, cameraID, global_vars.choosenWorkplace))
         db.commit()
         self.actionsListButton.disabled = True
         self.detectionListButton.disabled = True
@@ -158,12 +190,14 @@ class DeleteRule(Button):
                 actionID = aID
         if cameraID is not None and detectionID is not None and actionID is not None:
             db, cursor = connectToDatabase()
-            cursor.execute("SELECT rules, actions FROM cameras WHERE generated_id=%s", (cameraID,))
+            cursor.execute("SELECT rules, actions FROM cameras WHERE generated_id=%s AND workspace_id=%s",
+                           (cameraID, global_vars.choosenWorkplace))
             results = cursor.fetchone()
             rules_str = results[0]
             actions_str = results[1]
-            cursor.execute("UPDATE cameras SET rules=%s, actions=%s WHERE generated_id=%s",
-                           (rules_str.replace(str(detectionID), ''), actions_str.replace(str(actionID), ''), cameraID))
+            cursor.execute("UPDATE cameras SET rules=%s, actions=%s WHERE generated_id=%s AND workspace_id=%s",
+                           (rules_str.replace(str(detectionID), ''), actions_str.replace(str(actionID), ''), cameraID,
+                            global_vars.choosenWorkplace))
             db.commit()
             closeDatabaseConnection(db, cursor)
 
