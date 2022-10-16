@@ -5,10 +5,12 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import Screen
 from kivy.uix.spinner import Spinner, SpinnerOption
 from kivy.uix.stacklayout import StackLayout
 from kivy.utils import rgba
 
+from modules import global_vars
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules.global_vars import cameras_dict, SECONDARY_COLOR, BG_COLOR, detection_dict, actions_dict
 
@@ -17,22 +19,34 @@ last_addnewrule: FloatLayout
 title_label: Label
 
 
+class RulesScreen(Screen):
+    def __init__(self, **kwargs):
+        super(RulesScreen, self).__init__(**kwargs)
+
+    def on_pre_enter(self, *args):
+        global rules_container
+        rules_container.load_rules()
+
+
 class RulesContainer(StackLayout):
+    global title_label
+
     def __init__(self, **kwargs):
         super(RulesContainer, self).__init__(**kwargs)
         global rules_container
         rules_container = self
 
-    def on_kv_post(self, base_widget):
-        self.load_rules()
-
     def load_rules(self):
+        self.clear_widgets()
+
+        title_label.active_rules = 0
         db, cursor = connectToDatabase()
 
-        cursor.execute("SELECT name, rules, actions FROM cameras WHERE rules!=''")
+        cursor.execute("SELECT name, rules, actions FROM cameras WHERE rules!='' AND workspace_id=%s",
+                       (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
         for row in results:
-            global title_label
+
             name = row[0]
             rules_str = row[1]
             actions_str = row[2]
@@ -41,9 +55,9 @@ class RulesContainer(StackLayout):
                 rule_name = detection_dict.get(int(rules_str[i]))
                 action_name = actions_dict.get(int(actions_str[i]))
                 rule_creator = NewRuleCreator(isGenerated=True, camera_name=name, rule_name=rule_name,
-                                          action_name=action_name)
+                                              action_name=action_name)
                 self.add_widget(rule_creator)
-
+        self.add_widget(AddNewRule())
         closeDatabaseConnection(db, cursor)
 
 
