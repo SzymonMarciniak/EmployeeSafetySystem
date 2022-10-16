@@ -60,7 +60,6 @@
 
                 wh_bg: (236/255, 236/255, 236/255, 1)
                 bl_bg: (15/255, 175/255, 255/255, 1)
-                gray_color: (46/2555, 49/255, 64/255, 1)
 
                 canvas.before:
                     Color:
@@ -70,7 +69,7 @@
                         rectangle: self.x, self.y, self.width, self.height
                 
                 color: self.bl_bg if self.state == "normal" else self.wh_bg
-                background_color: self.gray_color if self.state == "normal" else self.bl_bg
+                background_color: [0,0,0,0] if self.state == "normal" else self.bl_bg
 
         
             
@@ -184,8 +183,6 @@
 <ChooseSetupButton@ToggleButton>:
     wh_bg: (236/255, 236/255, 236/255, 1)
     bl_bg: (15/255, 175/255, 255/255, 1)
-    gray_color: DM_MAIN_COLOR
-
     
     canvas.before:
         Color:
@@ -200,7 +197,6 @@
 <ChooseFloorButton@ToggleButton>:
     wh_bg: (236/255, 236/255, 236/255, 1)
     bl_bg: (15/255, 175/255, 255/255, 1)
-    gray_color: DM_MAIN_COLOR
 
     
     canvas.before:

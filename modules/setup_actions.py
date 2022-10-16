@@ -96,7 +96,7 @@ class SetupScreen(Screen):
         Config.set('kivy', 'default_font', 'Lato')
 
         self.choose = "None"
-        with self.canvas:
+        with self.canvas.after:
             Color(200 / 255, 200 / 255, 200 / 255)
             self.main_room = Line(width=1.5)
             self.bind(size=self.rooms_refresh)
@@ -270,8 +270,12 @@ class SetupScreen(Screen):
             if room.floor == self.current_floor:
                 p = len(rooms_list)
                 if p != id:
+                    x_move = 0
+                    if id in rooms_to_move:
+                        x_move = .254 
+
                     ckx1, cky1, ckx2, cky2 = rooms_points[id]
-                    x1, x2 = ckx1 * self.width, ckx2 * self.width
+                    x1, x2 = (ckx1+ x_move) * self.width, (ckx2 + x_move) * self.width
                     y1, y2 = cky1 * self.height, cky2 * self.height
 
                     room.points = x1, y2, x1, y1, x2, y1, x2, y2, x1, y2
@@ -302,8 +306,13 @@ class SetupScreen(Screen):
             if door.floor == self.current_floor:
                 p = len(door_list)
                 if p != id:
+                    x_move = 0
+                    if id in doors_to_move:
+                        x_move = .254 
+                                                
+
                     ckx1, cky1, ckx2, cky2 = doors_points[id]
-                    x1, x2 = ckx1 * self.width, ckx2 * self.width
+                    x1, x2 = (ckx1 + x_move) * self.width , (ckx2 + x_move) * self.width 
                     y1, y2 = cky1 * self.height, cky2 * self.height
                     door.points = x1, y1, x2, y2
 
@@ -313,8 +322,11 @@ class SetupScreen(Screen):
             if camera.floor == self.current_floor:
                 circle1, circle2 = circle1_list[id], circle2_list[id]
                 if p != id:
+                    x_move = 0
+                    if id in cameras_to_move:
+                        x_move = .254 
                     ckx1, cky1 = camera_points[id]
-                    x1 = ckx1 * self.width
+                    x1 = (ckx1+ x_move) * self.width
                     y1 = cky1 * self.height
                     camera.pos = x1, y1
                     circle1.pos = camera.pos[0] + 5, camera.pos[1] + 5
@@ -522,7 +534,7 @@ class SetupScreen(Screen):
         new_name = popup.ids["getNameText"].text
         if new_created == "camera":
 
-            with self.canvas:
+            with self.canvas.after:
                 Color(1, 1, 1, 1, mode='rgba')
                 camera = Camera(size=(20, 20), deleteId=self.new_cam_id, name=new_name, floor=self.current_floor)
                 cameras_dict[self.new_cam_id] = new_name
@@ -546,7 +558,7 @@ class SetupScreen(Screen):
             self.cameras_refresh()
         elif new_created == "room":
 
-            with self.canvas.before:
+            with self.canvas.after:
                 Color(200 / 255, 200 / 255, 200 / 255)
                 line = Room(width=1.5, deleteId=self.new_room_id, name=new_name, floor=self.current_floor)
             rooms_list.append(line)
@@ -665,7 +677,7 @@ class SetupScreen(Screen):
                         db.commit()
                         closeDatabaseConnection(db, cursor)
 
-                        with self.canvas.before:
+                        with self.canvas.after:
                             Color(40 / 255, 42 / 255, 53 / 255)
                             door = Door(width=8, cap="square", deleteId=self.new_door_id, floor=self.current_floor)
                         door_list.append(door)
