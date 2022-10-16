@@ -121,7 +121,7 @@ class MenuButton(Button):
                                  transition='in_out_quad')
                 anim.start(children)
         self.active = True
-        if (self.sID == 1) or (self.sID == 2):
+        if self.sID == 1:
             if not global_vars.AI_run:
                 global first
                 if first:
