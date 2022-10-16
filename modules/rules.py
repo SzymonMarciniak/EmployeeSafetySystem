@@ -66,11 +66,8 @@ class RulesContainer(StackLayout):
                 self.add_widget(rule_creator)
                 cameraID = row[3]
                 if cameraID not in existing_rules:
-                    print("not in")
                     existing_rules[cameraID] = list()
                 existing_rules[cameraID].append(int(rules_str[i]))
-                print("DICT AFTER")
-                print(existing_rules)
         self.add_widget(AddNewRule())
         closeDatabaseConnection(db, cursor)
 
@@ -138,8 +135,6 @@ class SaveButton(Button):
             if value == self.actionsListButton.text:
                 actionID = aID
         global existing_rules
-        print("DICT BEFORE ANY ACTIONS")
-        print(existing_rules)
         camera_detection_list = existing_rules.get(cameraID)
         if camera_detection_list is not None:
             for value in camera_detection_list:
@@ -158,12 +153,8 @@ class SaveButton(Button):
                     return
 
         if cameraID not in existing_rules:
-            print("not in")
             existing_rules[cameraID] = list()
-            print(existing_rules)
         existing_rules[cameraID].append(detectionID)
-        print("DICT AFTER")
-        print(existing_rules)
         cursor.execute("UPDATE cameras SET rules=concat(rules, '%s'), actions=concat(actions, '%s') WHERE "
                        "generated_id=%s AND workspace_id=%s",
                        (detectionID, actionID, cameraID, global_vars.choosenWorkplace))

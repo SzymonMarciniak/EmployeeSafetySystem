@@ -16,7 +16,6 @@ from modules.global_vars import cameras_dict
 choices = {
     1: 'cameras_screen',
     2: 'alerts_screen',
-    3: 'dev',
     4: 'rules_screen',
     5: 'SetupScreen',
     6: 'settings_screen',
@@ -62,7 +61,6 @@ class MainWorkplaceScreen(Screen):
         for row in results:
             global_vars.cameras_dict[row[0]] = row[1]
 
-        print(global_vars.cameras_dict)
         closeDatabaseConnection(db, cursor)
 
         userName = ""

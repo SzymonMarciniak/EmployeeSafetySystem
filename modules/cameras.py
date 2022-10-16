@@ -22,16 +22,18 @@ from alarms.alarms import Alarms
 from modules import global_vars
 
 alarms = Alarms()
+already_loaded_cameras = False
 
 
 class CamerasScreen(Screen):
-    alreadyLoaded = False
-    
     def __init__(self, **kwargs):
         super(CamerasScreen, self).__init__(**kwargs)
 
     def on_pre_enter(self):
-        global_vars.cameras_layout.load_cameras()
+        global already_loaded_cameras
+        if not already_loaded_cameras:
+            already_loaded_cameras = True
+            global_vars.cameras_layout.load_cameras()
 
 
 class CameraView(Image):
@@ -48,12 +50,12 @@ class CamerasLayout(StackLayout):
         global_vars.cameras_layout = self
 
     def load_cameras(self):
+
         db, cursor = connectToDatabase()
         cursor.execute("SELECT generated_id FROM cameras WHERE workspace_id=%s", (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
         for row in results:
             rlayout = RLayout(cameraID=row[0])
-            print("CAM_ID" + str(row[0]))
             rlayout.cameraID = row[0]
             rlayout.source = 'img/test.png'
             self.add_widget(rlayout)
