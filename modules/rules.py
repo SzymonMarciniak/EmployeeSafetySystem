@@ -37,6 +37,10 @@ class RulesContainer(StackLayout):
         rules_container = self
 
     def load_rules(self):
+        """
+        Load all rules of cameras when entering rules screen. Clears all unnecessary widgets and add them once again
+        to ensure their correctness.
+        """
         self.clear_widgets()
 
         title_label.active_rules = 0
@@ -46,7 +50,6 @@ class RulesContainer(StackLayout):
                        (global_vars.choosenWorkplace,))
         results = cursor.fetchall()
         for row in results:
-
             name = row[0]
             rules_str = row[1]
             actions_str = row[2]
@@ -96,6 +99,9 @@ class SaveButton(Button):
         super(SaveButton, self).__init__(**kwargs)
 
     def on_press(self):
+        """
+        Called when save icon is pressed. Checks for all values and if one or more of them are blank - show popup
+        """
         if self.actionsListButton.text == '' or self.detectionListButton.text == '' or self.camerasListButton.text == '':
             popup_content = BoxLayout(orientation='vertical')
             popup_content.add_widget(Label(text='You have omitted one or more values in a rule you are trying to save'))
@@ -134,6 +140,10 @@ class DeleteRule(Button):
         super(DeleteRule, self).__init__(**kwargs)
 
     def on_press(self):
+        """
+        Called when trash icon is pressed. Checks if rule is already saved, if yes - delete rule from database, if not -
+        - remove it only from the app screen, because it is not saved yet.
+        """
         cameraID = None
         detectionID = None
         actionID = None
@@ -180,6 +190,15 @@ class NewRuleCreator(FloatLayout):
         super(NewRuleCreator, self).__init__(**kwargs)
 
     def on_kv_post(self, base_widget):
+        """
+        Called right after kivy file is loaded. If the rule is genereted via database loading system it sets camera,
+        rule and action name and disables user ability to change them, because they are preloaded.
+
+        Params
+        ---------------
+        base_widget
+            unused
+        """
         delete_rule = self.ids.delete_rule
         delete_rule.bind(on_press=self.delete_pressed)
         if self.isGenerated:
@@ -219,6 +238,10 @@ class AddNewRule_Button(Button):
         super(AddNewRule_Button, self).__init__(**kwargs)
 
     def on_press(self):
+        """
+        Called when user pressed 'Add new rule' button. Function generates new creator object with editable values vie
+        drop-down menus (or spinners), then updates rules count as well as moves the button to the bottom of container.
+        """
         rl = NewRuleCreator()
         global rules_container, last_addnewrule, title_label
         rules_container.remove_widget(last_addnewrule)
