@@ -20,15 +20,17 @@ from PoseModule.yolov7.detect import detect as PoseDetect
 from PoseModule.yolov7.utils.datasets import LoadImages
 from modules import global_vars
 
-cameras_layout: StackLayout
-
 
 class CamerasScreen(Screen):
+    alreadyLoaded = False
+
     def __init__(self, **kwargs):
         super(CamerasScreen, self).__init__(**kwargs)
 
     def on_pre_enter(self):
-        cameras_layout.load_cameras()
+        if not self.alreadyLoaded:
+            self.alreadyLoaded = True
+            global_vars.cameras_layout.load_cameras()
 
 
 class CameraView(Image):
@@ -42,8 +44,7 @@ class CameraView(Image):
 class CamerasLayout(StackLayout):
     def __init__(self, **kwargs):
         super(CamerasLayout, self).__init__(**kwargs)
-        global cameras_layout
-        cameras_layout = self
+        global_vars.cameras_layout = self
 
     def load_cameras(self):
         db, cursor = connectToDatabase()
@@ -138,6 +139,7 @@ class RLayout(RelativeLayout):
                 closeDatabaseConnection(db, cursor)
 
                 if notification_enabled:
+                    cam_id = None
                     for nr0, img in enumerate(img_list):
                         if abs(cam_view[nr0].last_alarm - time.time()) > 300:
                             cam_view[nr0].last_alarm = time.time()
@@ -152,6 +154,15 @@ class RLayout(RelativeLayout):
                                     RLayout.do_alert(
                                         action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                             if "2" in rules_list[nr0][0]:
                                 object_name = "helmet"
@@ -163,6 +174,15 @@ class RLayout(RelativeLayout):
                                     RLayout.do_alert(
                                         action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                             # if helmets detecting do not detect caps
                             elif "3" in rules_list[nr0][0]:
@@ -174,11 +194,29 @@ class RLayout(RelativeLayout):
                                 if is_danger:  # support detection by helmet model to better results
                                     is_danger = RLayout.do_predictions(
                                         object_lists, object_name, nr0, helmet_model)
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                                 if is_danger:
                                     RLayout.do_alert(
                                         action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                             if "4" in rules_list[nr0][0]:
                                 object_name = "vest"
@@ -193,6 +231,15 @@ class RLayout(RelativeLayout):
                                     RLayout.do_alert(
                                         action_list, object_name, nr0)
                                     alert_color = [1, 1, 0, 1]
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                             if "7" in rules_list[nr0][0]:
                                 fall = False
@@ -223,15 +270,22 @@ class RLayout(RelativeLayout):
                                         action = 3
                                     db, cursor = connectToDatabase()
                                     cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                                   (global_vars.choosenWorkplace, cam_id, "Fall", global_vars.actions_dict[int(action)]))
+                                                   (global_vars.choosenWorkplace, cam_id, "Fall",
+                                                    global_vars.actions_dict[int(action)]))
                                     db.commit()
                                     closeDatabaseConnection(db, cursor)
                                     print(
                                         f"On camera of id: {cam_id} detect FALL!!!")
                                     alert_color = [1, 0, 0, 1]
-
-                            if True == False:  # HERE set circle color to 'alert_color'
-                                alert_color = alert_color
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = alert_color
+                                else:
+                                    cam_id = cam_view[0].cameraID
+                                    for cam_layout in global_vars.cameras_layout.children:
+                                        if cam_layout.cameraID == cam_id:
+                                            cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
 
                 for nr, camera_image in enumerate(cam_view):
                     if cam_nr < len(datasets):
@@ -335,5 +389,5 @@ class InfoButton(Button):
         generatedID = self.parent.parent.parent.parent.parent.cameraID
         content = PopupContent(generatedID=generatedID)
         popup = Popup(title='Info about camera', content=content,
-                      auto_dismiss=True, size_hint=[.7, .7])
+                      auto_dismiss=True, size_hint=[None, None], size=[500, 300])
         popup.open()
