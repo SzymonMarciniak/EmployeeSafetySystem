@@ -303,8 +303,8 @@ class RLayout(RelativeLayout):
                                 camera_image.source = failed_load_camera_img
                         else:
                             try:
-                                if img0_list[nr]:
-                                    img = img0_list[nr]
+                                if img_list[nr].any():
+                                    img = img_list[nr]
                                     img = np.array(img)
                                     img = np.rot90(img, 2)
                                     buffer = img.tobytes()

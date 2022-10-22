@@ -107,10 +107,13 @@ class detect:
                     diff_z_list = []
 
                     for i, det in enumerate(pred):
-                        if self.webcam:
+                        if isinstance(dataset, LoadStreams):
                             im0 = im0s[i].copy()
-                        else:
+                            im1 = im0s[i].copy()
+                        elif isinstance(dataset, LoadImages):
                             im0 = im0s.copy()
+                            im1 = im0s.copy()
+
                         if len(det):
                             scale_coords(
                                 img.shape[2:], det[:, :4], im0.shape, kpt_label=False)
@@ -118,85 +121,87 @@ class detect:
                                 img.shape[2:], det[:, 6:], im0.shape, kpt_label=self.kpt_label, step=3)
 
                             for det_index, (*xyxy, conf, cls) in enumerate(reversed(det[:, :6])):
-                                if self.view_img:
-                                    c = int(cls)
-                                    label = None if False else (
-                                        self.names[c] if False else f'{self.names[c]} {conf:.2f}')
-                                    kpts = det[det_index, 6:]
-                                    step = 3
-                                    nr = 0  # 0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder, 11-left hip, 12-rught hip
+                            
+                                c = int(cls)
+                                label = None if False else (
+                                    self.names[c] if False else f'{self.names[c]} {conf:.2f}')
+                                kpts = det[det_index, 6:]
+                                step = 3
+                                nr = 0  # 0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder, 11-left hip, 12-rught hip
 
-                                    # mouth point - for mask
-                                    x_center, y_nose = kpts[step *
-                                                            nr], kpts[step * nr + 1]
-                                    y_shouder_l, y_shouder_r = kpts[step *
-                                                                    5 + 1], kpts[step * 6 + 1]
-                                    y_shouders = (
-                                        (y_shouder_l + y_shouder_r) / 2)
-                                    y_center = abs(
-                                        (y_shouders - y_nose) / 2.0) + y_nose
-                                    #cv2.circle(im0, (int(x_center), int(y_center)), 6, (0,0,255), -1)
+                                # mouth point - for mask
+                                x_center, y_nose = kpts[step *
+                                                        nr], kpts[step * nr + 1]
+                                y_shouder_l, y_shouder_r = kpts[step *
+                                                                5 + 1], kpts[step * 6 + 1]
+                                y_shouders = (
+                                    (y_shouder_l + y_shouder_r) / 2)
+                                y_center = abs(
+                                    (y_shouders - y_nose) / 2.0) + y_nose
+                                #cv2.circle(im0, (int(x_center), int(y_center)), 6, (0,0,255), -1)
 
-                                    # mask zone
-                                    x_start_mask = int(kpts[step * 3])
-                                    x_end_mask = int(kpts[step * 4])
-                                    y_start_mask = int(y_nose)
-                                    y_end_height = int(y_center)
-                                    mask_zone_img = im0s[y_start_mask:y_end_height,
-                                                         x_end_mask:x_start_mask]
-                                    mask_list.append(mask_zone_img)
-                                    cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(
-                                        0, 255, 255), thickness=2)
+                                # mask zone
+                                x_start_mask = int(kpts[step * 3])
+                                x_end_mask = int(kpts[step * 4])
+                                y_start_mask = int(y_nose)
+                                y_end_height = int(y_center)
 
-                                    # helmet zone
-                                    x_start_helmet = int(kpts[step * 3])
-                                    x_end_helmet = int(kpts[step * 4])
-                                    dis = abs(((kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2) - (
-                                        (kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2))
-                                    # phi number - gold proportion
-                                    height_helmet = int(dis * 1.618)
-                                    y_start_helmet = int(
-                                        ((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet * 1.2)
-                                    y_end_helmet = int(
-                                        (kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2)
-                                    helmet_zone_img = im0s[y_start_helmet:y_end_helmet,
-                                                           x_end_helmet:x_start_helmet]
-                                    helmet_list.append(helmet_zone_img)
-                                    cv2.rectangle(im0, (x_start_helmet, y_start_helmet), (x_end_helmet, y_end_helmet), color=(
-                                        0, 255, 255), thickness=2)
+                                mask_zone_img = im1[y_start_mask:y_end_height,
+                                                        x_end_mask:x_start_mask]
 
-                                    # vest zone
-                                    x_shouder_l, y_shouder_l = int(
-                                        kpts[step * 5]), int(kpts[step * 5 + 1])
-                                    x_hip_r, y_hip_r = int(
-                                        kpts[step * 12]), int(kpts[step * 12 + 1])
-                                    helmet_zone_img = im0s[y_shouder_l:y_hip_r,
-                                                           x_hip_r:x_shouder_l]
-                                    vest_list.append(helmet_zone_img)
-                                    cv2.rectangle(im0, (x_shouder_l, y_shouder_l), (x_hip_r, y_hip_r), color=(
-                                        255, 0, 0), thickness=2)
+                                
 
-                                    # fall detector zone
-                                    head_x, head_y, head_z = int(
-                                        kpts[step * 1]), int(kpts[step * 1 + 1]), kpts[step * 1 + 2]
-                                    foot_x, foot_y, foot_z = int(
-                                        kpts[step * 11]), int(kpts[step * 11 + 1]), kpts[step * 11 + 2]
-                                    diff_x = abs(head_x-foot_x)
-                                    diff_y = head_y-foot_y
-                                    diff_z = abs(head_z-foot_z)
-                                    diff_x_list.append(diff_x)
-                                    diff_y_list.append(diff_y)
-                                    diff_z_list.append(diff_z)
-                                    # print(f"HEAD:  x: {head_x},    y:{head_y},     z:{head_z}")
-                                    # print(f"FOOT:  x: {foot_x},    y:{foot_y},     z:{foot_z}")
-                                    # print(f"diff_x: {diff_x},     diff_y: {diff_y},     diff_z: {diff_z}")
+                                mask_list.append(mask_zone_img)
+                                cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(
+                                    0, 255, 255), thickness=2)
 
-                                    # Entire body:
-                                    #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
+                                # helmet zone
+                                x_start_helmet = int(kpts[step * 3])
+                                x_end_helmet = int(kpts[step * 4])
+                                dis = abs(((kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2) - (
+                                    (kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2))
+                                # phi number - gold proportion
+                                height_helmet = int(dis * 1.618)
+                                y_start_helmet = int(
+                                    ((kpts[step * 5 + 1] + kpts[step * 6 + 1]) / 2) - height_helmet * 1.2)
+                                y_end_helmet = int(
+                                    (kpts[step * 1 + 1] + kpts[step * 2 + 1]) / 2)
+                                helmet_zone_img = im1[y_start_helmet:y_end_helmet,
+                                                        x_end_helmet:x_start_helmet]
+                                helmet_list.append(helmet_zone_img)
+                                cv2.rectangle(im0, (x_start_helmet, y_start_helmet), (x_end_helmet, y_end_helmet), color=(
+                                    0, 255, 255), thickness=2)
 
-                        # Stream results
-                        if self.view_img:
-                            return im0, mask_list, helmet_list, vest_list, im0s, diff_x_list, diff_y_list, diff_z_list
+                                # vest zone
+                                x_shouder_l, y_shouder_l = int(
+                                    kpts[step * 5]), int(kpts[step * 5 + 1])
+                                x_hip_r, y_hip_r = int(
+                                    kpts[step * 12]), int(kpts[step * 12 + 1])
+                                helmet_zone_img = im1[y_shouder_l:y_hip_r,
+                                                        x_hip_r:x_shouder_l]
+                                vest_list.append(helmet_zone_img)
+                                cv2.rectangle(im0, (x_shouder_l, y_shouder_l), (x_hip_r, y_hip_r), color=(
+                                    255, 0, 0), thickness=2)
+
+                                # fall detector zone
+                                head_x, head_y, head_z = int(
+                                    kpts[step * 1]), int(kpts[step * 1 + 1]), kpts[step * 1 + 2]
+                                foot_x, foot_y, foot_z = int(
+                                    kpts[step * 11]), int(kpts[step * 11 + 1]), kpts[step * 11 + 2]
+                                diff_x = abs(head_x-foot_x)
+                                diff_y = head_y-foot_y
+                                diff_z = abs(head_z-foot_z)
+                                diff_x_list.append(diff_x)
+                                diff_y_list.append(diff_y)
+                                diff_z_list.append(diff_z)
+                                # print(f"HEAD:  x: {head_x},    y:{head_y},     z:{head_z}")
+                                # print(f"FOOT:  x: {foot_x},    y:{foot_y},     z:{foot_z}")
+                                # print(f"diff_x: {diff_x},     diff_y: {diff_y},     diff_z: {diff_z}")
+
+                                # Entire body:
+                                #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
+
+                        return im0, mask_list, helmet_list, vest_list, im0s, diff_x_list, diff_y_list, diff_z_list
 
     @staticmethod
     def check_available_cameras():
