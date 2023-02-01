@@ -1,1 +1,0 @@
-hoverEventObjects = None

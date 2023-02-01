@@ -2,9 +2,10 @@ import re
 
 from kivy.animation import Animation
 from kivy.app import App
-from kivy.garden.iconfonts import icon
+from iconfonts.iconfonts import icon
 from kivy.uix.screenmanager import FadeTransition
 
+from modules import global_vars
 from modules.dbactions import closeDatabaseConnection, connectToDatabase
 
 
@@ -38,31 +39,43 @@ def checkDataCorrectness(login: str, password: str, errorBox, repeatPassword: st
         Every pattern has been met and account info could have been retrieved or inserted from/to database
     """
     EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
-
     if not EMAIL_REGEX.fullmatch(login):
         ErrorBox().showError(errorBox=errorBox, reason="E-mail structure is incorrect")
         return False
     elif len(password) < 8 or len(password) > 64:
-        ErrorBox().showError(errorBox, "Password should be 8-64 characters long")
+        ErrorBox().showError(errorBox=errorBox,
+                             reason="Password should be 8-64 characters long")
         return False
     elif repeatPassword is not None:
+        splitted = fullName.split(' ')
         if password != repeatPassword:
             ErrorBox().showError(errorBox=errorBox, reason="Passwords do not match")
             return False
         elif len(fullName) < 1:
             ErrorBox().showError(errorBox=errorBox, reason="You did not provide your full name")
             return False
-        elif len(fullName.split(' ')) <= 1:
-            ErrorBox().showError(errorBox=errorBox, reason="Separate first and last name with a gap")
+        elif len(splitted) <= 1:
+            ErrorBox().showError(errorBox=errorBox,
+                                 reason="Separate first and last name with a gap")
+            return False
+        for s in splitted:
+            if len(s) <= 3:
+                ErrorBox().showError(errorBox=errorBox, reason="Your full name format seems invalid")
+                return False
+
         else:
             if doesAccountExist(login, errorBox) is False:
                 db, cursor = connectToDatabase()
-                cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, NOW(), NOW())", ([login, password,
-                                                                                                    fullName]))
+                cursor.execute("INSERT INTO accounts VALUES (null, %s, %s, %s, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP())",
+                               ([login, password, fullName]))
                 db.commit()
+                app = App.get_running_app()
+                app.root.transition = FadeTransition()
+                app.root.current = 'login_screen'
                 return True
             else:
-                ErrorBox().showError(errorBox=errorBox, reason="Account already registered for this E-mail")
+                ErrorBox().showError(errorBox=errorBox,
+                                     reason="Account already registered for this E-mail")
                 return False
     else:
         checkCredintialsInDatabase(login, password, errorBox)
@@ -120,18 +133,50 @@ def checkCredintialsInDatabase(login, password, errorBox):
         Invalid credintials; error shown
     """
     db, cursor = connectToDatabase()
-    cursor.execute("SELECT * FROM accounts WHERE login=%s AND password=%s;", (login, password))
+    cursor.execute(
+        "SELECT id FROM accounts WHERE login=%s AND password=%s;", (login, password))
     results = cursor.fetchone()
     if results is not None:
         disableErrorMsg(errorBox)
+        global_vars.userID = results[0]
         App.get_running_app().root.transition = FadeTransition()
-        App.get_running_app().root.current = 'main_screen'
+        App.get_running_app().root.current = 'choose_workplace_screen'
     else:
         ErrorBox().showError(errorBox, "Could not log in. Ensure the credentials match")
         closeDatabaseConnection(db, cursor)
         return False
     closeDatabaseConnection(db, cursor)
     return True
+
+
+def checkForPassword(password, repeatPassword, errorBox):
+    """
+    Params
+    ------------------
+    password: str
+        Password provided in passsword's text input
+    repeatPassword: str
+        Repeated password inputed in text input
+    errorBox: ObjectProperty
+        Object of the errorBox; the container handling all error messages and showing them
+
+    Return value
+    ------------------
+    True: bool
+        Password matched all requirements such as length
+    False: bool
+        Requirements not met
+    """
+    if len(password) < 8 or len(password) > 64:
+        ErrorBox().showError(errorBox=errorBox,
+                             reason="Password should be 8-64 characters long")
+        return False
+    elif password != repeatPassword:
+        ErrorBox().showError(errorBox=errorBox, reason="Passwords do not match")
+        return False
+    else:
+        disableErrorMsg(errorBox)
+        return True
 
 
 def disableErrorMsg(errorBox):
@@ -157,7 +202,8 @@ class ErrorBox:
 
     def showError(self, errorBox, reason):
         errorBox.disabled = False
-        errorBox.text = ("[size=40]%s[/size]\n" + reason) % icon('zmdi-alert-circle')
+        errorBox.text = ("[size=40]%s[/size]\n" +
+                         reason) % icon('zmdi-alert-circle')
         anim1 = Animation(opacity=1, duration=0.7)
         anim1.start(errorBox)
         self.errorBox = errorBox

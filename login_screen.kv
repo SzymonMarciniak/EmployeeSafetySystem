@@ -8,12 +8,12 @@
     orientation: 'vertical'
     canvas.before:
         Color:
-            rgba: rgba('#ececec')
+            rgba: BG_COLOR
         Rectangle:
             size: self.size
             pos: self.pos
         Color:
-            rgba: rgba('#08c48c30')
+            rgba: DECORATION_COLOR
         Ellipse:
             pos: self.size[0] - 200, - 200
             size: 400, 400
@@ -21,30 +21,30 @@
             pos: -225, self.size[1] *.5 - 125
             size: 250, 250
         Color:
-            rgba: rgba('#0fafff')
+            rgba: MAIN_COLOR
         Triangle:
             points: [0, self.size[1], .9 * self.size[0], self.size[1], 0, .75 * self.size[1]]
         Color:
-            rgba: rgba('#0f87ff')
+            rgba: SECONDARY_COLOR
         Triangle:
             points: [self.size[0], self.size[1], 0, self.size[1], self.size[0], .73 * self.size[1]]
+    ChangeLanguage:
+        background_normal: "img/gb.png"
+        background_down: "img/gb.png"
+        size: 50, 38
+        size_hint: None, None
+        pos: root.width - (self.width + 10), root.height - (self.height + 10)
     BoxLayout:
         orientation: 'vertical'
         Widget:
             size_hint_y: .15
         RelativeLayout:
             size_hint_y: .1
-            ChangeLanguage:
-                background_normal: "img/gb.png"
-                background_down: "img/gb.png"
-                size: 50, 38
-                size_hint: None, None
-                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-
         Label:
-            text: "EmployeeSafetySystem | Log in"
-            color: rgba('#0fafff')
-            font_size: mtx.sp(24)
+            text: "Log in"
+            font_name: 'Lato'
+            color: MAIN_COLOR
+            font_size: self.height / 2
             size_hint_y: .1
         BoxLayout:
             background_color: 0,1,0,1
@@ -54,13 +54,13 @@
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-key')
-                color: rgba('#0fafff')
-                font_size: mtx.sp(96)
+                color: MAIN_COLOR
+                font_size: self.height / 1.5
             Label:
                 markup: True
                 text: "%s" % icon('zmdi-lock')
-                color: rgba('#0fafff')
-                font_size: mtx.sp(96)
+                color: MAIN_COLOR
+                font_size: self.height / 1.5
         LoginScreenLayout:
             size_hint_y: .6
             padding: [.1 * self.size[0], 0]
@@ -86,7 +86,7 @@
                         self.color = rgba('#08c48c')
                     on_release:
                         passwordBox.password = True
-                        self.color = rgba('#0fafff')
+                        self.color = MAIN_COLOR
                 Label:
                     id: capsLockLabel
                     color: rgba('#08c48c')
@@ -123,7 +123,7 @@
 <PasswordSwitch@Button>:
     background_normal: ''
     background_color: [0,0,0,0]
-    color: rgba("#0fafff")
+    color: MAIN_COLOR
     font_size: mtx.sp(24)
     markup: True
     text: "%s" % icon('zmdi-eye')
@@ -132,8 +132,10 @@
     color: rgba("#c92a1e")
     margin: 20
     lineWidth: 1.8
+    font_size: min(self.width / 22, 40)
     markup: True
     halign: 'center'
+    valign: 'top'
     opacity: 0
     disabled: True
     canvas.before:
