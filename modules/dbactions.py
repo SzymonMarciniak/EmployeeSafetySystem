@@ -37,7 +37,7 @@ def connectToDatabase(firstConnect=False):
     """
     try:
         db = mysql.connector.connect(
-            host='localhost', user='root', password='', database="employee_safety_system")
+            host='localhost', user='root', password='password123', database="employee_safety_system")
     except mysql.connector.Error as error:
         if error.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             raise ConnectionError(
