@@ -146,15 +146,69 @@ class RLayout(RelativeLayout):
         #Clock.schedule_interval(RLayout.iterate_images, 5)
         while True:
             self.iterate_images()
-            print('working')
+            
+    def ai_singe_camera_prediction(self, object_name, object_lists, model, nr0, cam_view, alignment, equation, reverse):
+        print(time.time())
+        if alignment is None:
+            is_danger = RLayout.do_predictions(
+                object_lists, object_name, nr0, model
+            )
+        elif equation is None:
+            is_danger = RLayout.do_predictions(
+                object_lists, object_name, nr0, model, alignment=alignment
+            )
+        else:
+            is_danger = RLayout.do_predictions(
+                object_lists, object_name, nr0, model, equation, alignment=alignment, reverse=reverse)
 
-    def ai_singe_camera_prediction(self, object_name, object_lists, model, nr0, cam_view):
-        is_danger = RLayout.do_predictions(
-            object_lists, object_name, nr0, model)
         if is_danger:
             RLayout.do_alert(
                 self.action_list, object_name, nr0)
             alert_color = [1, 1, 0, 1]
+            cam_id = cam_view[0].cameraID
+            for cam_layout in global_vars.cameras_layout.children:
+                if cam_layout.cameraID == cam_id:
+                    cam_layout.ids.alert_indicator.alert_color = alert_color
+        else:
+            cam_id = cam_view[0].cameraID
+            for cam_layout in global_vars.cameras_layout.children:
+                if cam_layout.cameraID == cam_id:
+                    cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
+
+    def ai_single_camera_prediction_fall(self, diff_x_lists, diff_y_lists, diff_z_lists, diff_x, diff_y, diff_z, cam_view, nr0):
+        fall = False
+        diff_x_list = diff_x_lists[nr0]
+        diff_y_list = diff_y_lists[nr0]
+        diff_z_list = diff_z_lists[nr0]
+        for diff_x in diff_x_list:
+            if diff_x > 80:
+                fall = True
+        for diff_y in diff_y_list:
+            if diff_y > 0:
+                fall = True
+        for diff_z in diff_z_list:
+            if 0.2 < diff_z < 0.4:
+                fall = True
+        if fall:
+            cam_id = cam_view[nr0].cameraID
+            action = str(self.action_list[nr0][0])
+            if "2" in action:
+                action = 2
+            elif "1" in action:
+                action = 1
+            else:
+                action = 3
+            db, cursor = connectToDatabase()
+            cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
+                           (global_vars.choosenWorkplace, cam_id, "Fall",
+                            global_vars.actions_dict[int(action)]))
+            db.commit()
+            closeDatabaseConnection(db, cursor)
+            print(
+                f"On camera of id: {cam_id} detect FALL!!!")
+            # alarms.flash_alarm_on(2)
+            # alarms.start_buzzer()
+            alert_color = [1, 0, 0, 1]
             cam_id = cam_view[0].cameraID
             for cam_layout in global_vars.cameras_layout.children:
                 if cam_layout.cameraID == cam_id:
@@ -193,186 +247,63 @@ class RLayout(RelativeLayout):
                 if self.notification_enabled:
                     cam_id = None
                     for nr0, img in enumerate(img_list):
-                        self.ai_singe_camera_prediction()
                         if nr0 + 1 <= len(cam_view):
-                            if abs(cam_view[nr0].last_alarm - time.time()) > 300:
+                            if abs(cam_view[nr0].last_alarm - time.time()) > 10:
                                 cam_view[nr0].last_alarm = time.time()
                                 alert_color = [0, 1, 0, 1]
                                 if "1" in self.rules_list[nr0][0]:
-                                    object_name = "mask"
-                                    object_lists = mask_lists
-                                    model = mask_model
-                                    
-                                    is_danger = RLayout.do_predictions(
-                                        object_lists, object_name, nr0, model)
-                                    if is_danger:
-                                        RLayout.do_alert(
-                                            self.action_list, object_name, nr0)
-                                        alert_color = [1, 1, 0, 1]
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = alert_color
-                                    else:
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
-    
+                                    threading.Thread(target=self.ai_singe_camera_prediction, args=("mask", mask_lists, mask_model, nr0, cam_view)).start()
                                 if "2" in self.rules_list[nr0][0]:
-                                    object_name = "helmet"
-                                    object_lists = helmet_cap_lists
-                                    model = helmet_model
-                                    is_danger = RLayout.do_predictions(
-                                        object_lists, object_name, nr0, model)
-                                    if is_danger:
-                                        RLayout.do_alert(
-                                            self.action_list, object_name, nr0)
-                                        alert_color = [1, 1, 0, 1]
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = alert_color
-                                    else:
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
-
+                                    threading.Thread(target=self.ai_singe_camera_prediction, args=("helmet", helmet_cap_lists, helmet_model, nr0, cam_view)).start()
                                 # if helmets detecting do not detect caps
                                 elif "3" in self.rules_list[nr0][0]:
-                                    object_name = "cap"
-                                    object_lists = helmet_cap_lists
-                                    model = cap_model
-                                    is_danger = RLayout.do_predictions(
-                                        object_lists, object_name, nr0, model, alignment=0.2)
-                                    if is_danger:  # support detection by helmet model to better results
-                                        is_danger = RLayout.do_predictions(
-                                            object_lists, object_name, nr0, helmet_model)
-    
-                                    if is_danger:
-                                        RLayout.do_alert(
-                                            self.action_list, object_name, nr0)
-                                        alert_color = [1, 1, 0, 1]
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = alert_color
-                                    else:
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
-    
+                                    threading.Thread(target=self.ai_singe_camera_prediction, args=("cap", helmet_cap_lists, cap_model, nr0, cam_view, 0.2)).start()
                                 if "4" in self.rules_list[nr0][0]:
-                                    object_name = "vest"
-                                    object_lists = vest_lists
-                                    model = vest_model
-                                    equation = 10 ** 15
-                                    alignment = 0.5
-                                    is_danger = RLayout.do_predictions(
-                                        object_lists, object_name, nr0, model, equation, alignment, reverse=True)
-    
-                                    if is_danger:
-                                        RLayout.do_alert(
-                                            self.action_list, object_name, nr0)
-                                        alert_color = [1, 1, 0, 1]
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = alert_color
-                                    else:
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
-    
+                                    threading.Thread(target=self.ai_singe_camera_prediction, args=("vest", vest_lists, vest_model, nr0, cam_view, 0.5, 10 ** 15, True)).start()
                                 if "7" in self.rules_list[nr0][0]:
-                                    fall = False
-                                    diff_x_list = diff_x_lists[nr0]
-                                    diff_y_list = diff_y_lists[nr0]
-                                    diff_z_list = diff_z_lists[nr0]
-    
-                                    for diff_x in diff_x_list:
-                                        if diff_x > 80:
-                                            fall = True
-    
-                                    for diff_y in diff_y_list:
-                                        if diff_y > 0:
-                                            fall = True
-    
-                                    for diff_z in diff_z_list:
-                                        if 0.2 < diff_z < 0.4:
-                                            fall = True
-    
-                                    if fall:
-                                        cam_id = cam_view[nr0].cameraID
-                                        action = str(self.action_list[nr0][0])
-                                        if "2" in action:
-                                            action = 2
-                                        elif "1" in action:
-                                            action = 1
-                                        else:
-                                            action = 3
-                                        db, cursor = connectToDatabase()
-                                        cursor.execute("INSERT INTO logs VALUES (null, %s, %s, %s, %s, now(), 0)",
-                                                       (global_vars.choosenWorkplace, cam_id, "Fall",
-                                                        global_vars.actions_dict[int(action)]))
-                                        db.commit()
-                                        closeDatabaseConnection(db, cursor)
-                                        print(
-                                            f"On camera of id: {cam_id} detect FALL!!!")
-                                        # alarms.flash_alarm_on(2)
-                                        # alarms.start_buzzer()
-                                        alert_color = [1, 0, 0, 1]
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = alert_color
-                                    else:
-                                        cam_id = cam_view[0].cameraID
-                                        for cam_layout in global_vars.cameras_layout.children:
-                                            if cam_layout.cameraID == cam_id:
-                                                cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
-
+                                    threading.Thread(target=self.ai_single_camera_prediction_fall, args=(diff_x_lists, diff_y_lists, diff_z_lists, diff_x, diff_y, diff_z, cam_view, nr0))
+                                   
+                print("BEFORE")
                 for nr, camera_image in enumerate(cam_view):
-                    if cam_nr < len(datasets):
-                        cam_nr += 1
-                        if isinstance(datasets[nr], LoadImages):
-                            try:
-                                if img_list[nr].any():
-                                    img = img_list[nr]
-                                    
-                                    Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
-                                else:
-                                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                            except:
-                                Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                        else:
-                            try:
-                                if img_list[nr].any():
-                                    img = img_list[nr]
-                                    img = np.array(img)
-                                    img = np.rot90(img, 2)
-                                    buffer = img.tobytes()
-                                    texture = Texture.create(
-                                        size=(640, 480), colorfmt='bgr')
-                                    texture.blit_buffer(
-                                        buffer, colorfmt='bgr', bufferfmt='ubyte')
-                                    Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
-                                else:
-                                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                            except:
-                                Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                    else:
-                        Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                cam_nr = 0
+                    self.send_data_to_camera_view(camera_image, img_list, nr, datasets)
+                    cam_nr = 0
         else:
             for camera_image in cam_view:
                 Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
 
     
+    def send_data_to_camera_view(self, camera_image, img_list, nr, datasets):
+        global cam_nr
+        if cam_nr < len(datasets):
+            cam_nr += 1
+            if isinstance(datasets[nr], LoadImages):
+                try:
+                    if img_list[nr].any():
+                        print(camera_image)
+                        img = img_list[nr]
+                        Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
+                    else:
+                        Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+                except:
+                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+            else:
+                try:
+                    if img_list[nr].any():
+                        img = img_list[nr]
+                        img = np.array(img)
+                        img = np.rot90(img, 2)
+                        Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img,))
+                    else:
+                        Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+                except:
+                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+        else:
+            Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+
+
+
     def set_image_texture(self, camera_image, img):
+        print("AFTER: ", camera_image)
         buffer = cv2.flip(img, 0).tobytes()
         texture = Texture.create(
             size=(img.shape[1], img.shape[0]), colorfmt='bgr')
