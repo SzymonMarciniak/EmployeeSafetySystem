@@ -118,11 +118,7 @@ class RLayout(RelativeLayout):
             timer.setDaemon(True)
             timer.start()
             threading.Timer(2.0, self.print_test).start()
-            # threading.Thread(target=self.iterate_images).start()
             iteration_started = True
-
-    def print_test(self):
-        print('test')
 
     def load_data_from_database(self):
         db, cursor = connectToDatabase()
@@ -132,7 +128,6 @@ class RLayout(RelativeLayout):
         cursor.execute(
                     f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
         self.rules_list = cursor.fetchall()
-        print(self.rules_list)
         cursor.execute(
             f"SELECT actions FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
         self.action_list = cursor.fetchall()
@@ -148,7 +143,6 @@ class RLayout(RelativeLayout):
             self.iterate_images()
             
     def ai_singe_camera_prediction(self, object_name, object_lists, model, nr0, cam_view, alignment, equation, reverse):
-        print(time.time())
         if alignment is None:
             is_danger = RLayout.do_predictions(
                 object_lists, object_name, nr0, model
@@ -263,7 +257,6 @@ class RLayout(RelativeLayout):
                                 if "7" in self.rules_list[nr0][0]:
                                     threading.Thread(target=self.ai_single_camera_prediction_fall, args=(diff_x_lists, diff_y_lists, diff_z_lists, diff_x, diff_y, diff_z, cam_view, nr0))
                                    
-                print("BEFORE")
                 for nr, camera_image in enumerate(cam_view):
                     self.send_data_to_camera_view(camera_image, img_list, nr, datasets)
                     cam_nr = 0
@@ -279,7 +272,6 @@ class RLayout(RelativeLayout):
             if isinstance(datasets[nr], LoadImages):
                 try:
                     if img_list[nr].any():
-                        print(camera_image)
                         img = img_list[nr]
                         Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
                     else:
@@ -303,7 +295,6 @@ class RLayout(RelativeLayout):
 
 
     def set_image_texture(self, camera_image, img):
-        print("AFTER: ", camera_image)
         buffer = cv2.flip(img, 0).tobytes()
         texture = Texture.create(
             size=(img.shape[1], img.shape[0]), colorfmt='bgr')
