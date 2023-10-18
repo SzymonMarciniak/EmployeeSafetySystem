@@ -11,6 +11,7 @@ from kivy.uix.screenmanager import Screen, FadeTransition
 from modules import global_vars
 from modules.dbactions import connectToDatabase, closeDatabaseConnection
 from modules.global_vars import MAIN_COLOR, SECONDARY_COLOR
+from modules.cameras import RLayout, CamerasLayout
 
 
 class ChooseWorkplaceScreen(Screen):
@@ -214,6 +215,9 @@ class LogoutButton(Button):
 
 def LogoutClient():
     global_vars.userID = None
+    RLayout.clear_widgets()
+    CamerasLayout.clear_widgets()
+    RLayout.first_load = True
     app = App.get_running_app()
     app.root.transition = FadeTransition()
     app.root.current = "login_screen"

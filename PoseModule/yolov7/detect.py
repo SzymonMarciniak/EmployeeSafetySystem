@@ -208,7 +208,7 @@ class detect:
     @staticmethod
     def check_available_cameras():
         cam_list = []
-        for i in range(1, 10):
+        for i in range(0, 10):
             cap = cv2.VideoCapture(i)
             if cap is None or not cap.isOpened():
                 pass

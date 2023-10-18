@@ -319,7 +319,7 @@ class SetupScreen(Screen):
                     circle1.pos = camera.pos[0] + 5, camera.pos[1] + 5
                     circle2.pos = circle1.pos[0] + 2.5, circle1.pos[1] + 2.5
         
-        global_vars.already_loaded_cameras = False #Force reloading screen layout after adding/removing a camera
+        # global_vars.already_loaded_cameras = False #Force reloading screen layout after adding/removing a camera
 
 
     def create_door_function(self, *args):

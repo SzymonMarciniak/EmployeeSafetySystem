@@ -53,17 +53,20 @@ class CamerasLayout(StackLayout):
     def load_cameras(self):
         if RLayout.first_load:
             db, cursor = connectToDatabase()
+            print(f"WORK: {global_vars.choosenWorkplace}")
             cursor.execute("SELECT generated_id FROM cameras WHERE workspace_id=%s", (global_vars.choosenWorkplace,))
             results = cursor.fetchall()
             
-            # self.clear_widgets()
+            self.clear_widgets()
+            global_vars.cameras_layout.clear_widgets()
+            print("CLEARNING")
             
             for row in results:
                 rlayout = RLayout(cameraID=row[0])
                 rlayout.cameraID = row[0]
                 rlayout.source = 'img/test.png'
                 self.add_widget(rlayout)
-            RLayout.first_load = False
+            # RLayout.first_load = False
             closeDatabaseConnection(db, cursor)
 
 
