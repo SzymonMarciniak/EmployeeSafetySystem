@@ -353,7 +353,6 @@ class RLayout(RelativeLayout):
                        (global_vars.choosenWorkplace, cam_id, reason, global_vars.actions_dict[int(action)]))
         db.commit()
         closeDatabaseConnection(db, cursor)
-        print(f"On camera of id: {cam_id} detect no {object_name}!!!")
 
 
 class PopupContent(BoxLayout):
