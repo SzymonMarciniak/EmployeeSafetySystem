@@ -22,7 +22,7 @@ choices = {
     7: 'login_screen'
 }
 
-t1 = Thread(target=RLayout.set_interval)
+#t1 = Thread(target=RLayout.set_interval)
 
 
 class MainWorkplaceScreen(Screen):
@@ -126,7 +126,7 @@ class MenuButton(Button):
             if not global_vars.AI_run:
                 global first
                 if first:
-                    t1.run()
+                    # t1.run()
                     first = False
                 global_vars.AI_run = True
         else:
