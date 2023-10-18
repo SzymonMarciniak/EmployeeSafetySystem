@@ -1,12 +1,12 @@
 from kivy import Config
 from kivy.app import App
-from kivy.core.text import LabelBase
 from kivy.core.window import Window
 from iconfonts import iconfonts
 from kivy.lang import Builder
 from kivy.properties import OptionProperty, NumericProperty
+from kivy.core.text import LabelBase
 
-from kivy.uix.button import Button
+# from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.stacklayout import StackLayout
 

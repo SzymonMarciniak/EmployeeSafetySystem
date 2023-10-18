@@ -51,19 +51,20 @@ class CamerasLayout(StackLayout):
         global_vars.cameras_layout = self
 
     def load_cameras(self):
-
-        db, cursor = connectToDatabase()
-        cursor.execute("SELECT generated_id FROM cameras WHERE workspace_id=%s", (global_vars.choosenWorkplace,))
-        results = cursor.fetchall()
-        
-        self.clear_widgets()
-
-        for row in results:
-            rlayout = RLayout(cameraID=row[0])
-            rlayout.cameraID = row[0]
-            rlayout.source = 'img/test.png'
-            self.add_widget(rlayout)
-        closeDatabaseConnection(db, cursor)
+        if RLayout.first_load:
+            db, cursor = connectToDatabase()
+            cursor.execute("SELECT generated_id FROM cameras WHERE workspace_id=%s", (global_vars.choosenWorkplace,))
+            results = cursor.fetchall()
+            
+            # self.clear_widgets()
+            
+            for row in results:
+                rlayout = RLayout(cameraID=row[0])
+                rlayout.cameraID = row[0]
+                rlayout.source = 'img/test.png'
+                self.add_widget(rlayout)
+            RLayout.first_load = False
+            closeDatabaseConnection(db, cursor)
 
 
 cam_view = []
@@ -97,7 +98,7 @@ iteration_started = False
 class RLayout(RelativeLayout):
     camera_view_parent = ObjectProperty()
     cameraID = NumericProperty()
-
+    first_load = True
 
     def __init__(self, **kwargs):
         super(RLayout, self).__init__(**kwargs)
@@ -117,7 +118,6 @@ class RLayout(RelativeLayout):
             timer = threading.Timer(0, self.set_interval)
             timer.setDaemon(True)
             timer.start()
-            threading.Timer(2.0, self.print_test).start()
             iteration_started = True
 
     def load_data_from_database(self):
@@ -267,28 +267,32 @@ class RLayout(RelativeLayout):
     
     def send_data_to_camera_view(self, camera_image, img_list, nr, datasets):
         global cam_nr
+        if nr > len(datasets):
+            nr -= len(datasets) + 1
         if cam_nr < len(datasets):
             cam_nr += 1
-            if isinstance(datasets[nr], LoadImages):
-                try:
-                    if img_list[nr].any():
-                        img = img_list[nr]
-                        Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
-                    else:
+            try:
+                if isinstance(datasets[nr], LoadImages):
+                    try:
+                        if img_list[nr].any():
+                            img = img_list[nr]
+                            Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img))
+                        else:
+                            Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+                    except:
                         Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                except:
-                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-            else:
-                try:
-                    if img_list[nr].any():
-                        img = img_list[nr]
-                        img = np.array(img)
-                        img = np.rot90(img, 2)
-                        Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img,))
-                    else:
+                else:
+                    try:
+                        if img_list[nr].any():
+                            img = img_list[nr]
+                            img = np.array(img)
+                            # img = np.rot90(img, 2)
+                            Clock.schedule_once(lambda dt: self.set_image_texture(camera_image, img,))
+                        else:
+                            Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+                    except:
                         Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
-                except:
-                    Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
+            except: print(nr)
         else:
             Clock.schedule_once(lambda dt: self.set_image_source(camera_image, failed_load_camera_img))
 
