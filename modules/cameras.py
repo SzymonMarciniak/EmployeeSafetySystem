@@ -162,12 +162,12 @@ class RLayout(RelativeLayout):
             RLayout.do_alert(
                 self.action_list, object_name, nr0)
             alert_color = [1, 1, 0, 1]
-            cam_id = cam_view[0].cameraID
+            cam_id = cam_view[nr0].cameraID
             for cam_layout in global_vars.cameras_layout.children:
                 if cam_layout.cameraID == cam_id:
                     cam_layout.ids.alert_indicator.alert_color = alert_color
         else:
-            cam_id = cam_view[0].cameraID
+            cam_id = cam_view[nr0].cameraID
             for cam_layout in global_vars.cameras_layout.children:
                 if cam_layout.cameraID == cam_id:
                     cam_layout.ids.alert_indicator.alert_color = [0, 1, 0, 1]
