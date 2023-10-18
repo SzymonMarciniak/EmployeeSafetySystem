@@ -17,4 +17,6 @@ detection_dict = {1: 'No mask', 2: 'No helmet',
                   3: 'No cap', 4: 'No vest', 7: 'Person falls'}
 actions_dict = {1: 'Flash lights', 2: 'Start alarm', 3: 'Notificate'}
 
+already_loaded_cameras = False
+
 AI_run = False

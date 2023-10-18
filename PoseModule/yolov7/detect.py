@@ -106,6 +106,9 @@ class detect:
                     diff_y_list = []
                     diff_z_list = []
 
+                    x_list = []
+                    y_list = []
+
                     for i, det in enumerate(pred):
                         if isinstance(dataset, LoadStreams):
                             im0 = im0s[i].copy()
@@ -127,7 +130,7 @@ class detect:
                                     self.names[c] if False else f'{self.names[c]} {conf:.2f}')
                                 kpts = det[det_index, 6:]
                                 step = 3
-                                nr = 0  # 0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder, 11-left hip, 12-rught hip
+                                nr = 0  # 0-nose, 1-left eye, 2-right eye, 3-left ear, 4-right ear, 5-left shouder, 6-right shouder, 11-left hip, 12-right hip
 
                                 # mouth point - for mask
                                 x_center, y_nose = kpts[step *
@@ -150,7 +153,6 @@ class detect:
                                                         x_end_mask:x_start_mask]
 
                                 
-
                                 mask_list.append(mask_zone_img)
                                 cv2.rectangle(im0, (x_start_mask, y_start_mask), (x_end_mask, y_end_height), color=(
                                     0, 255, 255), thickness=2)
@@ -199,17 +201,18 @@ class detect:
                                 # print(f"diff_x: {diff_x},     diff_y: {diff_y},     diff_z: {diff_z}")
 
                                 # Entire body:
-                                #plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
+                                plot_one_box(xyxy, im0, label=label, color=colors(c, True), line_thickness=self.line_thickness, kpt_label=self.kpt_label, kpts=kpts, steps=3, orig_shape=im0.shape[:2])
 
                         return im0, mask_list, helmet_list, vest_list, im0s, diff_x_list, diff_y_list, diff_z_list
 
     @staticmethod
     def check_available_cameras():
         cam_list = []
-        for i in range(0, 10):
+        for i in range(1, 10):
             cap = cv2.VideoCapture(i)
             if cap is None or not cap.isOpened():
                 pass
             else:
                 cam_list.append(i)
+        # cam_list.append("rtsp://admin:dzbanek22448008@192.168.1.102:554/0")
         return cam_list

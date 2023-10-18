@@ -318,6 +318,9 @@ class SetupScreen(Screen):
                     camera.pos = x1, y1
                     circle1.pos = camera.pos[0] + 5, camera.pos[1] + 5
                     circle2.pos = circle1.pos[0] + 2.5, circle1.pos[1] + 2.5
+        
+        global_vars.already_loaded_cameras = False #Force reloading screen layout after adding/removing a camera
+
 
     def create_door_function(self, *args):
         self.kx1, self.ky1 = self.points
@@ -477,6 +480,9 @@ class SetupScreen(Screen):
                     db.commit()
                     closeDatabaseConnection(db, cursor)
                     self.show_ids(clear=True)
+
+                    global_vars.cameras_dict.pop(int(my_id))
+
                     self.cameras_refresh()
 
             for nr, door in enumerate(door_list):
@@ -523,6 +529,10 @@ class SetupScreen(Screen):
             db.commit()
             closeDatabaseConnection(db, cursor)
             cameras_names.append(new_name)
+
+            global_vars.cameras_dict[new_id] = new_name
+            
+
             self.cameras_refresh()
 
         elif new_created == "room":

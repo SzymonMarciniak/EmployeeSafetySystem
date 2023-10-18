@@ -137,11 +137,20 @@
                         Rectangle:
                             pos: 0,0
                             size: 10000, 10000
-                    Label:
-                        markup: True
-                        text: "Choose category to magically show all necessary info"
-                        color: BG_COLOR
-                        font_size: sp(32)
+                    AnchorLayout:
+                        Label:
+                            markup: True
+                            text: "Choose category to magically show all necessary info"
+                            color: BG_COLOR
+                            halign: 'center'
+                            font_size:
+                                (
+                                self.width / 10.5 if app.size in 'S' else
+                                64
+                                )
+                            size_hint: 1, None
+                            text_size: self.width, None
+                            height: self.texture_size[1]
                 Screen:
                     name: 'dev'
                     Button:

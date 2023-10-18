@@ -58,7 +58,8 @@ def sendRecoveryEmail(userMail):
     userMail: string
         E-mail provided by user to receive password recovery message
     """
-    systemMail = "employeesafetysystem@ess.com"
+    systemMail = "szymonmarciniak22@gmail.com" #temporary - to db
+    passwordMail = "tbgdqbzbawmfkkpo" #Ops, you found the password to our mail... good luck with your login attempt ;) - to db
 
     db, cursor = connectToDatabase()
     cursor.execute("SELECT id, name FROM accounts WHERE login=%s", (userMail,))
@@ -106,7 +107,9 @@ def sendRecoveryEmail(userMail):
     part2 = MIMEText(html, 'html')
     msg.attach(part1)
     msg.attach(part2)
-    smtp = smtplib.SMTP('localhost')
+    smtp = smtplib.SMTP("smtp.gmail.com", 587)
+    smtp.starttls() 
+    smtp.login(user=systemMail, password=passwordMail)
     smtp.sendmail(systemMail, userMail, msg.as_string())
     global_vars.userID = userID
 
