@@ -36,7 +36,8 @@ class MainWorkplaceScreen(Screen):
         self.hello_text = f"Hello {userName}"
 
     def on_enter(self, *args):
-        Window.fullscreen = 'auto'
+        # Window.fullscreen = 'auto'
+        pass
 
     def on_pre_enter(self):
         """

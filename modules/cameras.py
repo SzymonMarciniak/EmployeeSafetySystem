@@ -127,8 +127,8 @@ class RLayout(RelativeLayout):
                         diff_x_lists.append(diff_x)
                         diff_y_lists.append(diff_y)
                         diff_z_lists.append(diff_z)
-                    except:
-                        print("Failed to load camera or video is over")
+                    except Exception as err:
+                        print("Failed to load camera or video is over", err)
 
                 cursor.execute(
                     f"SELECT rules FROM cameras WHERE workspace_id = {global_vars.choosenWorkplace}")
@@ -391,3 +391,5 @@ class InfoButton(Button):
         popup = Popup(title='Info about camera', content=content,
                       auto_dismiss=True, size_hint=[None, None], size=[500, 300])
         popup.open()
+
+
