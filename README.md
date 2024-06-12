@@ -1,3 +1,6 @@
+# Documentation:
+https://github.com/SzymonMarciniak/EmployeeSafetySystem/blob/main/Documentation.pdf
+
 # RUN 
 
 # 1. Create virtual environment 
